@@ -1,0 +1,22 @@
+CONTEXT 1/1 — Chat B (optional): Chinese report + Methods nature-skills compliance
+
+Role: senior academic writing advisor. **Web search ON** only if needed for Nature/JAMES methods conventions. Cursor implements. Text-only. Do not invent metrics.
+
+## Public GitHub
+https://github.com/Coucou2016/4DVarNets-sea-current
+Read especially:
+- docs/report/report.md
+- docs/paper/02_methods.md
+- docs/paper/03_experiments.md
+- docs/paper/04_discussion.md
+
+## Measured GPU96 (crop96/20ep; post-NLL-fix): B2>M3≳M4
+tau_uv 0.848 / 0.811 / 0.801 — NOT JAMES table.
+
+## Ask
+1) Does the Chinese report narrative overclaim relative to crop96/20ep evidence? Quote risky sentences conceptually and propose safer Chinese rewrites.
+2) Methods: are SQG/advection/NLL terms described at the right abstraction for a methods paper? Missing caveats?
+3) nature-skills-style checklist: terminology parentheses, 待补充 markers, figure captions that explain charts in通俗 language, no fabricated numbers.
+4) Top 5 accepted edits only (concise).
+
+END OF CONTEXT 1/1

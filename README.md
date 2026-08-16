@@ -1,8 +1,12 @@
 # 4DVarNets — Sea Surface Current Inversion from SST–SSH Synergies
 
+**Public repo:** [github.com/Coucou2016/4DVarNets-sea-current](https://github.com/Coucou2016/4DVarNets-sea-current)
+
 Implementation of **Fablet et al. (2024)**, *Inversion of Sea Surface Currents From Satellite-Derived SST-SSH Synergies With 4DVarNets*, JAMES ([doi:10.1029/2023MS003609](https://doi.org/10.1029/2023MS003609)), plus a physics-augmented variational cost for follow-on experiments.
 
 Reference code: [CIA-Oceanix/4dvarnet-james-uv-ssc](https://github.com/CIA-Oceanix/4dvarnet-james-uv-ssc).
+
+**Honest GPU96 note (crop96 / 20ep, ≠ JAMES table):** measured ranking **B2 > M3 ≳ M4** (τ_uv 0.848 / 0.811 / 0.801). See `results/metrics_*_GPU96.json` and `docs/report/`.
 
 ## Innovation vs Fablet 2024
 

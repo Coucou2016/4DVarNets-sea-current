@@ -441,8 +441,8 @@ def build_documents(metrics: dict, b64: dict) -> tuple[str, str]:
 
 <header class="cover">
   <h1>基于 SST–SSH 协同与物理残差的 4DVarNet 海表流场反演：裁剪 NATL60 OSSE 消融研究报告</h1>
-  <p class="meta">项目：4DVarNets-sea-current　｜　报告日期：{today}　｜　实现与验收：Cursor Agent　｜　顾问通道：ChatGPT（本轮浏览器 MCP 不可用，文献由 WebSearch 独立核验）</p>
-  <p class="meta">基线文献：Fablet et al. (2024), JAMES, doi:10.1029/2023MS003609</p>
+  <p class="meta">项目：4DVarNets-sea-current　｜　报告日期：{today}　｜　实现与验收：Cursor Agent　｜　公开代码：<a href="https://github.com/Coucou2016/4DVarNets-sea-current">github.com/Coucou2016/4DVarNets-sea-current</a></p>
+  <p class="meta">基线文献：Fablet et al. (2024), JAMES, doi:10.1029/2023MS003609　｜　顾问通道：ChatGPT（浏览器自动化失败 2×；粘贴简报已备，文献由 WebSearch 独立核验）</p>
   <span class="badge">证据级别：合成短训（方向性）+ NATL60 GPU96 crop96/20ep（初步）· 非正式论文 Table</span>
 </header>
 
@@ -521,7 +521,8 @@ def build_documents(metrics: dict, b64: dict) -> tuple[str, str]:
     <li>NATL60 crop96/20ep：训练并评估 B2、M3、M4；</li>
     <li>诊断 M4 raw NLL 尺度问题 → 代码/配置修复 → M4 全量 20ep 重训；</li>
     <li>SciencePlots 出图；撰写英文论文草稿章节与本中文自包含报告；</li>
-    <li>ChatGPT 顾问通道：本轮无可用浏览器 MCP / <code>gh</code> 未安装，未能粘贴对话或推送 GitHub；文献 DOI 由 Cursor WebSearch 独立核验；粘贴简报已更新于 <code>docs/chatgpt_collaboration/</code>。</li>
+    <li>公开仓库：<a href="https://github.com/Coucou2016/4DVarNets-sea-current">https://github.com/Coucou2016/4DVarNets-sea-current</a>（已推送 code+docs+metrics+figures；排除 NATL60 <code>*.nc</code>、checkpoints <code>*.pt</code>、wheels/secrets）。</li>
+    <li>ChatGPT 顾问通道：Cursor 浏览器可建 tab，但导航至 chatgpt.com 连续失败；粘贴简报（含 GitHub URL）见 <code>docs/chatgpt_collaboration/PASTE_ChatA_GH_LIT_2026-08-16.txt</code> 与 <code>PASTE_ChatB_REPORT_REVIEW_2026-08-16.txt</code>。文献 DOI 由 Cursor WebSearch 独立核验。</li>
   </ol>
 </section>
 
@@ -562,7 +563,7 @@ def build_documents(metrics: dict, b64: dict) -> tuple[str, str]:
     <li>硬件限制导致裁剪训练，可能与物理残差假设的空间上下文冲突；</li>
     <li>缺少多种子置信区间与完整 λ 扫描（待补充）；</li>
     <li>全场 NATL60 长训、OSE/漂流浮标评估未完成（待补充）；</li>
-    <li>ChatGPT 浏览器协作与 GitHub 推送本轮受阻（无 <code>gh</code> / 无浏览器 MCP），不影响本地报告与图表交付。</li>
+    <li>ChatGPT 浏览器自动粘贴本轮失败（导航失败）；公开 GitHub 已就绪，可由人工粘贴顾问简报继续迭代。</li>
   </ul>
   <p class="footer">本文件由 <code>scripts/build_report.py</code> 生成：CSS 内联、图片 Base64 嵌入、表格为 HTML。请以 results/metrics_*.json 为数值真源。</p>
 </section>
@@ -617,7 +618,7 @@ def build_documents(metrics: dict, b64: dict) -> tuple[str, str]:
 
 ## 4. 研究过程
 
-实现 → 合成验证 → GPU96 消融 → M4 NLL 修复重训 → 出图与报告。ChatGPT 浏览器本轮不可用；DOI 由 WebSearch 核验。
+实现 → 合成验证 → GPU96 消融 → M4 NLL 修复重训 → 出图与报告。公开仓库 https://github.com/Coucou2016/4DVarNets-sea-current ；ChatGPT 浏览器自动粘贴失败，DOI 由 WebSearch 核验；粘贴简报见 docs/chatgpt_collaboration/。
 
 ---
 
@@ -651,7 +652,7 @@ B2 领先支持“学习协同可能已覆盖部分 SQG/平流可迁移信息”
 
 ## 8. 局限与展望
 
-裁剪偏差、多种子与 λ 扫描缺失、全场长训与 OSE 未完成；GitHub/`gh` 与 ChatGPT 浏览器本轮受阻。
+裁剪偏差、多种子与 λ 扫描缺失、全场长训与 OSE 未完成；公开 GitHub 已推送；ChatGPT 浏览器自动粘贴本轮失败（人工粘贴简报可继续）。
 
 ---
 

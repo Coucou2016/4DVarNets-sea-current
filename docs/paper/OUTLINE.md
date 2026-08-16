@@ -111,7 +111,7 @@ Paths: `results/figures/` and mirrored `docs/paper/figures/`. Caption drafts in 
 ## 7. Assumptions / missing inputs
 
 - Full-domain NATL60 long training not yet available → Table 1 empty of our numbers.
-- ChatGPT browser MCP unavailable this dual-agent turn (no browser tool server) → Cursor WebSearch citations + refreshed paste (`PASTE_ChatB_LIT_FRAMEWORK_2026-08-16_report.txt`). No conversation URL.
-- GitHub sharing blocked: `gh` not installed / no auth; local `git init` optional only — no push.
+- ChatGPT browser: tabs creatable but navigate to chatgpt.com failed (2+ attempts) → Cursor WebSearch citations + pastes with public GitHub URL (`PASTE_ChatA_GH_LIT_2026-08-16.txt`, `PASTE_ChatB_REPORT_REVIEW_2026-08-16.txt`). No conversation URL this turn.
+- **Public GitHub:** https://github.com/Coucou2016/4DVarNets-sea-current (code+docs+metrics+figures; excludes `*.nc` / `*.pt` / wheels / secrets).
 - M4 GPU96 **post**-σ-normalization-fix retrain done (2026-08-16); SSH recovered (0.063). Still crop96/20ep ≠ paper table.
 - Strain–uncertainty physical calibration (α, dx) still under review.

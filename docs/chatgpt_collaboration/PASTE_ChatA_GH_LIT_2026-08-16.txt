@@ -1,0 +1,39 @@
+CONTEXT 1/1 — Chat A: literature + writing architecture + innovation framework (public GitHub readable)
+
+Role: external senior advisor only. **Web search ON**. Cursor = sole implementer; you advise; do not write code for us to paste blindly. Reply in structured text. Cite DOI/URL. Do NOT invent our measured numbers. Do NOT paste Fablet JAMES Table scores as if they were ours.
+
+## Public GitHub (please READ code + docs)
+https://github.com/Coucou2016/4DVarNets-sea-current
+
+Key paths:
+- README.md (method + ablation matrix B1/B2/M1–M4)
+- docs/paper/ (01–04, PAPER.md, OUTLINE.md, paper.html)
+- docs/report/report.md (+ report.html)
+- results/metrics_*_GPU96.json (measured)
+- fourdvarnet/solver.py, physics.py, losses.py (cost terms)
+
+## Measured facts ONLY (NATL60 crop96 / 20 epochs — NOT JAMES paper table)
+| ID | tau_uv | rmse_uv | rmse_ssh |
+| B2 (SSH+SST, Fablet-like flags) | 0.848 | 0.184 | 0.059 |
+| M3 (+SQG + advection residuals) | 0.811 | 0.206 | 0.064 |
+| M4 (+strain UV NLL; post σ-normalized NLL retrain) | 0.801 | 0.211 | 0.063 |
+| M4 pre-fix archive | 0.806 | 0.209 | 0.122 |
+| geostrophic baseline | −3.74 | 1.029 | 0.059 |
+Honest ranking on this regime: **B2 > M3 ≳ M4**; all beat geostrophy on currents.
+Synthetic short ablation (directional only): M4 can look best among B2/M3/M4 — regime-dependent.
+Solver backbone unchanged: unrolled ConvLSTM 4DVarNet; we add eSQG-style SQG residual + SST advection residual (+ optional strain-aware UV uncertainty).
+
+## Tasks (use web search + the GitHub repo)
+1) Related literature architecture for a JAMES/GMD-style methods paper: Fablet 2024 JAMES; 4DVarNet-SSH Beauchamp 2023 GMD; SQG/eSQG; heat-budget/advection; multimodal SST–SSH DL; VarDyn or other dynamical SST–SSH counterparts. Give 5–8 citations with DOI and 1-line use.
+2) Honest innovation / contribution framing when physics extras underperform pure SST synergy on short cropped OSSE (partial/negative-result language; when SQG/adv help vs fail; what is still publishable).
+3) Critique our paper outline and Methods narrative on GitHub (Key Points → Intro → Methods cost terms → Experiments OSSE+ablation → Results with geostrophy → Discussion → Conclusions). Flag overclaim risks vs README/code.
+4) Suggest figure/table set for a methods paper given only crop96/20ep + synthetic directional evidence + the repo figures.
+5) Optional: 3 concrete revision bullets for docs/report Chinese narrative tone (通俗 but precise terminology parentheses) without fabricating data.
+
+## Deliverable format
+A. Citations (title, year, venue, DOI, 1-line use)
+B. Framing paragraph (hedge verbs calibrated to crop96/20ep; B2>M3≳M4)
+C. Outline / Methods critique (keep / change / cut) grounded in the GitHub files you read
+D. Non-claims / risks
+E. Figure/table recommendations
+END OF CONTEXT 1/1

@@ -43,7 +43,7 @@
 
 ## 4. 研究过程
 
-实现 → 合成验证 → GPU96 消融 → M4 NLL 修复重训 → 出图与报告。ChatGPT 浏览器本轮不可用；DOI 由 WebSearch 核验。
+实现 → 合成验证 → GPU96 消融 → M4 NLL 修复重训 → 出图与报告。公开仓库 https://github.com/Coucou2016/4DVarNets-sea-current ；ChatGPT 浏览器自动粘贴失败，DOI 由 WebSearch 核验；粘贴简报见 docs/chatgpt_collaboration/。
 
 ---
 
@@ -136,7 +136,7 @@ B2 领先支持“学习协同可能已覆盖部分 SQG/平流可迁移信息”
 
 ## 8. 局限与展望
 
-裁剪偏差、多种子与 λ 扫描缺失、全场长训与 OSE 未完成；GitHub/`gh` 与 ChatGPT 浏览器本轮受阻。
+裁剪偏差、多种子与 λ 扫描缺失、全场长训与 OSE 未完成；公开 GitHub 已推送；ChatGPT 浏览器自动粘贴本轮失败（人工粘贴简报可继续）。
 
 ---
 
