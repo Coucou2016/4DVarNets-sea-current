@@ -426,7 +426,8 @@ Not claimed:
 - Single GPU class (4GB) forced crop96; may interact with physics residuals.
 - No formal significance / multi-seed intervals yet.
 - Strain α / dx calibration still under review for physical units.
-- Literature survey for ChatGPT-assisted architecture framing was Cursor WebSearch–backed this session (browser MCP to chatgpt.com failed); paste brief left for human/advisor paste.
+- Literature survey for ChatGPT-assisted architecture framing was Cursor WebSearch–backed this session (browser navigate to chatgpt.com failed after tab create); pastes with public GitHub URL left for human/advisor paste: `docs/chatgpt_collaboration/PASTE_ChatA_GH_LIT_2026-08-16.txt`.
+- Public code+docs: https://github.com/Coucou2016/4DVarNets-sea-current
 
 # 5. Conclusions (draft)
 
