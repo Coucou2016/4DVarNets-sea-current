@@ -1,0 +1,12 @@
+ROUND 1 — Architecture / innovation framing (paste into ChatGPT; Web search ON)
+
+Public GitHub: https://github.com/Coucou2016/4DVarNets-sea-current
+Read: README.md, docs/paper/01_introduction.md, docs/paper/OUTLINE.md, results/metrics_*_GPU96.json
+
+MEASURED ONLY (NATL60 crop96/20ep ≠ JAMES Table):
+B2 0.848/0.184/0.059; M3 0.811/0.206/0.064; M4 post-fix 0.801/0.211/0.063; geo −3.74/1.029/0.059.
+Ranking B2>M3≳M4.
+
+Tasks: defensible contribution; 5–8 citations with DOI; framing when physics underperforms SST synergy; overclaim risks; 5 Key Points/Intro revision bullets.
+Do NOT invent our numbers or paste Fablet Table as ours.
+Format: A Citations | B Framing | C Risks | D Bullets | E Non-claims

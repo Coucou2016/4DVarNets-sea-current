@@ -43,7 +43,7 @@
 
 ## 4. 研究过程
 
-实现 → 合成验证 → GPU96 消融 → M4 NLL 修复重训 → 出图与报告。公开仓库 https://github.com/Coucou2016/4DVarNets-sea-current ；ChatGPT 浏览器自动粘贴失败，DOI 由 WebSearch 核验；粘贴简报见 docs/chatgpt_collaboration/。
+实现 → 合成验证 → GPU96 消融 → M4 NLL 修复重训 → 扩展诊断表/图 → 出图与报告。公开仓库 https://github.com/Coucou2016/4DVarNets-sea-current ；ChatGPT 浏览器 MCP / Codex 配额受阻（见 SESSION_5ROUNDS.md），DOI 由 WebSearch 核验；粘贴简报见 docs/chatgpt_collaboration/。
 
 ---
 
@@ -51,15 +51,15 @@
 
 ### 表1. NATL60 GPU96
 
-| 配置 | τ_uv ↑ | rmse_uv ↓ | rmse_ssh ↓ | λ_x,uv (km) |
-|------|--------|-----------|------------|-------------|
-| B2 | 0.848 | 0.184 | 0.059 | 90.3 |
-| M3 | 0.811 | 0.206 | 0.064 | 79.6 |
-| M4 post-NLL-fix | 0.801 | 0.211 | 0.063 | 86.1 |
-| M4 pre-fix | 0.806 | 0.209 | 0.122 | 91.1 |
-| geo | -3.740 | 1.029 | 0.059 | 101.6 |
+| 配置 | τ_uv ↑ | rmse_uv ↓ | rmse_ssh ↓ | τ_div | λ_x,uv (km) |
+|------|--------|-----------|------------|-------|-------------|
+| B2 | 0.848 | 0.184 | 0.059 | 0.354 | 90.3 |
+| M3 | 0.811 | 0.206 | 0.064 | -1.317 | 79.6 |
+| M4 post-NLL-fix | 0.801 | 0.211 | 0.063 | -1.480 | 86.1 |
+| M4 pre-fix | 0.806 | 0.209 | 0.122 | -2.844 | 91.1 |
+| geo | -3.740 | 1.029 | 0.059 | 0.000 | 101.6 |
 
-> 注：NATL60 crop96/20ep，≠ JAMES paper table。
+> 注：NATL60 crop96/20ep，≠ JAMES paper table。全场 200ep / B1 本会话未跑（4GB GPU）。
 
 ### 表2. 合成 OSSE
 
@@ -119,6 +119,21 @@
 <p><strong>读图方式：</strong>M4 在 M3 上增加应变相关 UV 不确定性监督项。修正前 raw NLL 曾使最佳验证损失膨胀至约 682、SSH RMSE 恶化；本图为 σ 归一化 NLL + MSE 混合后的 20 epoch 重训结果。</p>
 <p><strong>结论：</strong>最佳验证损失约 4.83（约第 15 epoch），SSH 误差恢复至约 0.063；流场技能仍略低于 B2。说明损失尺度工程修复有效，但物理/不确定性项仍未在本协议上超越 SST 协同。</p>
 
+### 图8. NATL60 GPU96（crop96/20ep）τ_div 诊断
+
+![图8. NATL60 GPU96（crop96/20ep）τ_div 诊断](../paper/figures/fig_GPU96_tau_div.png)
+
+<p><strong>读图方式：</strong>纵轴为散度场解释方差 τ_div（explained variance of divergence）。正值表示相对气候学方差有正解释能力；负值表示该诊断上弱于气候学基线。</p>
+<p><strong>背景与目的：</strong>主表 τ_uv 之外，补充动力学结构诊断，检验物理残差是否改善散度一致性。</p>
+<p><strong>结论：</strong>在本裁剪短训协议上仅 B2 为正（约 0.35），M3/M4 为负。这加强“物理项并非普遍加分”的部分结果叙事，仍<strong>≠</strong>论文正式 Table。</p>
+
+### 图9. NATL60 GPU96（crop96/20ep）λ_x,uv 诊断
+
+![图9. NATL60 GPU96（crop96/20ep）λ_x,uv 诊断](../paper/figures/fig_GPU96_lambda_x_uv.png)
+
+<p><strong>读图方式：</strong>纵轴为表面流速分辨尺度 λ_x,uv（km，error/signal PSD 比阈值阈值相关定义）。数值来自同一评测 JSON。</p>
+<p><strong>结论：</strong>报告实测尺度诊断以充实证据面；因 crop96/20ep，不得把 λ_x 宣称为 JAMES Table 分辨尺度结论。</p>
+
 
 ---
 
@@ -136,7 +151,7 @@ B2 领先支持“学习协同可能已覆盖部分 SQG/平流可迁移信息”
 
 ## 8. 局限与展望
 
-裁剪偏差、多种子与 λ 扫描缺失、全场长训与 OSE 未完成；公开 GitHub 已推送；ChatGPT 浏览器自动粘贴本轮失败（人工粘贴简报可继续）。
+裁剪偏差、多种子与 λ 扫描缺失、全场长训与 OSE/B1 未完成；公开 GitHub 已推送；ChatGPT 自动化顾问通道本会话受阻（人工粘贴简报可继续）。
 
 ---
 

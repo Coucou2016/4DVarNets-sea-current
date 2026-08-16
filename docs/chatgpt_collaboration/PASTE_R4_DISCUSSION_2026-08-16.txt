@@ -1,0 +1,7 @@
+ROUND 4 — Discussion / limitations (paste into ChatGPT)
+
+GitHub: https://github.com/Coucou2016/4DVarNets-sea-current → docs/paper/04_discussion.md
+
+Honest ranking B2>M3≳M4 on crop96/20ep; M4 NLL scale bug fixed (SSH 0.122→0.063).
+Ask: strengthen partial/negative-result framing without overclaim; rival explanations; next gates given 4GB GPU; what language to forbid.
+No invented numbers.

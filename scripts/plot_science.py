@@ -97,6 +97,8 @@ def main() -> None:
     gpu_tau = []
     gpu_geo = []
     gpu_rmse = []
+    gpu_tau_div = []
+    gpu_lam_uv = []
     for name in ("B2_GPU96", "M3_GPU96", "M4_GPU96"):
         path = results / f"metrics_{name}.json"
         if not path.is_file():
@@ -106,6 +108,8 @@ def main() -> None:
         gpu_ids.append(label)
         gpu_tau.append(_metric(blob, "tau_uv"))
         gpu_rmse.append(_metric(blob, "rmse_uv"))
+        gpu_tau_div.append(_metric(blob, "tau_div"))
+        gpu_lam_uv.append(_metric(blob, "lambda_x_uv_km"))
         gpu_geo.append(float((blob.get("geostrophic") or {}).get("tau_uv", float("nan"))))
 
     if gpu_ids:
@@ -125,6 +129,24 @@ def main() -> None:
             title="NATL60 crop96/20ep - NOT paper Table row",
         )
         written += save_figure(fig, fig_dir / "fig_GPU96_rmse_uv")
+        fig.clf()
+
+        fig = bar_compare(
+            gpu_ids,
+            {r"Model $\tau_{div}$": gpu_tau_div},
+            ylabel=r"$\tau_{div}$",
+            title="NATL60 crop96/20ep - NOT paper Table (diagnostics)",
+        )
+        written += save_figure(fig, fig_dir / "fig_GPU96_tau_div")
+        fig.clf()
+
+        fig = bar_compare(
+            gpu_ids,
+            {r"$\lambda_{x,uv}$ (km)": gpu_lam_uv},
+            ylabel=r"$\lambda_{x,uv}$ (km)",
+            title="NATL60 crop96/20ep - NOT paper Table (diagnostics)",
+        )
+        written += save_figure(fig, fig_dir / "fig_GPU96_lambda_x_uv")
         fig.clf()
 
         if "B2-GPU96" in gpu_ids:

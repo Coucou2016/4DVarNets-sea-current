@@ -1,0 +1,7 @@
+ROUND 5 — Full paper polish (paste into ChatGPT)
+
+GitHub: https://github.com/Coucou2016/4DVarNets-sea-current → docs/paper/PAPER.md (Key Points, PLS, Abstract, Conclusions)
+
+Give line-level revision suggestions for Abstract + Key Points + Conclusions only.
+Constraint: keep measured crop96/20ep numbers exactly; keep “preliminary ≠ JAMES Table”; no new claims.
+Return: keep / change / cut bullets only.

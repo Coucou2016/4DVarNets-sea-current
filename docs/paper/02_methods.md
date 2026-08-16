@@ -1,6 +1,6 @@
 # 2. Methods
 
-**Status:** working draft; equations mapped to repository modules.  
+**Status:** matured draft; equations mapped to repository modules.  
 Solver architecture follows Fablet et al. (2024); novelty is confined to cost/loss physics terms.
 
 ---
@@ -39,13 +39,15 @@ Implementation: `VariationalCost` in `fourdvarnet/solver.py`.
 
 **Flags (ablation):** `use_sst`, `use_sqg`, `use_adv` (config / CLI). Default λ weights in `config/default.yaml` (`lam_obs`, `lam_sst`, `lam_prior`, `lam_sqg`, `lam_adv`).
 
+**Contrast to VarDyn.** VarDyn (Le Guillou et al., 2025) jointly maps SSH and SST with QG / advection–diffusion dynamical constraints inside a classical 4DVar-style scheme. Our cost adds *SSC-facing* eSQG-style and SST-advection residuals inside a **learned unrolled** 4DVarNet aimed at \((u,v)\), rather than replacing the neural solver with a reduced dynamical propagator.
+
 ---
 
 ## 2.3 Effective eSQG-style operator \(A_{\mathrm{SQG}}\)
 
 We use an *effective* surface QG–style mixing of SST and SSH anomalies to predict a velocity field (not a full 3D SQG inversion). Code: `physics.sqg_velocity` (`fourdvarnet/physics.py`), with deformation radius `Ld` (`Ld_km` in config), Coriolis `f0`, gravity `g`, and grid spacings `dx, dy` from `physics.dx_deg`.
 
-**Assumptions / limits.** SST is treated as a usable surface-density proxy; phase/amplitude relations may fail in mixed-layer–dominated or strongly unbalanced regimes. This motivates reporting cases where SQG residuals do **not** improve over pure SST synergy.
+**Assumptions / limits.** SST is treated as a usable surface-density proxy; phase/amplitude relations may fail in mixed-layer–dominated or strongly unbalanced regimes, or when interior PV contributes to surface velocity (Miracca-Lage et al., 2022; Yassin & Griffies, 2023). This motivates reporting cases where SQG residuals do **not** improve over pure SST synergy.
 
 ---
 
@@ -87,14 +89,15 @@ Code map: `physics.strain_uncertainty`, `TrainingLoss` (`use_uncert`).
 
 | ID | Meaning | Flags |
 |----|---------|-------|
+| B1 | SSH-only (no SST) | sst=0, sqg=0, adv=0, uncert=0 |
 | B2 | SSH+SST (Fablet-like synergy) | sst=1, sqg=0, adv=0, uncert=0 |
 | M3 | + SQG + advection | sst=1, sqg=1, adv=1, uncert=0 |
 | M4 | + strain UV uncertainty | sst=1, sqg=1, adv=1, uncert=1 |
 
-Full matrix B1/M1/M2 documented in `docs/PAPER_EXPERIMENTS.md`.
+Full matrix B1/M1/M2 documented in `docs/PAPER_EXPERIMENTS.md`. **B1 crop96/20ep** is desirable for ablation completeness but was **not run in this session** (GPU occupied / 4GB memory budget shared with other jobs); we report measured B2/M3/M4 only.
 
 ---
 
 ## 2.7 Metrics
 
-Primary: \(\tau_{uv}\) (explained variance), `rmse_uv`, `rmse_ssh`, resolved scale \(\lambda_x\) (when defined). Always co-report **geostrophic** baseline on the same split (`fourdvarnet/metrics.py`, `scripts/evaluate.py`).
+Primary: \(\tau_{uv}\) (explained variance), `rmse_uv`, `rmse_ssh`. Diagnostics from the same JSON: \(\tau_{\mathrm{div}}\), \(\tau_{\mathrm{vort}}\), \(\tau_{\mathrm{strain}}\), resolved scales \(\lambda_x\) (SSH and UV). Always co-report **geostrophic** baseline on the same split (`fourdvarnet/metrics.py`, `scripts/evaluate.py`).

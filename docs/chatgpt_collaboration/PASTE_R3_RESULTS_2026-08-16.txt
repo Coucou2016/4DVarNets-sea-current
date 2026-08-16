@@ -1,0 +1,10 @@
+ROUND 3 — Results / figures (paste into ChatGPT)
+
+GitHub: https://github.com/Coucou2016/4DVarNets-sea-current
+docs/paper/03_experiments.md + results/figures (SciencePlots)
+
+Primary table (crop96/20ep): B2 0.848/0.184/0.059; M3 0.811/0.206/0.064; M4 0.801/0.211/0.063; geo −3.74/1.029/0.059.
+Diagnostics also in JSON: B2 τ_div=+0.354; M3/M4 τ_div negative.
+
+Ask: figure narrative; what experiments are missing (B1, multi-seed, 200ep); what NOT to claim; caption wording.
+Do NOT invent JAMES Table scores. Hardware: GTX 950M 4GB.

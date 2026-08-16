@@ -262,6 +262,8 @@ def html_table_gpu(metrics: dict) -> str:
             f"<td>{_fmt(_m(b,'tau_uv'))}</td>"
             f"<td>{_fmt(_m(b,'rmse_uv'))}</td>"
             f"<td>{_fmt(_m(b,'rmse_ssh'))}</td>"
+            f"<td>{_fmt(_m(b,'tau_div'))}</td>"
+            f"<td>{_fmt(_m(b,'lambda_x_ssh_km'),1)}</td>"
             f"<td>{_fmt(_m(b,'lambda_x_uv_km'),1)}</td>"
             "</tr>"
         )
@@ -272,19 +274,21 @@ def html_table_gpu(metrics: dict) -> str:
             f"<td>{_fmt(_g(geo_src,'tau_uv'))}</td>"
             f"<td>{_fmt(_g(geo_src,'rmse_uv'))}</td>"
             f"<td>{_fmt(_g(geo_src,'rmse_ssh'))}</td>"
+            f"<td>{_fmt(_g(geo_src,'tau_div'))}</td>"
+            f"<td>{_fmt(_g(geo_src,'lambda_x_ssh_km'),1)}</td>"
             f"<td>{_fmt(_g(geo_src,'lambda_x_uv_km'),1)}</td>"
             "</tr>"
         )
     body = "\n".join(rows)
     return f"""<table>
 <thead><tr>
-<th class="left">配置 ID</th><th>τ_uv ↑</th><th>rmse_uv ↓</th><th>rmse_ssh ↓</th><th>λ_x,uv (km)</th>
+<th class="left">配置 ID</th><th>τ_uv ↑</th><th>rmse_uv ↓</th><th>rmse_ssh ↓</th><th>τ_div</th><th>λ_x,ssh (km)</th><th>λ_x,uv (km)</th>
 </tr></thead>
 <tbody>
 {body}
 </tbody>
 </table>
-<p class="table-note">表注：数值来自本地 <code>results/metrics_*_GPU96.json</code>。协议为 NATL60 <strong>crop_size=96、20 epochs</strong>，<strong>不等于</strong> Fablet 2024 JAMES 论文 Table 全场长训结果。请勿将本表数字当作论文正式 Table 行引用。</p>"""
+<p class="table-note">表注：数值来自本地 <code>results/metrics_*_GPU96.json</code>（汇总见 <code>results/metrics_GPU96_expanded_summary.json</code>）。协议为 NATL60 <strong>crop_size=96、20 epochs</strong>，<strong>不等于</strong> Fablet 2024 JAMES 论文 Table 全场长训结果。请勿将本表数字当作论文正式 Table 行引用。B1 SSH-only 本会话未测；全场 200ep 受 4GB GPU 限制暂不可行。</p>"""
 
 
 def html_table_synth(metrics: dict) -> str:
@@ -390,6 +394,27 @@ def build_documents(metrics: dict, b64: dict) -> tuple[str, str]:
             b64,
         )
     )
+    figs.append(
+        _fig_block(
+            "fig8",
+            "图8. NATL60 GPU96（crop96/20ep）τ_div 诊断",
+            "fig_GPU96_tau_div.png",
+            """<p><strong>读图方式：</strong>纵轴为散度场解释方差 τ_div（explained variance of divergence）。正值表示相对气候学方差有正解释能力；负值表示该诊断上弱于气候学基线。</p>
+<p><strong>背景与目的：</strong>主表 τ_uv 之外，补充动力学结构诊断，检验物理残差是否改善散度一致性。</p>
+<p><strong>结论：</strong>在本裁剪短训协议上仅 B2 为正（约 0.35），M3/M4 为负。这加强“物理项并非普遍加分”的部分结果叙事，仍<strong>≠</strong>论文正式 Table。</p>""",
+            b64,
+        )
+    )
+    figs.append(
+        _fig_block(
+            "fig9",
+            "图9. NATL60 GPU96（crop96/20ep）λ_x,uv 诊断",
+            "fig_GPU96_lambda_x_uv.png",
+            """<p><strong>读图方式：</strong>纵轴为表面流速分辨尺度 λ_x,uv（km，error/signal PSD 比阈值阈值相关定义）。数值来自同一评测 JSON。</p>
+<p><strong>结论：</strong>报告实测尺度诊断以充实证据面；因 crop96/20ep，不得把 λ_x 宣称为 JAMES Table 分辨尺度结论。</p>""",
+            b64,
+        )
+    )
 
     fig_html = "\n".join(h for h, _ in figs)
     fig_md = "\n".join(m for _, m in figs)
@@ -400,8 +425,8 @@ def build_documents(metrics: dict, b64: dict) -> tuple[str, str]:
     # Markdown tables
     def md_gpu() -> str:
         lines = [
-            "| 配置 | τ_uv ↑ | rmse_uv ↓ | rmse_ssh ↓ | λ_x,uv (km) |",
-            "|------|--------|-----------|------------|-------------|",
+            "| 配置 | τ_uv ↑ | rmse_uv ↓ | rmse_ssh ↓ | τ_div | λ_x,uv (km) |",
+            "|------|--------|-----------|------------|-------|-------------|",
         ]
         gpu = metrics["gpu"]
         mapping = [
@@ -415,15 +440,15 @@ def build_documents(metrics: dict, b64: dict) -> tuple[str, str]:
                 continue
             b = gpu[k]
             lines.append(
-                f"| {lab} | {_fmt(_m(b,'tau_uv'))} | {_fmt(_m(b,'rmse_uv'))} | {_fmt(_m(b,'rmse_ssh'))} | {_fmt(_m(b,'lambda_x_uv_km'),1)} |"
+                f"| {lab} | {_fmt(_m(b,'tau_uv'))} | {_fmt(_m(b,'rmse_uv'))} | {_fmt(_m(b,'rmse_ssh'))} | {_fmt(_m(b,'tau_div'))} | {_fmt(_m(b,'lambda_x_uv_km'),1)} |"
             )
         if "B2_GPU96" in gpu:
             b = gpu["B2_GPU96"]
             lines.append(
-                f"| geo | {_fmt(_g(b,'tau_uv'))} | {_fmt(_g(b,'rmse_uv'))} | {_fmt(_g(b,'rmse_ssh'))} | {_fmt(_g(b,'lambda_x_uv_km'),1)} |"
+                f"| geo | {_fmt(_g(b,'tau_uv'))} | {_fmt(_g(b,'rmse_uv'))} | {_fmt(_g(b,'rmse_ssh'))} | {_fmt(_g(b,'tau_div'))} | {_fmt(_g(b,'lambda_x_uv_km'),1)} |"
             )
         lines.append("")
-        lines.append("> 注：NATL60 crop96/20ep，≠ JAMES paper table。")
+        lines.append("> 注：NATL60 crop96/20ep，≠ JAMES paper table。全场 200ep / B1 本会话未跑（4GB GPU）。")
         return "\n".join(lines)
 
     html = f"""<!DOCTYPE html>
@@ -442,7 +467,7 @@ def build_documents(metrics: dict, b64: dict) -> tuple[str, str]:
 <header class="cover">
   <h1>基于 SST–SSH 协同与物理残差的 4DVarNet 海表流场反演：裁剪 NATL60 OSSE 消融研究报告</h1>
   <p class="meta">项目：4DVarNets-sea-current　｜　报告日期：{today}　｜　实现与验收：Cursor Agent　｜　公开代码：<a href="https://github.com/Coucou2016/4DVarNets-sea-current">github.com/Coucou2016/4DVarNets-sea-current</a></p>
-  <p class="meta">基线文献：Fablet et al. (2024), JAMES, doi:10.1029/2023MS003609　｜　顾问通道：ChatGPT（浏览器自动化失败 2×；粘贴简报已备，文献由 WebSearch 独立核验）</p>
+  <p class="meta">基线文献：Fablet et al. (2024), JAMES, doi:10.1029/2023MS003609　｜　顾问通道：ChatGPT（本会话浏览器 MCP 与 Codex 配额均受阻；见 docs/chatgpt_collaboration/SESSION_5ROUNDS.md；文献 DOI 由 WebSearch 核验）</p>
   <span class="badge">证据级别：合成短训（方向性）+ NATL60 GPU96 crop96/20ep（初步）· 非正式论文 Table</span>
 </header>
 
@@ -522,7 +547,7 @@ def build_documents(metrics: dict, b64: dict) -> tuple[str, str]:
     <li>诊断 M4 raw NLL 尺度问题 → 代码/配置修复 → M4 全量 20ep 重训；</li>
     <li>SciencePlots 出图；撰写英文论文草稿章节与本中文自包含报告；</li>
     <li>公开仓库：<a href="https://github.com/Coucou2016/4DVarNets-sea-current">https://github.com/Coucou2016/4DVarNets-sea-current</a>（已推送 code+docs+metrics+figures；排除 NATL60 <code>*.nc</code>、checkpoints <code>*.pt</code>、wheels/secrets）。</li>
-    <li>ChatGPT 顾问通道：Cursor 浏览器可建 tab，但导航至 chatgpt.com 连续失败；粘贴简报（含 GitHub URL）见 <code>docs/chatgpt_collaboration/PASTE_ChatA_GH_LIT_2026-08-16.txt</code> 与 <code>PASTE_ChatB_REPORT_REVIEW_2026-08-16.txt</code>。文献 DOI 由 Cursor WebSearch 独立核验。</li>
+    <li>ChatGPT 顾问通道：本会话 ≥5 轮尝试见 <code>docs/chatgpt_collaboration/SESSION_5ROUNDS.md</code>（浏览器 tab 创建即丢失；Codex ChatGPT 登录但用量限额至 2026-08-20）。粘贴简报与 GitHub URL 已备；文献 DOI 由 Cursor WebSearch 独立核验后写入论文。</li>
   </ol>
 </section>
 
@@ -563,7 +588,7 @@ def build_documents(metrics: dict, b64: dict) -> tuple[str, str]:
     <li>硬件限制导致裁剪训练，可能与物理残差假设的空间上下文冲突；</li>
     <li>缺少多种子置信区间与完整 λ 扫描（待补充）；</li>
     <li>全场 NATL60 长训、OSE/漂流浮标评估未完成（待补充）；</li>
-    <li>ChatGPT 浏览器自动粘贴本轮失败（导航失败）；公开 GitHub 已就绪，可由人工粘贴顾问简报继续迭代。</li>
+    <li>ChatGPT 浏览器/Codex 顾问自动化本轮受阻（见 SESSION_5ROUNDS.md）；公开 GitHub 已就绪，可由人工在 chatgpt.com 粘贴顾问简报继续迭代。</li>
   </ul>
   <p class="footer">本文件由 <code>scripts/build_report.py</code> 生成：CSS 内联、图片 Base64 嵌入、表格为 HTML。请以 results/metrics_*.json 为数值真源。</p>
 </section>
@@ -618,7 +643,7 @@ def build_documents(metrics: dict, b64: dict) -> tuple[str, str]:
 
 ## 4. 研究过程
 
-实现 → 合成验证 → GPU96 消融 → M4 NLL 修复重训 → 出图与报告。公开仓库 https://github.com/Coucou2016/4DVarNets-sea-current ；ChatGPT 浏览器自动粘贴失败，DOI 由 WebSearch 核验；粘贴简报见 docs/chatgpt_collaboration/。
+实现 → 合成验证 → GPU96 消融 → M4 NLL 修复重训 → 扩展诊断表/图 → 出图与报告。公开仓库 https://github.com/Coucou2016/4DVarNets-sea-current ；ChatGPT 浏览器 MCP / Codex 配额受阻（见 SESSION_5ROUNDS.md），DOI 由 WebSearch 核验；粘贴简报见 docs/chatgpt_collaboration/。
 
 ---
 
@@ -652,7 +677,7 @@ B2 领先支持“学习协同可能已覆盖部分 SQG/平流可迁移信息”
 
 ## 8. 局限与展望
 
-裁剪偏差、多种子与 λ 扫描缺失、全场长训与 OSE 未完成；公开 GitHub 已推送；ChatGPT 浏览器自动粘贴本轮失败（人工粘贴简报可继续）。
+裁剪偏差、多种子与 λ 扫描缺失、全场长训与 OSE/B1 未完成；公开 GitHub 已推送；ChatGPT 自动化顾问通道本会话受阻（人工粘贴简报可继续）。
 
 ---
 

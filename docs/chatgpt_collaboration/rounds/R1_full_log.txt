@@ -1,0 +1,40 @@
+Reading additional input from stdin...
+OpenAI Codex v0.147.0
+--------
+workdir: E:\Projects\20260522-4DVarNets-sea-current
+model: gpt-5.6-luna
+provider: openai
+approval: never
+sandbox: read-only
+reasoning effort: max
+reasoning summaries: none
+session id: 01a00a52-fcad-7360-a89a-43aa6f1ca39d
+--------
+user
+You are an external senior advisor/reviewer ONLY (not an implementer). Web-search capable reasoning OK. Do NOT write code patches. Do NOT invent measured numbers. Do NOT treat Fablet JAMES Table scores as ours.
+
+Public GitHub: https://github.com/Coucou2016/4DVarNets-sea-current
+Read locally if available: README.md, docs/paper/01_introduction.md, docs/paper/OUTLINE.md, results/metrics_*_GPU96.json
+
+MEASURED ONLY (NATL60 crop96/20ep 鈥?preliminary, NOT paper Table):
+B2: tau_uv=0.848, rmse_uv=0.184, rmse_ssh=0.059
+M3: 0.811 / 0.206 / 0.064
+M4 post-NLL-fix: 0.801 / 0.211 / 0.063
+geo: -3.74 / 1.029 / 0.059
+Ranking: B2 > M3 鈮?M4; all beat geostrophy on currents.
+
+ROUND 1 GOAL 鈥?Architecture / root cause & innovation framing:
+1) What contribution is defensible for a JAMES/GMD-style methods paper given B2>M3 on short cropped OSSE?
+2) Cite 5鈥? key papers (title, year, venue, DOI) for related-work architecture.
+3) How to frame physics residuals as regime-/hyperparameter-dependent without overclaim.
+4) Overclaim risks in current intro/outline.
+5) Top 5 concrete revision bullets for Key Points + Intro gap/contribution paragraphs.
+
+Reply structured: A Citations | B Framing paragraph | C Overclaim risks | D Revision bullets | E Non-claims
+ERROR: Reconnecting... 2/5
+ERROR: Reconnecting... 3/5
+ERROR: Reconnecting... 4/5
+ERROR: Reconnecting... 5/5
+warning: Falling back from WebSockets to HTTPS transport. request timed out
+ERROR: You've hit your usage limit. Upgrade to Pro (https://chatgpt.com/explore/pro), visit https://chatgpt.com/codex/settings/usage to purchase more credits or try again at Aug 20th, 2026 5:30 PM.
+ERROR: You've hit your usage limit. Upgrade to Pro (https://chatgpt.com/explore/pro), visit https://chatgpt.com/codex/settings/usage to purchase more credits or try again at Aug 20th, 2026 5:30 PM.

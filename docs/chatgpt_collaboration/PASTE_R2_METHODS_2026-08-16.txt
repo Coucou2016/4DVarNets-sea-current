@@ -1,0 +1,7 @@
+ROUND 2 — Methods critique (paste into ChatGPT; Web search ON)
+
+Public GitHub: https://github.com/Coucou2016/4DVarNets-sea-current
+Point to: docs/paper/02_methods.md, fourdvarnet/solver.py, physics.py, losses.py, config/default.yaml
+
+Ask: Is the cost equation clear? Is eSQG-style vs full SQG hedged enough? Is M4 σ-normalized NLL explained for JAMES/GMD readers? Contrast vs VarDyn dynamical SSH–SST mapping. Flag missing B1. List concrete Methods edits only (no code).
+Do NOT invent metrics.
