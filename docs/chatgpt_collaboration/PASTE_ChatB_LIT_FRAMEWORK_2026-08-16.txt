@@ -1,0 +1,28 @@
+CONTEXT 1/1 — Chat B: Literature survey + paper writing framework (text-only)
+Role: external senior advisor with **web browsing/search ENABLED**. Cursor is sole implementer. Do NOT return zip/patch packages. Cite with DOI/URL. Do not invent DOIs or our experimental numbers.
+
+## Task
+1) Survey related literature (use web search):
+   - Fablet et al. JAMES 2024 4DVarNet SST–SSH currents
+   - 4DVarNet-SSH / multimodal DA / SWOT OSSE
+   - SQG / eSQG surface current reconstruction from SST
+   - Heat-budget / SST advection current estimation
+   - Related JAMES / GMD / TGRS / Remote Sensing papers
+2) Name 3–6 papers whose **writing architecture/style** to imitate (IMRaD, Key Points, Methods clarity).
+3) Propose a **concrete paper outline** for OUR innovation only:
+   Physics residuals inside 4DVarNet cost = eSQG-style SQG + SST advection + strain uncertainty; OSSE→OSE path; ablation B2/M3/M4.
+4) List **defensible innovation points** vs Fablet 2024 (what is NOT novel).
+5) Deliver citations with DOI/URL.
+
+## Hard constraints / measured facts
+- Do not invent JAMES Table metrics for us.
+- Local measured (directional): synthetic 8ep B2/M3 τ_uv≈0.24, M4≈0.32 after truth-σ fix.
+- B2-GPU96 NATL60 crop96/20ep training finished (val≈4.53); crop/short ≠ paper Table.
+- Solver architecture unchanged (ConvLSTM 4DVarNet); cost/loss extended.
+
+## Deliverable format
+A. Style-model papers (title, year, venue, DOI, what to imitate)
+B. Outline (section titles + 1-line job each)
+C. Innovation bullets (defensible / non-claims)
+D. Open risks for Methods claims
+END OF CONTEXT 1/1

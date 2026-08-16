@@ -1,0 +1,23 @@
+============================= test session starts =============================
+platform win32 -- Python 3.10.13, pytest-9.1.1, pluggy-1.6.0
+rootdir: E:\Projects\20260522-4DVarNets-sea-current
+configfile: pytest.ini
+collected 40 items
+
+tests\test_config.py ..                                                  [  5%]
+tests\test_losses.py ....                                                [ 15%]
+tests\test_metrics.py .......                                            [ 32%]
+tests\test_model.py .....                                                [ 45%]
+tests\test_natl60.py ......                                              [ 60%]
+tests\test_physics.py .........                                          [ 82%]
+tests\test_real.py ....                                                  [ 92%]
+tests\test_synthetic.py .                                                [ 95%]
+tests\test_training.py ..                                                [100%]
+
+============================== warnings summary ===============================
+C:\Users\Administrator\MiniConda3\envs\faceswap\lib\site-packages\_pytest\config\__init__.py:864
+  C:\Users\Administrator\MiniConda3\envs\faceswap\lib\site-packages\_pytest\config\__init__.py:864: PytestAssertRewriteWarning: Module already imported so cannot be rewritten; pytest
+    self.import_plugin(arg, consider_entry_points=True)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================= 40 passed, 1 warning in 50.05s ========================

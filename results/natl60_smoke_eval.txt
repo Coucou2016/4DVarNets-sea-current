@@ -1,0 +1,20 @@
+=== 4DVarNet test metrics ===
+  rmse_ssh: 0.0599   (geostrophic 0.0614)
+  rmse_u: 0.5235   (geostrophic 0.5248)
+  rmse_v: 1.3910   (geostrophic 1.4135)
+  rmse_uv: 1.0509   (geostrophic 1.0662)
+  tau_uv: -4.2709   (geostrophic -4.4250)
+  tau_div: -0.0653   (geostrophic 0.0001)
+  tau_vort: -61.9828   (geostrophic -63.4565)
+  tau_curl: -61.9828   (geostrophic -63.4565)
+  tau_strain: -83.5984   (geostrophic -85.7071)
+  lambda_x_ssh_km: 76.1143   (geostrophic 106.5600)
+  lambda_x_ssh_min_ratio: 0.0027   (geostrophic 0.0028)
+  lambda_x_ssh_resolved: 1.0000   (geostrophic 1.0000)
+  lambda_x_uv_km: 106.5600   (geostrophic 106.5600)
+  lambda_x_uv_min_ratio: 0.0422   (geostrophic 0.0389)
+  lambda_x_uv_resolved: 1.0000   (geostrophic 1.0000)
+  tau_uv (geostrophic baseline): -4.4250
+  tau_uv (4DVarNet): -4.2709
+OK: model beats geostrophic baseline on this test split
+Wrote E:\Projects\20260522-4DVarNets-sea-current\results\metrics_NATL60smoke.json

@@ -1,0 +1,59 @@
+# Default config — Fablet et al. JAMES 2024 + physics-augmented cost
+data:
+  source: synthetic
+  cache: data/synthetic_osse.npz
+  n_time: 40
+  height: 48
+  width: 48
+  dT: 7
+  # NATL60 CPU smoke only (null = full paper grid / all windows):
+  # crop_size: 48
+  # max_samples: 4
+
+model:
+  dT_sst: 7
+  n_iter: 5
+  hidden_lstm: 64
+  feat_dim: 12
+  use_sst: true
+  use_sqg: true
+  use_adv: true
+  use_uncert: true
+  lam_obs: 1.0
+  lam_sst: 1.0
+  lam_prior: 0.1
+  lam_sqg: 0.1
+  lam_adv: 0.1
+  Ld_km: 30
+  kappa: 50.0
+  dt_seconds: 86400
+  uncert_sigma0: 0.05
+  # α·strain ~ O(0.1–1) for ~0.3 m/s fields on dx≈5.5 km; keep 1e4.
+  uncert_alpha: 1.0e4
+  # M4 fix: σ from truth strain + MSE mix + σ clamp + σ-normalized NLL (see TrainingLoss).
+  # Raw err²/σ² is ~1/σ0² (~400×) MSE and SSH degrades (GPU96 M4 val~682, rmse_ssh~2×).
+  # Normalized form: E[err² (σ0/σ)²] + σ0² E[log(σ/σ0)²] ≈ MSE when σ≈σ0.
+  uncert_from_truth: true
+  uncert_max_mult: 10.0
+  # Keep a strong MSE floor so NLL cannot abandon UV/SSH balance early.
+  uncert_mse_mix: 0.5
+
+physics:
+  f0: 7.0e-5
+  dx_deg: 0.05
+  g: 9.81
+
+train:
+  epochs: 8
+  batch_size: 4
+  lr: 0.001
+  # auto → CUDA when available, else CPU
+  device: auto
+  checkpoint_dir: checkpoints
+
+loss:
+  ssh: 50.0
+  grad_ssh: 100.0
+  uv: 50.0
+  div: 100.0
+  prior: 10.0

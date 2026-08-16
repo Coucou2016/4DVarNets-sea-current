@@ -1,0 +1,16 @@
+CONTEXT 1/1 — Chat A: M4 loss + 4GB Maxwell NATL60 risks (text-only)
+Role: external senior advisor/reviewer. Cursor sole implementer. No zip. Critique only.
+
+## Measured facts
+- M4 fix: σ from truth UV; clamp σ≤σ0·10; UV = 0.25·MSE + 0.75·NLL; σ0=0.05, α=1e4, dx≈5.5 km.
+- Synthetic 8ep post-fix: M4 τ_uv≈0.322 > B2/M3≈0.24 (directional).
+- GTX 950M 4GB; faceswap torch 1.12.1+cu113; base Miniconda = CPU torch footgun.
+- B2-GPU96 COMPLETE: NATL60 crop96 batch1 20ep; best val 4.5316; ~32 min; criterion.to(device) fixed.
+- M3-GPU96 started same recipe with --use-sqg 1 --use-adv 1.
+
+## Ask
+1) Is truth-σ+clamp+mix sufficient for M4 GPU next? Remaining failure modes?
+2) 4GB recipe risks for SQG FFT / adv / uncert vs B2.
+3) Keep α=1e4? Logging (mean σ, max strain)?
+4) Restate forbidden claims: no invented NATL60 table numbers; crop96≠paper row.
+END OF CONTEXT 1/1

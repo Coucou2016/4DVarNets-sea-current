@@ -1,0 +1,36 @@
+{
+  "ckpt": "checkpoints\\4dvarnet-M4fix-best.pt",
+  "source": "synthetic",
+  "flags": {
+    "use_sst": true,
+    "use_sqg": true,
+    "use_adv": true,
+    "use_uncert": true
+  },
+  "model": {
+    "rmse_ssh": 0.05224201641976833,
+    "rmse_u": 0.37532973289489746,
+    "rmse_v": 0.3673020452260971,
+    "rmse_uv": 0.37134337425231934,
+    "tau_uv": 0.28072165658603326,
+    "tau_div": -0.20160436545686877,
+    "tau_vort": 0.3109190954593612,
+    "tau_curl": 0.3109190954593612,
+    "tau_strain": -0.7827902842243122,
+    "lambda_x_ssh_km": null,
+    "lambda_x_uv_km": 177.60000000000002
+  },
+  "geostrophic": {
+    "rmse_ssh": 0.054063012823462486,
+    "rmse_u": 0.43694163858890533,
+    "rmse_v": 0.4247245490550995,
+    "rmse_uv": 0.43088045716285706,
+    "tau_uv": 0.0316480687573692,
+    "tau_div": 0.00016277202855252693,
+    "tau_vort": 0.003690146246363768,
+    "tau_curl": 0.003690146246363768,
+    "tau_strain": -2.3615548238447244,
+    "lambda_x_ssh_km": null,
+    "lambda_x_uv_km": null
+  }
+}

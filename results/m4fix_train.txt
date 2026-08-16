@@ -1,0 +1,10 @@
+device=cpu  epochs=8  source=synthetic
+epoch 1: train=1641.8453 val=1500.6700
+epoch 2: train=1454.8387 val=1373.2637
+epoch 3: train=1367.6663 val=1334.9099
+epoch 4: train=1333.4713 val=1316.0203
+epoch 5: train=1317.9109 val=1308.8304
+epoch 6: train=1297.1827 val=1285.4511
+epoch 7: train=1282.7941 val=1257.9814
+epoch 8: train=1253.7613 val=1231.5264
+Best val loss: 1231.5264  ckpt=4dvarnet-M4fix-best.pt

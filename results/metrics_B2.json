@@ -1,0 +1,36 @@
+{
+  "ckpt": "E:\\Projects\\20260522-4DVarNets-sea-current\\checkpoints\\4dvarnet-B2-best.pt",
+  "source": "synthetic",
+  "flags": {
+    "use_sst": true,
+    "use_sqg": false,
+    "use_adv": false,
+    "use_uncert": false
+  },
+  "model": {
+    "rmse_ssh": 0.052945706993341446,
+    "rmse_u": 0.39168527722358704,
+    "rmse_v": 0.37038518488407135,
+    "rmse_uv": 0.38118574023246765,
+    "tau_uv": 0.24212002815641348,
+    "tau_div": -0.12449026661715279,
+    "tau_vort": 0.30492172666695433,
+    "tau_curl": 0.30492172666695433,
+    "tau_strain": -0.6699593504980663,
+    "lambda_x_ssh_km": null,
+    "lambda_x_uv_km": 177.60000000000002
+  },
+  "geostrophic": {
+    "rmse_ssh": 0.054063012823462486,
+    "rmse_u": 0.43694163858890533,
+    "rmse_v": 0.4247245490550995,
+    "rmse_uv": 0.43088045716285706,
+    "tau_uv": 0.0316480687573692,
+    "tau_div": 0.00016277202855252693,
+    "tau_vort": 0.003690146246363768,
+    "tau_curl": 0.003690146246363768,
+    "tau_strain": -2.3615548238447244,
+    "lambda_x_ssh_km": null,
+    "lambda_x_uv_km": null
+  }
+}

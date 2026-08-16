@@ -1,0 +1,47 @@
+# Python / tooling
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+dist/
+build/
+*.egg-info/
+
+# Secrets / local env
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+credentials.json
+
+# Large training weights (keep small history JSON under checkpoints/)
+*.pt
+*.pth
+*.ckpt
+checkpoints/*.pt
+
+# NATL60 / heavy data cubes (multi-GB)
+data/natl60/*.nc
+data/natl60/*.part
+data/natl60/*.nc.part
+data/synthetic_osse.npz
+data/real/gdp_drifters.csv
+
+# Local scratch / wheels / zips
+tmp/
+tmp/wheels/
+*.whl
+*.zip
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp

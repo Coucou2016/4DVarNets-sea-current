@@ -1,0 +1,13 @@
+# Paths for NATL60 OSSE (paper §3) — relative to repo root.
+# Download: python scripts/download_natl60.py
+# Gulf Stream box used by the loader: 33–43N, 65–55W.
+natl60:
+  obs: data/natl60/dataset_nadir_0d_swot.nc
+  oi: data/natl60/ssh_NATL60_swot_4nadir.nc
+  ssh_ref: data/natl60/NATL60_ssh_y2013.1y.nc
+  sst_ref: data/natl60/NATL60_sst_y2013.1y.nc
+  u_ref: data/natl60/NATL60_u_y2013.1y.nc
+  v_ref: data/natl60/NATL60_v_y2013.1y.nc
+
+ose:
+  gdp: data/real/gdp_drifters.csv

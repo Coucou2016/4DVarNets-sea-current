@@ -1,0 +1,3 @@
+device=cpu  epochs=1  source=natl60  crop_size=48  max_samples=4  batch_size=1
+epoch 1: train=199.1759 val=81.3294
+Best val loss: 81.3294  ckpt=4dvarnet-NATL60smoke-best.pt

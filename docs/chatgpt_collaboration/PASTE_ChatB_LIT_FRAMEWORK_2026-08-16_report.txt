@@ -1,0 +1,29 @@
+CONTEXT 1/1 — Chat B: literature + JAMES/GMD framework (post-NLL-fix metrics)
+Role: external senior advisor. **Web search ON**. Cursor = sole implementer. Text-only reply. Cite DOI/URL. Do NOT invent our numbers or paste Fablet JAMES table scores as ours.
+
+## Measured facts ONLY (NATL60 crop96 / 20ep — NOT paper table)
+| ID | tau_uv | rmse_uv | rmse_ssh |
+| B2 | 0.848 | 0.184 | 0.059 |
+| M3 | 0.811 | 0.206 | 0.064 |
+| M4 | 0.801 | 0.211 | 0.063 |  ← post σ-normalized NLL retrain; SSH recovered
+| M4 pre-fix (archive) | 0.806 | 0.209 | 0.122 |
+| geo | -3.74 | 1.029 | 0.059 |
+Ranking: **B2 > M3 ≳ M4**; all beat geo on currents.
+Synthetic 8ep (directional): M4 best among B2/M3/M4.
+Solver unchanged ConvLSTM 4DVarNet; we add eSQG-style SQG + SST adv residuals (+ optional strain UV uncert).
+
+## GitHub
+No public repo URL this turn (`gh` unavailable). Ignore repo reading; use facts above.
+
+## Tasks (web-search)
+1) Related literature architecture to imitate (JAMES/GMD methods papers): Fablet 2024; 4DVarNet-SSH Beauchamp 2023; SQG/eSQG; heat-budget/advection; multimodal SST–SSH DL; optional VarDyn dynamical SST–SSH. 5–8 citations with DOI.
+2) Honest innovation framing when physics extras underperform SST synergy on short cropped OSSE (partial/negative result language; when SQG/adv help vs fail).
+3) Critique / improve our outline: Key Points → Intro → Methods (cost terms) → Experiments/OSSE+ablation → Results (geostrophy always) → Discussion → Conclusions. Flag overclaim risks.
+4) Suggest figure/table set for a methods paper given only crop96/20ep + synthetic directional evidence.
+
+## Deliverable format
+A. Citations (title, year, venue, DOI, 1-line use)
+B. Framing paragraph (hedge verbs calibrated to crop96/20ep)
+C. Outline critique (keep / change / cut)
+D. Non-claims / risks
+END OF CONTEXT 1/1

@@ -1,0 +1,20 @@
+=== 4DVarNet test metrics ===
+  rmse_ssh: 0.0627   (geostrophic 0.0586)
+  rmse_u: 0.2177   (geostrophic 1.2086)
+  rmse_v: 0.2041   (geostrophic 0.7717)
+  rmse_uv: 0.2112   (geostrophic 1.0292)
+  tau_uv: 0.8015   (geostrophic -3.7396)
+  tau_div: -1.4800   (geostrophic 0.0000)
+  tau_vort: -0.8583   (geostrophic -56.1035)
+  tau_curl: -0.8583   (geostrophic -56.1035)
+  tau_strain: -1.3162   (geostrophic -80.4751)
+  lambda_x_ssh_km: 83.2720   (geostrophic 122.2442)
+  lambda_x_ssh_min_ratio: 0.0006   (geostrophic 0.0003)
+  lambda_x_ssh_resolved: 1.0000   (geostrophic 1.0000)
+  lambda_x_uv_km: 86.1422   (geostrophic 101.5646)
+  lambda_x_uv_min_ratio: 0.0041   (geostrophic 0.0498)
+  lambda_x_uv_resolved: 1.0000   (geostrophic 1.0000)
+  tau_uv (geostrophic baseline): -3.7396
+  tau_uv (4DVarNet): 0.8015
+OK: model beats geostrophic baseline on this test split
+Wrote E:\Projects\20260522-4DVarNets-sea-current\results\metrics_M4_GPU96.json

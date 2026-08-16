@@ -1,0 +1,91 @@
+>> E:\Miniconda3\python.exe E:\Projects\20260522-4DVarNets-sea-current\scripts\train.py --config config/default.yaml --exp-name B2 --use-sst 1 --use-sqg 0 --use-adv 0 --use-uncert 0 --epochs 8
+device=cpu  epochs=8  source=synthetic
+epoch 1: train=20.2524 val=19.2345
+epoch 2: train=18.5947 val=17.8189
+epoch 3: train=17.3280 val=16.8327
+epoch 4: train=16.5088 val=16.1445
+epoch 5: train=15.8981 val=15.7206
+epoch 6: train=15.5414 val=15.3769
+epoch 7: train=15.2689 val=15.2257
+epoch 8: train=15.1422 val=15.1292
+Best val loss: 15.1292  ckpt=4dvarnet-B2-best.pt
+=== 4DVarNet test metrics ===
+  rmse_ssh: 0.0529   (geostrophic 0.0541)
+  rmse_u: 0.3917   (geostrophic 0.4369)
+  rmse_v: 0.3704   (geostrophic 0.4247)
+  rmse_uv: 0.3812   (geostrophic 0.4309)
+  tau_uv: 0.2421   (geostrophic 0.0316)
+  tau_div: -0.1245   (geostrophic 0.0002)
+  tau_vort: 0.3049   (geostrophic 0.0037)
+  tau_curl: 0.3049   (geostrophic 0.0037)
+  tau_strain: -0.6700   (geostrophic -2.3616)
+  lambda_x_ssh_km: nan   (geostrophic nan)
+  lambda_x_uv_km: 177.6000   (geostrophic nan)
+  tau_uv (geostrophic baseline): 0.0316
+  tau_uv (4DVarNet): 0.2421
+OK: model beats geostrophic baseline on this test split
+Wrote E:\Projects\20260522-4DVarNets-sea-current\results\metrics_B2.json
+>> E:\Miniconda3\python.exe E:\Projects\20260522-4DVarNets-sea-current\scripts\train.py --config config/default.yaml --exp-name M3 --use-sst 1 --use-sqg 1 --use-adv 1 --use-uncert 0 --epochs 8
+device=cpu  epochs=8  source=synthetic
+epoch 1: train=19.7550 val=18.2070
+epoch 2: train=17.6502 val=16.9331
+epoch 3: train=16.4951 val=16.1178
+epoch 4: train=15.7946 val=15.6325
+epoch 5: train=15.4901 val=15.4913
+epoch 6: train=15.4583 val=15.4166
+epoch 7: train=15.3180 val=15.3681
+epoch 8: train=15.2129 val=15.3259
+Best val loss: 15.3259  ckpt=4dvarnet-M3-best.pt
+=== 4DVarNet test metrics ===
+  rmse_ssh: 0.0530   (geostrophic 0.0541)
+  rmse_u: 0.3870   (geostrophic 0.4369)
+  rmse_v: 0.3755   (geostrophic 0.4247)
+  rmse_uv: 0.3813   (geostrophic 0.4309)
+  tau_uv: 0.2415   (geostrophic 0.0316)
+  tau_div: -0.2104   (geostrophic 0.0002)
+  tau_vort: 0.3095   (geostrophic 0.0037)
+  tau_curl: 0.3095   (geostrophic 0.0037)
+  tau_strain: -0.4745   (geostrophic -2.3616)
+  lambda_x_ssh_km: nan   (geostrophic nan)
+  lambda_x_ssh_min_ratio: 0.6046   (geostrophic 0.7478)
+  lambda_x_ssh_resolved: 0.0000   (geostrophic 0.0000)
+  lambda_x_uv_km: 177.6000   (geostrophic nan)
+  lambda_x_uv_min_ratio: 0.2305   (geostrophic 0.7830)
+  lambda_x_uv_resolved: 1.0000   (geostrophic 0.0000)
+  tau_uv (geostrophic baseline): 0.0316
+  tau_uv (4DVarNet): 0.2415
+OK: model beats geostrophic baseline on this test split
+Wrote E:\Projects\20260522-4DVarNets-sea-current\results\metrics_M3.json
+>> E:\Miniconda3\python.exe E:\Projects\20260522-4DVarNets-sea-current\scripts\train.py --config config/default.yaml --exp-name M4 --use-sst 1 --use-sqg 1 --use-adv 1 --use-uncert 1 --epochs 8
+device=cpu  epochs=8  source=synthetic  crop_size=None  max_samples=None  batch_size=4
+epoch 1: train=1644.0768 val=1552.9048
+epoch 2: train=1542.9717 val=1494.8562
+epoch 3: train=1464.0160 val=1411.6188
+epoch 4: train=1375.7225 val=1346.6589
+epoch 5: train=1320.6796 val=1307.9062
+epoch 6: train=1282.9659 val=1258.6881
+epoch 7: train=1238.9605 val=1200.9645
+epoch 8: train=1197.8725 val=1143.9220
+Best val loss: 1143.9220  ckpt=4dvarnet-M4-best.pt
+=== 4DVarNet test metrics ===
+  rmse_ssh: 0.0484   (geostrophic 0.0541)
+  rmse_u: 0.3591   (geostrophic 0.4369)
+  rmse_v: 0.3618   (geostrophic 0.4247)
+  rmse_uv: 0.3604   (geostrophic 0.4309)
+  tau_uv: 0.3224   (geostrophic 0.0316)
+  tau_div: -0.2155   (geostrophic 0.0002)
+  tau_vort: 0.3236   (geostrophic 0.0037)
+  tau_curl: 0.3236   (geostrophic 0.0037)
+  tau_strain: -0.5733   (geostrophic -2.3616)
+  lambda_x_ssh_km: 82.8800   (geostrophic nan)
+  lambda_x_ssh_min_ratio: 0.4636   (geostrophic 0.7478)
+  lambda_x_ssh_resolved: 1.0000   (geostrophic 0.0000)
+  lambda_x_uv_km: 177.6000   (geostrophic nan)
+  lambda_x_uv_min_ratio: 0.1829   (geostrophic 0.7830)
+  lambda_x_uv_resolved: 1.0000   (geostrophic 0.0000)
+  tau_uv (geostrophic baseline): 0.0316
+  tau_uv (4DVarNet): 0.3224
+OK: model beats geostrophic baseline on this test split
+Wrote E:\Projects\20260522-4DVarNets-sea-current\results\metrics_M4.json
+Wrote E:\Projects\20260522-4DVarNets-sea-current\results\ablation_summary.json
+Wrote E:\Projects\20260522-4DVarNets-sea-current\checkpoints\ablation_summary.json

@@ -1,0 +1,34 @@
+WATCH_START 2026-08-16T12:41:48.3595796+08:00
+t=0 alive=True hist=False stall=0 ckpt=08/16/2026 12:40:32 gpu=2186 MiB, 76 % | epoch 1: train=5540.3589 val=3492.6620
+t=1 alive=True hist=False stall=0 ckpt=08/16/2026 12:42:14 gpu=2186 MiB, 71 % | epoch 2: train=2201.4563 val=2086.9303
+t=2 alive=True hist=False stall=0 ckpt=08/16/2026 12:42:14 gpu=2186 MiB, 54 % | epoch 2: train=2201.4563 val=2086.9303
+t=3 alive=True hist=False stall=1 ckpt=08/16/2026 12:43:54 gpu=2186 MiB, 90 % | epoch 3: train=1916.0267 val=1967.2067
+t=4 alive=True hist=False stall=0 ckpt=08/16/2026 12:45:32 gpu=2186 MiB, 92 % | epoch 4: train=1698.3889 val=1347.7119
+t=5 alive=True hist=False stall=0 ckpt=08/16/2026 12:45:32 gpu=2186 MiB, 72 % | epoch 4: train=1698.3889 val=1347.7119
+t=6 alive=True hist=False stall=1 ckpt=08/16/2026 12:47:12 gpu=2186 MiB, 86 % | epoch 5: train=1148.7675 val=1120.5648
+t=7 alive=True hist=False stall=0 ckpt=08/16/2026 12:47:12 gpu=2186 MiB, 55 % | epoch 5: train=1148.7675 val=1120.5648
+t=8 alive=True hist=False stall=1 ckpt=08/16/2026 12:48:52 gpu=2186 MiB, 84 % | epoch 6: train=966.6586 val=754.5570
+t=9 alive=True hist=False stall=0 ckpt=08/16/2026 12:48:52 gpu=2186 MiB, 61 % | epoch 7: train=813.3785 val=767.6451
+t=10 alive=True hist=False stall=0 ckpt=08/16/2026 12:48:52 gpu=2186 MiB, 87 % | epoch 7: train=813.3785 val=767.6451
+t=11 alive=True hist=False stall=1 ckpt=08/16/2026 12:48:52 gpu=2186 MiB, 77 % | epoch 8: train=804.9410 val=801.4499
+t=12 alive=True hist=False stall=0 ckpt=08/16/2026 12:53:50 gpu=2265 MiB, 73 % | epoch 9: train=818.6371 val=736.4376
+t=13 alive=True hist=False stall=0 ckpt=08/16/2026 12:53:50 gpu=2188 MiB, 71 % | epoch 9: train=818.6371 val=736.4376
+t=14 alive=True hist=False stall=1 ckpt=08/16/2026 12:53:50 gpu=2187 MiB, 91 % | epoch 10: train=750.8131 val=772.2149
+t=15 alive=True hist=False stall=0 ckpt=08/16/2026 12:53:50 gpu=2187 MiB, 67 % | epoch 10: train=750.8131 val=772.2149
+t=16 alive=True hist=False stall=1 ckpt=08/16/2026 12:57:10 gpu=2187 MiB, 90 % | epoch 11: train=787.2794 val=682.3597
+t=17 alive=True hist=False stall=0 ckpt=08/16/2026 12:57:10 gpu=2187 MiB, 93 % | epoch 12: train=922.0086 val=1496.3463
+t=18 alive=True hist=False stall=0 ckpt=08/16/2026 12:57:10 gpu=2187 MiB, 87 % | epoch 12: train=922.0086 val=1496.3463
+t=19 alive=True hist=False stall=1 ckpt=08/16/2026 12:57:10 gpu=2187 MiB, 91 % | epoch 13: train=2972.5719 val=4876.2272
+t=20 alive=True hist=False stall=0 ckpt=08/16/2026 12:57:10 gpu=2187 MiB, 57 % | epoch 13: train=2972.5719 val=4876.2272
+t=21 alive=True hist=False stall=1 ckpt=08/16/2026 12:57:10 gpu=2187 MiB, 79 % | epoch 14: train=3287.3519 val=4857.6933
+t=22 alive=True hist=False stall=0 ckpt=08/16/2026 12:57:10 gpu=2187 MiB, 90 % | epoch 15: train=3489.7243 val=3200.2813
+t=23 alive=True hist=False stall=0 ckpt=08/16/2026 12:57:10 gpu=2187 MiB, 65 % | epoch 15: train=3489.7243 val=3200.2813
+t=24 alive=True hist=False stall=1 ckpt=08/16/2026 12:57:10 gpu=2187 MiB, 74 % | epoch 16: train=2074.0380 val=2287.8774
+t=25 alive=True hist=False stall=0 ckpt=08/16/2026 12:57:10 gpu=2187 MiB, 82 % | epoch 16: train=2074.0380 val=2287.8774
+t=26 alive=True hist=False stall=1 ckpt=08/16/2026 12:57:10 gpu=2187 MiB, 88 % | epoch 17: train=3015.6515 val=3000.5498
+t=27 alive=True hist=False stall=0 ckpt=08/16/2026 12:57:10 gpu=2187 MiB, 85 % | epoch 18: train=2294.0692 val=5065.1372
+t=28 alive=True hist=False stall=0 ckpt=08/16/2026 12:57:10 gpu=2187 MiB, 91 % | epoch 18: train=2294.0692 val=5065.1372
+t=29 alive=True hist=False stall=1 ckpt=08/16/2026 12:57:10 gpu=2187 MiB, 76 % | epoch 19: train=2407.4731 val=2160.3766
+t=30 alive=True hist=False stall=0 ckpt=08/16/2026 12:57:10 gpu=2187 MiB, 66 % | epoch 19: train=2407.4731 val=2160.3766
+t=31 alive=False hist=True stall=1 ckpt=08/16/2026 12:57:10 gpu=1145 MiB, 2 % | Best val loss: 682.3597  ckpt=4dvarnet-M4-GPU96-best.pt
+PROCESS_EXITED 2026-08-16T13:12:52.2183789+08:00

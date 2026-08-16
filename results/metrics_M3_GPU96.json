@@ -1,0 +1,44 @@
+{
+  "ckpt": "checkpoints\\4dvarnet-M3-GPU96-best.pt",
+  "source": "natl60",
+  "flags": {
+    "use_sst": true,
+    "use_sqg": true,
+    "use_adv": true,
+    "use_uncert": false
+  },
+  "model": {
+    "rmse_ssh": 0.06432840103904407,
+    "rmse_u": 0.2268890676399072,
+    "rmse_v": 0.18267656117677689,
+    "rmse_uv": 0.2063452402750651,
+    "tau_uv": 0.8106132686951512,
+    "tau_div": -1.3170320993616196,
+    "tau_vort": -0.6345102074463186,
+    "tau_curl": -0.6345102074463186,
+    "tau_strain": -0.9076333342247391,
+    "lambda_x_ssh_km": 97.56664668664668,
+    "lambda_x_ssh_min_ratio": 0.0015807153812533031,
+    "lambda_x_ssh_resolved": 1.0,
+    "lambda_x_uv_km": 79.5593963930806,
+    "lambda_x_uv_min_ratio": 0.0038315224554876155,
+    "lambda_x_uv_resolved": 1.0
+  },
+  "geostrophic": {
+    "rmse_ssh": 0.058601529647906624,
+    "rmse_u": 1.2086441467205684,
+    "rmse_v": 0.7717369645833969,
+    "rmse_uv": 1.0292318512996037,
+    "tau_uv": -3.739631425437356,
+    "tau_div": 2.9384238717835205e-05,
+    "tau_vort": -56.10350298085388,
+    "tau_curl": -56.10350298085388,
+    "tau_strain": -80.47511418013018,
+    "lambda_x_ssh_km": 122.24415584415586,
+    "lambda_x_ssh_min_ratio": 0.00033470854097827544,
+    "lambda_x_ssh_resolved": 1.0,
+    "lambda_x_uv_km": 101.56456876456878,
+    "lambda_x_uv_min_ratio": 0.04979477141388692,
+    "lambda_x_uv_resolved": 1.0
+  }
+}

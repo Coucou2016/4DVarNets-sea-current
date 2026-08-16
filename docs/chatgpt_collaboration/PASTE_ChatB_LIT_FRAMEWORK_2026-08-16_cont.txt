@@ -1,0 +1,29 @@
+CONTEXT 1/1 — Chat B update: honest framing when physics extras underperform + JAMES Methods/Results skeleton
+Role: external senior advisor with **web browsing/search ENABLED**. Cursor = sole implementer. Text-only reply. Cite DOI/URL. Do NOT invent our experimental numbers or Fablet table scores as ours.
+
+## Measured facts (use ONLY these)
+GPU96 NATL60 crop96 / 20ep (local ≠ paper table):
+| ID | tau_uv | rmse_uv | rmse_ssh |
+| B2 | 0.848 | 0.184 | 0.059 |
+| M3 | 0.811 | 0.206 | 0.064 |
+| M4 | 0.806 | 0.209 | 0.122 |
+| geo | -3.74 | 1.029 | — |
+All beat geo on tau_uv; ranking B2 > M3 ≳ M4; M4 worse SSH.
+Synthetic 8ep earlier: M4 best among B2/M3/M4.
+Solver = unchanged ConvLSTM 4DVarNet; we add eSQG-style SQG + SST adv residuals (+ optional strain UV uncert).
+
+## Tasks (please web-search)
+1) Literature architecture for SST–SSH currents: Fablet 2024 JAMES; 4DVarNet-SSH; SQG/eSQG; heat-budget/advection currents; multimodal SST–SSH DL. Give 5–8 citations with DOI.
+2) How to **honestly frame innovation** when physics extras (M3/M4) **underperform** pure SST synergy (B2) on short cropped OSSE:
+   - negative / partial result language suitable for JAMES/GMD methods paper
+   - when SQG/advection typically help vs fail (regime, ML depth, unbalanced motion, hyperparams)
+   - how to keep contributions defensible without claiming universal gains
+3) Propose **Methods + Results section skeleton** matching JAMES style (Key Points-aware; OSSE protocol; ablation; geostrophic baseline always present).
+4) List open risks for overclaiming.
+
+## Deliverable format
+A. Citations (title, year, venue, DOI, 1-line use)
+B. Framing paragraph (ready to adapt; hedge verbs calibrated to crop96/20ep)
+C. Methods/Results skeleton (numbered subsections + 1-line job each)
+D. Non-claims / risks
+END OF CONTEXT 1/1
