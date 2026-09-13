@@ -11,7 +11,13 @@ This document is the working manuscript framework after local literature verific
 
 ## Core claim (bounded, updated)
 
-We extend the Fablet et al. (2024) multimodal 4DVarNet cost with **explicit physics residuals** (eSQG-style SQG, SST advection, optional strain-aware UV uncertainty). On **GPU96 crop96/20ep**, B2 (SST synergy) **outperforms** M3 ≳ M4 on τ_uv. M4 SSH degradation from raw NLL scale mismatch is **fixed** (post-fix rmse_ssh ≈ 0.063); UV ranking unchanged. Innovation includes the ablatable physics cost **and** an honest partial/negative result on when extras help.
+We use a compact 4DVarNet-**inspired** ConvLSTM unrolled solver (not a byte-faithful
+Fablet clone; solver graph **was** changed — full unrolled autodiff, no per-iter
+`detach`) and extend the variational cost / supervised loss with **explicit physics
+residuals** (eSQG-style SQG, SST advection, optional strain-aware UV **spatial
+reweighting** — M4 is **not** uncertainty estimation). Historical GPU96 crop96/20ep
+scores are **`pre_p0_fix` / obsolete for claims**. Innovation includes the ablatable
+physics cost **and** an honest partial/negative result on when extras help.
 
 ## What Fablet 2024 already did (do not rehash as ours)
 
@@ -21,11 +27,11 @@ Trainable observation/prior operators inside 4DVarNet for SST–SSH → SSC; NAT
 
 | Claim element | Module |
 |---------------|--------|
-| Unrolled solver (unchanged) | `fourdvarnet/model.py`, `convlstm.py`, `solver.py` |
+| Unrolled solver (inspired; P0 graph fix) | `fourdvarnet/model.py`, `convlstm.py`, `solver.py` |
 | eSQG-style residual | `physics.sqg_velocity` |
 | Advection residual | `physics.sst_advection_residual` |
-| Strain σ / UV term | `physics.strain_uncertainty`, `losses.TrainingLoss` |
-| Metrics | `metrics.py` (τ, RMSE, λ_x, geostrophic) |
+| Strain σ / UV **reweight** (not σ head) | `physics.strain_uncertainty`, `losses.TrainingLoss` |
+| Metrics | `metrics.py` (τ, RMSE, λ_x, OI-only geostrophic) |
 
 ## Results narrative (evidence-calibrated)
 

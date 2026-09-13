@@ -1,153 +1,163 @@
-[
-  {
-    "name": "B2",
-    "use_sst": 1,
-    "use_sqg": 0,
-    "use_adv": 0,
-    "use_uncert": 0,
-    "ckpt": "E:\\Projects\\20260522-4DVarNets-sea-current\\checkpoints\\4dvarnet-B2-best.pt",
-    "eval_ok": true,
-    "metrics": {
+{
+  "pre_p0_fix": true,
+  "disclaimer": "PRE-P0-FIX / OBSOLETE FOR FORMAL PAPER CLAIMS. Synthetic ablation summary collected before Phase-1 P0 correctness fixes. See docs/REVIEW_RESPONSE_P0.md.",
+  "runs": [
+    {
+      "name": "B2",
+      "use_sst": 1,
+      "use_sqg": 0,
+      "use_adv": 0,
+      "use_uncert": 0,
       "ckpt": "E:\\Projects\\20260522-4DVarNets-sea-current\\checkpoints\\4dvarnet-B2-best.pt",
-      "source": "synthetic",
-      "flags": {
-        "use_sst": true,
-        "use_sqg": false,
-        "use_adv": false,
-        "use_uncert": false
+      "eval_ok": true,
+      "metrics": {
+        "ckpt": "E:\\Projects\\20260522-4DVarNets-sea-current\\checkpoints\\4dvarnet-B2-best.pt",
+        "source": "synthetic",
+        "flags": {
+          "use_sst": true,
+          "use_sqg": false,
+          "use_adv": false,
+          "use_uncert": false
+        },
+        "model": {
+          "rmse_ssh": 0.052945706993341446,
+          "rmse_u": 0.39168527722358704,
+          "rmse_v": 0.37038518488407135,
+          "rmse_uv": 0.38118574023246765,
+          "tau_uv": 0.24212002815641348,
+          "tau_div": -0.12449026661715279,
+          "tau_vort": 0.30492172666695433,
+          "tau_curl": 0.30492172666695433,
+          "tau_strain": -0.6699593504980663,
+          "lambda_x_ssh_km": null,
+          "lambda_x_uv_km": 177.60000000000002
+        },
+        "geostrophic": {
+          "rmse_ssh": 0.054063012823462486,
+          "rmse_u": 0.43694163858890533,
+          "rmse_v": 0.4247245490550995,
+          "rmse_uv": 0.43088045716285706,
+          "tau_uv": 0.0316480687573692,
+          "tau_div": 0.00016277202855252693,
+          "tau_vort": 0.003690146246363768,
+          "tau_curl": 0.003690146246363768,
+          "tau_strain": -2.3615548238447244,
+          "lambda_x_ssh_km": null,
+          "lambda_x_uv_km": null
+        },
+        "pre_p0_fix": true
       },
-      "model": {
-        "rmse_ssh": 0.052945706993341446,
-        "rmse_u": 0.39168527722358704,
-        "rmse_v": 0.37038518488407135,
-        "rmse_uv": 0.38118574023246765,
-        "tau_uv": 0.24212002815641348,
-        "tau_div": -0.12449026661715279,
-        "tau_vort": 0.30492172666695433,
-        "tau_curl": 0.30492172666695433,
-        "tau_strain": -0.6699593504980663,
-        "lambda_x_ssh_km": null,
-        "lambda_x_uv_km": 177.60000000000002
-      },
-      "geostrophic": {
-        "rmse_ssh": 0.054063012823462486,
-        "rmse_u": 0.43694163858890533,
-        "rmse_v": 0.4247245490550995,
-        "rmse_uv": 0.43088045716285706,
-        "tau_uv": 0.0316480687573692,
-        "tau_div": 0.00016277202855252693,
-        "tau_vort": 0.003690146246363768,
-        "tau_curl": 0.003690146246363768,
-        "tau_strain": -2.3615548238447244,
-        "lambda_x_ssh_km": null,
-        "lambda_x_uv_km": null
-      }
-    }
-  },
-  {
-    "name": "M3",
-    "use_sst": 1,
-    "use_sqg": 1,
-    "use_adv": 1,
-    "use_uncert": 0,
-    "ckpt": "E:\\Projects\\20260522-4DVarNets-sea-current\\checkpoints\\4dvarnet-M3-best.pt",
-    "eval_ok": true,
-    "metrics": {
+      "pre_p0_fix": true
+    },
+    {
+      "name": "M3",
+      "use_sst": 1,
+      "use_sqg": 1,
+      "use_adv": 1,
+      "use_uncert": 0,
       "ckpt": "E:\\Projects\\20260522-4DVarNets-sea-current\\checkpoints\\4dvarnet-M3-best.pt",
-      "source": "synthetic",
-      "flags": {
-        "use_sst": true,
-        "use_sqg": true,
-        "use_adv": true,
-        "use_uncert": false
+      "eval_ok": true,
+      "metrics": {
+        "ckpt": "E:\\Projects\\20260522-4DVarNets-sea-current\\checkpoints\\4dvarnet-M3-best.pt",
+        "source": "synthetic",
+        "flags": {
+          "use_sst": true,
+          "use_sqg": true,
+          "use_adv": true,
+          "use_uncert": false
+        },
+        "model": {
+          "rmse_ssh": 0.053039321675896645,
+          "rmse_u": 0.387030765414238,
+          "rmse_v": 0.37554067373275757,
+          "rmse_uv": 0.3813364803791046,
+          "tau_uv": 0.24150187925756256,
+          "tau_div": -0.21035784313717298,
+          "tau_vort": 0.3094822116487396,
+          "tau_curl": 0.3094822116487396,
+          "tau_strain": -0.47451054926556824,
+          "lambda_x_ssh_km": null,
+          "lambda_x_ssh_min_ratio": 0.6046223660554566,
+          "lambda_x_ssh_resolved": 0.0,
+          "lambda_x_uv_km": 177.60000000000002,
+          "lambda_x_uv_min_ratio": 0.23046397283022418,
+          "lambda_x_uv_resolved": 1.0
+        },
+        "geostrophic": {
+          "rmse_ssh": 0.054063012823462486,
+          "rmse_u": 0.43694163858890533,
+          "rmse_v": 0.4247245490550995,
+          "rmse_uv": 0.43088045716285706,
+          "tau_uv": 0.0316480687573692,
+          "tau_div": 0.00016277202855252693,
+          "tau_vort": 0.003690146246363768,
+          "tau_curl": 0.003690146246363768,
+          "tau_strain": -2.3615548238447244,
+          "lambda_x_ssh_km": null,
+          "lambda_x_ssh_min_ratio": 0.7478472481309822,
+          "lambda_x_ssh_resolved": 0.0,
+          "lambda_x_uv_km": null,
+          "lambda_x_uv_min_ratio": 0.7830444303515247,
+          "lambda_x_uv_resolved": 0.0
+        },
+        "pre_p0_fix": true
       },
-      "model": {
-        "rmse_ssh": 0.053039321675896645,
-        "rmse_u": 0.387030765414238,
-        "rmse_v": 0.37554067373275757,
-        "rmse_uv": 0.3813364803791046,
-        "tau_uv": 0.24150187925756256,
-        "tau_div": -0.21035784313717298,
-        "tau_vort": 0.3094822116487396,
-        "tau_curl": 0.3094822116487396,
-        "tau_strain": -0.47451054926556824,
-        "lambda_x_ssh_km": null,
-        "lambda_x_ssh_min_ratio": 0.6046223660554566,
-        "lambda_x_ssh_resolved": 0.0,
-        "lambda_x_uv_km": 177.60000000000002,
-        "lambda_x_uv_min_ratio": 0.23046397283022418,
-        "lambda_x_uv_resolved": 1.0
-      },
-      "geostrophic": {
-        "rmse_ssh": 0.054063012823462486,
-        "rmse_u": 0.43694163858890533,
-        "rmse_v": 0.4247245490550995,
-        "rmse_uv": 0.43088045716285706,
-        "tau_uv": 0.0316480687573692,
-        "tau_div": 0.00016277202855252693,
-        "tau_vort": 0.003690146246363768,
-        "tau_curl": 0.003690146246363768,
-        "tau_strain": -2.3615548238447244,
-        "lambda_x_ssh_km": null,
-        "lambda_x_ssh_min_ratio": 0.7478472481309822,
-        "lambda_x_ssh_resolved": 0.0,
-        "lambda_x_uv_km": null,
-        "lambda_x_uv_min_ratio": 0.7830444303515247,
-        "lambda_x_uv_resolved": 0.0
-      }
-    }
-  },
-  {
-    "name": "M4",
-    "use_sst": 1,
-    "use_sqg": 1,
-    "use_adv": 1,
-    "use_uncert": 1,
-    "ckpt": "E:\\Projects\\20260522-4DVarNets-sea-current\\checkpoints\\4dvarnet-M4-best.pt",
-    "eval_ok": true,
-    "metrics": {
+      "pre_p0_fix": true
+    },
+    {
+      "name": "M4",
+      "use_sst": 1,
+      "use_sqg": 1,
+      "use_adv": 1,
+      "use_uncert": 1,
       "ckpt": "E:\\Projects\\20260522-4DVarNets-sea-current\\checkpoints\\4dvarnet-M4-best.pt",
-      "source": "synthetic",
-      "flags": {
-        "use_sst": true,
-        "use_sqg": true,
-        "use_adv": true,
-        "use_uncert": true
+      "eval_ok": true,
+      "metrics": {
+        "ckpt": "E:\\Projects\\20260522-4DVarNets-sea-current\\checkpoints\\4dvarnet-M4-best.pt",
+        "source": "synthetic",
+        "flags": {
+          "use_sst": true,
+          "use_sqg": true,
+          "use_adv": true,
+          "use_uncert": true
+        },
+        "model": {
+          "rmse_ssh": 0.04835829325020313,
+          "rmse_u": 0.35906724631786346,
+          "rmse_v": 0.36175452172756195,
+          "rmse_uv": 0.36042115092277527,
+          "tau_uv": 0.3223895056079017,
+          "tau_div": -0.21553979060699568,
+          "tau_vort": 0.32359971892195444,
+          "tau_curl": 0.32359971892195444,
+          "tau_strain": -0.5733225210583248,
+          "lambda_x_ssh_km": 82.88000000000001,
+          "lambda_x_ssh_min_ratio": 0.4635531294768134,
+          "lambda_x_ssh_resolved": 1.0,
+          "lambda_x_uv_km": 177.60000000000002,
+          "lambda_x_uv_min_ratio": 0.18288252781222847,
+          "lambda_x_uv_resolved": 1.0
+        },
+        "geostrophic": {
+          "rmse_ssh": 0.054063012823462486,
+          "rmse_u": 0.43694163858890533,
+          "rmse_v": 0.4247245490550995,
+          "rmse_uv": 0.43088045716285706,
+          "tau_uv": 0.0316480687573692,
+          "tau_div": 0.00016277202855252693,
+          "tau_vort": 0.003690146246363768,
+          "tau_curl": 0.003690146246363768,
+          "tau_strain": -2.3615548238447244,
+          "lambda_x_ssh_km": null,
+          "lambda_x_ssh_min_ratio": 0.7478472481309822,
+          "lambda_x_ssh_resolved": 0.0,
+          "lambda_x_uv_km": null,
+          "lambda_x_uv_min_ratio": 0.7830444303515247,
+          "lambda_x_uv_resolved": 0.0
+        },
+        "pre_p0_fix": true
       },
-      "model": {
-        "rmse_ssh": 0.04835829325020313,
-        "rmse_u": 0.35906724631786346,
-        "rmse_v": 0.36175452172756195,
-        "rmse_uv": 0.36042115092277527,
-        "tau_uv": 0.3223895056079017,
-        "tau_div": -0.21553979060699568,
-        "tau_vort": 0.32359971892195444,
-        "tau_curl": 0.32359971892195444,
-        "tau_strain": -0.5733225210583248,
-        "lambda_x_ssh_km": 82.88000000000001,
-        "lambda_x_ssh_min_ratio": 0.4635531294768134,
-        "lambda_x_ssh_resolved": 1.0,
-        "lambda_x_uv_km": 177.60000000000002,
-        "lambda_x_uv_min_ratio": 0.18288252781222847,
-        "lambda_x_uv_resolved": 1.0
-      },
-      "geostrophic": {
-        "rmse_ssh": 0.054063012823462486,
-        "rmse_u": 0.43694163858890533,
-        "rmse_v": 0.4247245490550995,
-        "rmse_uv": 0.43088045716285706,
-        "tau_uv": 0.0316480687573692,
-        "tau_div": 0.00016277202855252693,
-        "tau_vort": 0.003690146246363768,
-        "tau_curl": 0.003690146246363768,
-        "tau_strain": -2.3615548238447244,
-        "lambda_x_ssh_km": null,
-        "lambda_x_ssh_min_ratio": 0.7478472481309822,
-        "lambda_x_ssh_resolved": 0.0,
-        "lambda_x_uv_km": null,
-        "lambda_x_uv_min_ratio": 0.7830444303515247,
-        "lambda_x_uv_resolved": 0.0
-      }
+      "pre_p0_fix": true
     }
-  }
-]
+  ]
+}

@@ -19,34 +19,34 @@ code { font-family: Consolas, monospace; font-size: 0.9em; }
 <h1>Physics-constrained 4DVarNet for SST–SSH sea-surface current inversion</h1>
 <p><strong>Assembled manuscript (working).</strong> Crop96/20ep ≠ JAMES Table.<br />
 <strong>Public code:</strong> https://github.com/Coucou2016/4DVarNets-sea-current<br />
-<strong>Assembled:</strong> 2026-08-16</p>
+<strong>Assembled:</strong> 2026-09-14</p>
 <p><strong>Axes (nature-writing):</strong> <code>task=manuscript</code>, <code>paper_type=methods</code>, <code>journal=generic</code> (JAMES / GMD-style methods paper; Nature-family <em>clarity</em>, not flagship Nature format), <code>language=en</code>.</p>
 <hr />
 <h2>Key Points</h2>
 <ul>
-<li>Explicit eSQG-style SQG, SST-advection, and optional strain-aware UV uncertainty residuals can be embedded in a Fablet-like 4DVarNet cost without replacing the ConvLSTM solver.</li>
-<li>On a preliminary NATL60 <strong>crop96 / 20-epoch</strong> OSSE, measured ranking is <strong>B2 &gt; M3 ≳ M4</strong> on τ_uv (0.848 / 0.811 / 0.801); all beat geostrophy (τ_uv ≈ −3.74). Physics extras are not universally additive.</li>
-<li>A raw heteroscedastic NLL scale bug starved M4 SSH (rmse_ssh 0.122); σ-normalized UV loss + retrain recovers rmse_ssh ≈ 0.063 while UV still trails B2. Cropped short runs are <strong>not</strong> paper Table rows.</li>
+<li>Explicit eSQG-style SQG, SST-advection, and optional strain-aware UV <strong>reweighting</strong> can be embedded in a compact 4DVarNet-<strong>inspired</strong> cost (solver graph was updated for full unrolled autodiff; not a byte-faithful Fablet clone).</li>
+<li>Historical NATL60 <strong>crop96 / 20-epoch</strong> OSSE scores (<strong><code>pre_p0_fix</code> / obsolete for claims</strong>) ranked <strong>B2 &gt; M3 ≳ M4</strong> on τ_uv; all beat geostrophy. Physics extras are not universally additive.</li>
+<li>A raw heteroscedastic NLL scale bug starved M4 SSH; σ-normalized UV reweight + retrain recovered SSH while UV still trailed B2. Cropped short runs are <strong>not</strong> paper Table rows. Post-P0 retrain required before any formal score.</li>
 </ul>
 <h2>Plain Language Summary</h2>
-<p>Satellites measure sea level and sea-surface temperature more easily than they measure ocean currents directly. Learning models that combine those measurements can estimate currents better than the classical geostrophic approximation. We test whether adding explicit physics “checks” (surface quasi-geostrophy and temperature advection) inside a variational neural solver helps further. In our short, cropped simulation tests, the simpler sea-level + temperature model still wins; the physics checks remain useful to implement and diagnose, but they do not automatically improve scores. We also show how a poorly scaled uncertainty loss can quietly damage sea-level skill, and how to fix that scaling.</p>
+<p>Satellites measure sea level and sea-surface temperature more easily than they measure ocean currents directly. Learning models that combine those measurements can estimate currents better than the classical geostrophic approximation. We test whether adding explicit physics “checks” (surface quasi-geostrophy and temperature advection) inside a variational neural solver helps further. In our short, cropped simulation tests, the simpler sea-level + temperature model still wins; the physics checks remain useful to implement and diagnose, but they do not automatically improve scores. We also show how a poorly scaled strain-reweighting loss can quietly damage sea-level skill, and how to fix that scaling.</p>
 <h2>Abstract</h2>
-<p>Estimating sea-surface currents (SSC) from satellite sea-surface height (SSH) remains limited by altimeter resolution and by the geostrophic approximation. Multimodal 4DVarNet solvers that synergize SSH with sea-surface temperature (SST) already improve SSC relative to geostrophy in NATL60 observing-system simulation experiments (OSSEs). Here we keep a Fablet-style unrolled ConvLSTM 4DVarNet and extend only the variational cost / supervised loss with (i) an effective eSQG-style SQG residual, (ii) an SST advection residual, and (iii) optional strain-heteroscedastic UV uncertainty. Under a controlled ablation (B2: SSH+SST; M3: +SQG+advection; M4: +uncertainty), synthetic short runs can favor physics extras, but on a preliminary NATL60 <strong>crop_size=96, 20-epoch</strong> protocol the measured ranking is <strong>B2 &gt; M3 ≳ M4</strong> on explained variance τ_uv (0.848 / 0.811 / 0.801), with all configurations beating geostrophy (τ_uv ≈ −3.74; rmse_uv ≈ 1.029). Expanded diagnostics from the same evaluations show positive τ_div / τ_vort / τ_strain only for B2. An M4 SSH degradation (rmse_ssh 0.122) is traced to raw NLL scale mismatch and repaired by a σ-normalized UV term (post-fix rmse_ssh 0.063). We therefore frame physics residuals as implementable, ablatable, and <strong>regime-/hyperparameter-dependent</strong>, not universally additive. Cropped short-epoch scores are preliminary and must not be read as JAMES Table rows; uncropped long-epoch NATL60 Table claims remain gated on hardware beyond a 4GB GPU.</p>
+<p>Estimating sea-surface currents (SSC) from satellite sea-surface height (SSH) remains limited by altimeter resolution and by the geostrophic approximation. Multimodal 4DVarNet solvers that synergize SSH with sea-surface temperature (SST) already improve SSC relative to geostrophy in NATL60 observing-system simulation experiments (OSSEs). Here we use a compact 4DVarNet-<strong>inspired</strong> ConvLSTM unrolled solver (not a byte-faithful Fablet reproduction; the solver autodiff graph was corrected) and extend the variational cost / supervised loss with (i) an effective eSQG-style SQG residual, (ii) an SST advection residual, and (iii) optional strain-aware spatial UV <strong>reweighting</strong> (M4 — not uncertainty estimation). Under a controlled ablation (B2: SSH+SST; M3: +SQG+advection; M4: +reweighting), synthetic short runs can favor physics extras, but historical NATL60 <strong>crop_size=96, 20-epoch</strong> scores (<strong><code>pre_p0_fix</code></strong>) ranked <strong>B2 &gt; M3 ≳ M4</strong> on explained variance τ_uv, with all configurations beating geostrophy. An M4 SSH degradation is traced to raw NLL scale mismatch and repaired by a σ-normalized UV term. We therefore frame physics residuals as implementable, ablatable, and <strong>regime-/hyperparameter-dependent</strong>, not universally additive. Cropped short-epoch scores must not be read as JAMES Table rows; post-P0 retrain and uncropped long-epoch NATL60 claims remain gated.</p>
 <hr />
 <h1>1. Introduction</h1>
 <p><strong>Status:</strong> matured draft (evidence-calibrated; crop96/20ep ≠ paper Table).<br />
 <strong>Nature-skills axes:</strong> <code>task=manuscript</code>, <code>paper_type=methods</code>, <code>journal=generic</code> (JAMES/GMD-style), <code>language=en</code>.</p>
 <hr />
 <p>Sea-surface current (SSC) estimation from satellite altimetry remains limited by the effective resolution of sea-surface height (SSH) and by the geostrophic approximation, which under-represents ageostrophic and small-scale contributions in energetic western-boundary regimes. Synergistic use of sea-surface temperature (SST) with SSH is a long-standing route to finer-scale surface velocities, via surface quasi-geostrophy (SQG / eSQG), heat-budget / advection inversions, and, more recently, multimodal deep learning (e.g. Lapeyre &amp; Klein, 2006; Rio et al., 2016; Martin et al., 2023; Fablet et al., 2024).</p>
-<p>Fablet et al. (2024, JAMES) established a multimodal 4DVarNet solver for SST–SSH → SSC in NATL60 Gulf Stream observing-system simulation experiments (OSSEs), with trainable observation/prior operators inside an unrolled variational loop. That baseline already demonstrates strong SST–SSH synergy relative to geostrophy. What it does <strong>not</strong> make explicit in the variational cost are physics residuals motivated by eSQG mixing and SST advection, nor a strain-aware treatment of UV uncertainty. A complementary line—VarDyn / dynamical joint SSH–SST mapping (Le Guillou, Chapron &amp; Rio, 2025, JAMES)—constrains SSH and SST with reduced dynamical models rather than learning SSC through an unrolled neural solver; we cite it as a dynamical counterpart, not a competing SSC Table.</p>
+<p>Fablet et al. (2024, JAMES) established a multimodal 4DVarNet solver for SST–SSH → SSC in NATL60 Gulf Stream observing-system simulation experiments (OSSEs), with trainable observation/prior operators inside an unrolled variational loop. That baseline already demonstrates strong SST–SSH synergy relative to geostrophy. What it does <strong>not</strong> make explicit in the variational cost are physics residuals motivated by eSQG mixing and SST advection, nor a strain-aware spatial treatment of UV errors. A complementary line—VarDyn / dynamical joint SSH–SST mapping (Le Guillou, Chapron &amp; Rio, 2025, JAMES)—constrains SSH and SST with reduced dynamical models rather than learning SSC through an unrolled neural solver; we cite it as a dynamical counterpart, not a competing SSC Table.</p>
 <p><strong>Gap.</strong> Without explicit physics residuals, it is hard to attribute gains to dynamical constraints versus learned multimodal synergy alone, and harder to diagnose when SQG/advection priors help or hurt. Conversely, naively adding physics terms can degrade skill if operators are misspecified, poorly scaled, or regime-dependent—e.g. when SST is a weak proxy for surface density, mixed-layer motions dominate, or interior potential vorticity contributes strongly to surface velocity (Isern-Fontanet / González-Haro transfer-function literature; Miracca-Lage et al., 2022; Yassin &amp; Griffies, 2023, on variable-stratification SQG regimes).</p>
-<p><strong>This work.</strong> We keep the Fablet-style ConvLSTM 4DVarNet solver and extend only the variational cost / supervised loss with (i) an <em>effective</em> eSQG-style SQG residual, (ii) an SST advection residual, and (iii) optional strain-heteroscedastic UV uncertainty. We evaluate a controlled ablation matrix (B2 / M3 / M4) under identical training protocols on synthetic and cropped NATL60 OSSEs.</p>
+<p><strong>This work.</strong> We use a compact 4DVarNet-<strong>inspired</strong> ConvLSTM unrolled solver (not a byte-faithful Fablet/IMT reproduction) and extend the variational cost / supervised loss with (i) an <em>effective</em> eSQG-style SQG residual, (ii) an SST advection residual (final-time backward for single-time state), and (iii) optional strain-aware spatial UV <strong>reweighting</strong> (M4 — not a learned uncertainty head). We evaluate a controlled ablation matrix (B2 / M3 / M4) under identical training protocols on synthetic and cropped NATL60 OSSEs.</p>
 <p><strong>Contributions (honest).</strong></p>
 <ol>
-<li><strong>Physics residuals inside the unrolled cost</strong> — code-mapped operators for SQG, advection, and strain-aware UV uncertainty, without replacing the solver architecture.</li>
-<li><strong>Ablation evidence under a fair protocol</strong> — isolating SST synergy (B2) vs SQG+adv (M3) vs +uncertainty (M4), with geostrophy co-reported.</li>
-<li><strong>Partial / negative result on short cropped NATL60</strong> — on GPU96 crop96/20ep, <strong>B2 outperforms M3 ≳ M4</strong> on τ_uv; all still beat geostrophy on currents. Physics extras are <strong>regime- and hyperparameter-dependent</strong>, not universally additive. (M4 SSH degradation from raw NLL was diagnosed and repaired; post-fix SSH ≈ B2/M3 while UV still trails B2.)</li>
-<li><strong>M4 loss-scale diagnosis</strong> — raw heteroscedastic NLL with σ₀≪1 can swamp SSH terms; we document and mitigate the scale mismatch (σ-normalized UV term + retrain).</li>
+<li><strong>Physics residuals inside the unrolled cost</strong> — code-mapped operators for SQG, advection, and strain-aware UV reweighting.</li>
+<li><strong>Ablation evidence under a fair protocol</strong> — isolating SST synergy (B2) vs SQG+adv (M3) vs +reweighting (M4), with geostrophy co-reported.</li>
+<li><strong>Partial / negative result on short cropped NATL60 (pre-P0 historical)</strong> — on GPU96 crop96/20ep, <strong>B2 outperformed M3 ≳ M4</strong> on τ_uv; all still beat geostrophy. Those scores are <strong><code>pre_p0_fix</code> / obsolete for claims</strong> after Phase-1 correctness fixes (<code>docs/REVIEW_RESPONSE_P0.md</code>). Physics extras are <strong>regime- and hyperparameter-dependent</strong>, not universally additive.</li>
+<li><strong>M4 loss-scale diagnosis</strong> — raw heteroscedastic NLL with σ₀≪1 can swamp SSH terms; we document and mitigate the scale mismatch (σ-normalized UV reweight + retrain).</li>
 </ol>
 <p><strong>Boundary.</strong> Cropped / short-epoch GPU runs are <strong>preliminary</strong> and are <strong>not</strong> JAMES Table rows. Full-domain NATL60 long training and OSE/drifter evaluation remain future evidence gates. Hardware (GTX 950M 4GB) currently precludes uncropped 200×200 / ~200-ep Table runs; we therefore strengthen what <em>is</em> measured (expanded diagnostics τ_div, λ_x; honest ranking) rather than invent Table scores.</p>
 <h3>Key citations (verified DOI)</h3>
@@ -63,10 +63,13 @@ code { font-family: Consolas, monospace; font-size: 0.9em; }
 </ul>
 <h1>2. Methods</h1>
 <p><strong>Status:</strong> matured draft; equations mapped to repository modules.<br />
-Solver architecture follows Fablet et al. (2024); novelty is confined to cost/loss physics terms.</p>
+Compact 4DVarNet-<strong>inspired</strong> ConvLSTM unrolled solver (not a byte-faithful Fablet/IMT
+reproduction). Physics residuals live in the variational cost / supervised loss; the
+solver graph <strong>was changed</strong> for Phase-1 P0 (full unrolled autodiff, no per-iter
+<code>detach</code>; see <code>Solver4DVarNet</code> vs ablation <code>Solver4DVarNetTruncated</code>).</p>
 <hr />
 <h2>2.1 State and unrolled variational solver</h2>
-<p>State at each analysis time is (x = (\eta, u, v)) (SSH and surface currents). Observations provide gappy SSH (y) and an SST window (z) of length (dT) (default 7 days). The solver performs (K) unrolled gradient steps on a variational cost (U(x)), with LSTM-parameterized updates (ConvLSTM), as in 4DVarNet.</p>
+<p>State at each analysis time is (x = (\eta, u, v)) (SSH and surface currents). Observations provide gappy SSH (y) and an SST window (z) of length (dT) (default 7 days). The solver performs (K) unrolled gradient steps on a variational cost (U(x)), with LSTM-parameterized updates (ConvLSTM), in the spirit of 4DVarNet.</p>
 <table>
 <thead>
 <tr>
@@ -93,7 +96,8 @@ Solver architecture follows Fablet et al. (2024); novelty is confined to cost/lo
 </tr>
 </tbody>
 </table>
-<p>Initial state uses observed/OI SSH plus geostrophic ((u_g, v_g)).</p>
+<p>Initial state uses observed/OI SSH plus geostrophic ((u_g, v_g)). The <strong>geostrophic baseline</strong> for metrics uses <strong>pure OI/DUACS SSH</strong> (not the hybrid OI+sparse model input).</p>
+<p>Grid spacings (dx, dy) for SQG / advection / divergence come from dataset meter metrics when NATL60 provides lat-aware scales; synthetic falls back to config isotropic (dx_{\deg}\times 111\,\mathrm{km}).</p>
 <hr />
 <h2>2.2 Variational cost with physics residuals</h2>
 <p>Following Fablet’s multimodal cost and extending it:</p>
@@ -109,23 +113,23 @@ U(x)
 ]</p>
 <p>Implementation: <code>VariationalCost</code> in <code>fourdvarnet/solver.py</code>.</p>
 <p><strong>Flags (ablation):</strong> <code>use_sst</code>, <code>use_sqg</code>, <code>use_adv</code> (config / CLI). Default λ weights in <code>config/default.yaml</code> (<code>lam_obs</code>, <code>lam_sst</code>, <code>lam_prior</code>, <code>lam_sqg</code>, <code>lam_adv</code>).</p>
-<p><strong>Contrast to VarDyn.</strong> VarDyn (Le Guillou et al., 2025) jointly maps SSH and SST with QG / advection–diffusion dynamical constraints inside a classical 4DVar-style scheme. Our cost adds <em>SSC-facing</em> eSQG-style and SST-advection residuals inside a <strong>learned unrolled</strong> 4DVarNet aimed at ((u,v)), rather than replacing the neural solver with a reduced dynamical propagator.</p>
+<p><strong>Contrast to VarDyn.</strong> VarDyn (Le Guillou et al., 2025) jointly maps SSH and SST with QG / advection–diffusion dynamical constraints inside a classical 4DVar-style scheme. Our cost adds <em>SSC-facing</em> eSQG-style and SST-advection residuals inside a <strong>learned unrolled</strong> 4DVarNet-inspired solver aimed at ((u,v)), rather than replacing the neural solver with a reduced dynamical propagator.</p>
 <hr />
 <h2>2.3 Effective eSQG-style operator (A_{\mathrm{SQG}})</h2>
-<p>We use an <em>effective</em> surface QG–style mixing of SST and SSH anomalies to predict a velocity field (not a full 3D SQG inversion). Code: <code>physics.sqg_velocity</code> (<code>fourdvarnet/physics.py</code>), with deformation radius <code>Ld</code> (<code>Ld_km</code> in config), Coriolis <code>f0</code>, gravity <code>g</code>, and grid spacings <code>dx, dy</code> from <code>physics.dx_deg</code>.</p>
+<p>We use an <em>effective</em> surface QG–style mixing of SST and SSH anomalies to predict a velocity field (not a full 3D SQG inversion). Code: <code>physics.sqg_velocity</code> (<code>fourdvarnet/physics.py</code>), with deformation radius <code>Ld</code> (<code>Ld_km</code> in config), Coriolis <code>f0</code>, gravity <code>g</code>, and grid spacings <code>dx, dy</code> from the dataset (or <code>physics.dx_deg</code> fallback).</p>
 <p><strong>Assumptions / limits.</strong> SST is treated as a usable surface-density proxy; phase/amplitude relations may fail in mixed-layer–dominated or strongly unbalanced regimes, or when interior PV contributes to surface velocity (Miracca-Lage et al., 2022; Yassin &amp; Griffies, 2023). This motivates reporting cases where SQG residuals do <strong>not</strong> improve over pure SST synergy.</p>
 <hr />
 <h2>2.4 SST advection residual</h2>
-<p>Heat-budget style residual:</p>
+<p>Heat-budget style residual (final-time backward for single-time state):</p>
 <p>[
 r_{\mathrm{adv}} = \partial_t T + u\,\partial_x T + v\,\partial_y T - \kappa \nabla^2 T,
 ]</p>
-<p>with (\partial_t T) from consecutive SST frames in the (dT) window. Code: <code>physics.sst_advection_residual</code>. Requires (dT \ge 2) SST frames.</p>
+<p>with (\partial_t T = (T_t - T_{t-1})/\Delta t) from consecutive SST frames in the (dT) window. Code: <code>physics.sst_advection_residual</code>. Requires (dT \ge 2) SST frames.</p>
 <hr />
-<h2>2.5 Supervised training loss and strain uncertainty (M4)</h2>
+<h2>2.5 Supervised training loss and strain reweighting (M4)</h2>
 <p>Outside the inner cost, training minimizes a weighted supervised loss on SSH, (\nabla)SSH, UV, divergence, and prior consistency (<code>fourdvarnet/losses.py</code> → <code>TrainingLoss</code>; weights under <code>loss:</code> in config).</p>
-<p><strong>M4 — strain-aware UV term.</strong> Let (\sigma = \sigma_0 (1 + \alpha\,\mathrm{strain}(u,v))), clamped to (\sigma \le \sigma_0 \cdot m_{\max}). By default σ is computed from <strong>truth</strong> UV (<code>uncert_from_truth</code>) to block the collapse mode where predicted strain is inflated to shrink a heteroscedastic NLL.</p>
-<p>Normalized UV uncertainty term (MSE units when (\sigma \approx \sigma_0)):</p>
+<p><strong>M4 — strain-aware spatial UV reweighting (not uncertainty estimation).</strong> Let (\sigma = \sigma_0 (1 + \alpha\,\mathrm{strain}(u,v))), clamped to (\sigma \le \sigma_0 \cdot m_{\max}). By default σ is computed from <strong>truth</strong> UV (<code>uncert_from_truth</code>) to block the collapse mode where predicted strain is inflated to shrink a heteroscedastic term. There is <strong>no</strong> learned σ head.</p>
+<p>Normalized UV reweight term (MSE units when (\sigma \approx \sigma_0)):</p>
 <p>[
 L_{\mathrm{uv}}^{\sigma}
 = \mathbb{E}\Big[ |e_{uv}|^2 \big(\sigma_0/\sigma\big)^2 \Big]
@@ -162,18 +166,23 @@ L_{\mathrm{uv}}^{\sigma}
 </tr>
 <tr>
 <td>M4</td>
-<td>+ strain UV uncertainty</td>
+<td>+ strain UV spatial reweighting</td>
 <td>sst=1, sqg=1, adv=1, uncert=1</td>
 </tr>
 </tbody>
 </table>
-<p>Full matrix B1/M1/M2 documented in <code>docs/PAPER_EXPERIMENTS.md</code>. <strong>B1 crop96/20ep</strong> is desirable for ablation completeness but was <strong>not run in this session</strong> (GPU occupied / 4GB memory budget shared with other jobs); we report measured B2/M3/M4 only.</p>
+<p>Full matrix B1/M1/M2 documented in <code>docs/PAPER_EXPERIMENTS.md</code>. <strong>B1 crop96/20ep</strong> is desirable for ablation completeness but was <strong>not run in this session</strong> (GPU occupied / 4GB memory budget shared with other jobs); we report measured B2/M3/M4 only. GPU96 scores are <strong><code>pre_p0_fix</code> / obsolete for formal claims</strong>.</p>
 <hr />
 <h2>2.7 Metrics</h2>
-<p>Primary: (\tau_{uv}) (explained variance), <code>rmse_uv</code>, <code>rmse_ssh</code>. Diagnostics from the same JSON: (\tau_{\mathrm{div}}), (\tau_{\mathrm{vort}}), (\tau_{\mathrm{strain}}), resolved scales (\lambda_x) (SSH and UV). Always co-report <strong>geostrophic</strong> baseline on the same split (<code>fourdvarnet/metrics.py</code>, <code>scripts/evaluate.py</code>).</p>
+<p>Primary: (\tau_{uv}) (explained variance), <code>rmse_uv</code>, <code>rmse_ssh</code>. Diagnostics from the same JSON: (\tau_{\mathrm{div}}), (\tau_{\mathrm{vort}}), (\tau_{\mathrm{strain}}), resolved scales (\lambda_x) (SSH and UV). Temporal (\lambda_t) (<code>resolved_timescale</code>) is reported when ≥8 test windows are available; otherwise evaluate output marks it <strong>待补充</strong>. Always co-report <strong>OI-only geostrophic</strong> baseline on the same split (<code>fourdvarnet/metrics.py</code>, <code>scripts/evaluate.py</code>).</p>
 <h1>3. Experiments (setup + preliminary results)</h1>
 <p><strong>Status:</strong> matured draft. All numeric values below are <strong>local measured</strong> results.<br />
 <strong>Hard caveat:</strong> GPU96 = NATL60 <strong>crop_size=96</strong>, <strong>20 epochs</strong> — <strong>not</strong> JAMES Table / full-domain 200-ep protocol.</p>
+<blockquote>
+<p><strong>P0 (2026-09):</strong> GPU96 / synthetic metrics JSON are tagged <code>pre_p0_fix</code> and are
+<strong>obsolete for formal claims</strong> after Phase-1 correctness fixes. See
+<code>docs/REVIEW_RESPONSE_P0.md</code>. Numbers below are <strong>historical pre-fix</strong> context only.</p>
+</blockquote>
 <p>Figures: SciencePlots + Times New Roman via <code>scripts/plot_science.py</code> → <code>results/figures/</code> (mirrored in <code>docs/paper/figures/</code>). Expanded summary JSON: <code>results/metrics_GPU96_expanded_summary.json</code>.</p>
 <hr />
 <h2>3.1 OSSE protocols</h2>
@@ -241,8 +250,8 @@ L_{\mathrm{uv}}^{\sigma}
 <td>✓</td>
 <td>✓</td>
 <td>✓</td>
-<td>+ strain UV uncertainty</td>
-<td>Measured GPU96 (post-NLL-fix)</td>
+<td>+ strain-aware spatial reweighting</td>
+<td>Measured GPU96 (post-NLL-fix; <strong>pre_p0_fix</strong>)</td>
 </tr>
 <tr>
 <td>geo</td>
@@ -359,7 +368,7 @@ L_{\mathrm{uv}}^{\sigma}
 <p><strong>Reading Table B.</strong> On this preliminary protocol, B2 alone shows positive explained variance for divergence/vorticity/strain; M3/M4 are negative on these diagnostics despite competitive τ_uv. This strengthens the partial-result narrative: physics residuals do not automatically improve dynamical structure scores under crop96/20ep. λ_x values are reported for completeness; they are <strong>not</strong> promoted to paper-Table resolved-scale claims.</p>
 <h3>Figures (captions)</h3>
 <p><strong>Figure 2 (synthetic).</strong> <code>fig_synth_ablation_tau_uv</code>, <code>fig_synth_ablation_rmse_uv</code><br />
-<em>Caption:</em> Synthetic OSSE ablation (8 epochs). Directional only; not NATL60 Table metrics. On this short synthetic run, M4 ranked best among B2/M3/M4 after the truth-σ uncertainty fix.</p>
+<em>Caption:</em> Synthetic OSSE ablation (8 epochs). Directional only; not NATL60 Table metrics. On this short synthetic run, M4 ranked best among B2/M3/M4 after the truth-σ reweight fix.</p>
 <p><strong>Figure 3 (GPU96 primary).</strong> <code>fig_GPU96_tau_uv</code>, <code>fig_GPU96_rmse_uv</code>, <code>fig_{B2,M3,M4}_GPU96_loss</code><br />
 <em>Caption:</em> NATL60 OSSE, <strong>cropped 96×96, 20 epochs</strong>. Explained variance and RMSE of surface currents for B2/M3/M4 vs geostrophy; loss curves for each run. <strong>Preliminary / not paper Table.</strong> B2 leads; M3 and M4 remain far above geostrophy but do not improve on B2.</p>
 <p><strong>Figure 3b (GPU96 diagnostics).</strong> <code>fig_GPU96_tau_div</code>, <code>fig_GPU96_lambda_x_uv</code><br />
@@ -399,9 +408,9 @@ L_{\mathrm{uv}}^{\sigma}
 <p><strong>Status:</strong> matured draft. Interprets measured crop96/20ep and synthetic evidence only.</p>
 <hr />
 <h2>4.1 Main interpretation</h2>
-<p>On the <strong>short cropped NATL60 OSSE</strong>, explicit SQG + advection residuals (M3) and strain uncertainty (M4) <strong>do not improve</strong> surface-current skill over the pure SST–SSH synergy baseline (B2). All three learned configurations still <strong>strongly outperform geostrophy</strong> on τ_uv and rmse_uv. Expanded diagnostics reinforce the message: only B2 shows positive τ_div / τ_vort / τ_strain on this protocol. The honest claim is therefore:</p>
+<p>On the <strong>short cropped NATL60 OSSE</strong> (historical <strong><code>pre_p0_fix</code></strong> scores), explicit SQG + advection residuals (M3) and strain <strong>reweighting</strong> (M4) <strong>do not improve</strong> surface-current skill over the pure SST–SSH synergy baseline (B2). All three learned configurations still <strong>strongly outperform geostrophy</strong> on τ_uv and rmse_uv. Expanded diagnostics reinforce the message: only B2 shows positive τ_div / τ_vort / τ_strain on this protocol. The honest claim is therefore:</p>
 <blockquote>
-<p>Physics-constrained cost terms are implementable inside 4DVarNet and remain competitive with geostrophy, but <strong>SST synergy alone can dominate</strong> under this cropped/short-epoch protocol; SQG/advection/uncertainty are <strong>not universally additive</strong>.</p>
+<p>Physics-constrained cost terms are implementable inside a 4DVarNet-<strong>inspired</strong> solver and remain competitive with geostrophy, but <strong>SST synergy alone can dominate</strong> under this cropped/short-epoch protocol; SQG/advection/reweighting are <strong>not universally additive</strong>.</p>
 </blockquote>
 <p>This is a useful <strong>partial / negative result</strong> for methods papers: it bounds when “more physics in the cost” helps, and it documents a concrete loss-scale failure mode (raw NLL) that can masquerade as a dynamical failure.</p>
 <hr />
@@ -419,7 +428,7 @@ L_{\mathrm{uv}}^{\sigma}
 <p><strong>Pre-fix GPU96</strong> matched M3 on tau_uv but roughly <strong>doubled</strong> rmse_ssh (0.122 vs ~0.06). Best-val ~682 vs ~5 for B2/M3 was a <strong>loss-scale bug</strong>, not a deep dynamical failure:</p>
 <ul>
 <li>Raw heteroscedastic NLL <code>||e||^2/sigma^2</code> with <code>sigma_0≈0.05</code> is <code>~1/sigma_0^2</code> larger than MSE.</li>
-<li>UV gradients then dominate; SSH terms become relatively weak — SSH fit suffers while UV remains OK via the uncertainty weighting.</li>
+<li>UV gradients then dominate; SSH terms become relatively weak — SSH fit suffers while UV remains OK via the strain reweighting.</li>
 </ul>
 <p><strong>Mitigation + retrain (2026-08-16):</strong> sigma-normalized UV term + <code>uncert_mse_mix: 0.5</code>; full M4-GPU96 <strong>20ep retrain</strong> on faceswap CUDA. Post-fix: best val <strong>4.83</strong>, rmse_ssh <strong>0.063</strong>, tau_uv <strong>0.801</strong>, rmse_uv <strong>0.211</strong>. SSH recovered near B2/M3; currents still trail B2 (ranking unchanged: B2 &gt; M3 ≳ M4). Pre-fix metrics archived as <code>results/metrics_M4_GPU96_pre_nllfix.json</code>.</p>
 <hr />
@@ -427,7 +436,7 @@ L_{\mathrm{uv}}^{\sigma}
 <p>Defensible:</p>
 <ul>
 <li>Explicit, ablatable physics residuals inside a Fablet-like 4DVarNet cost.</li>
-<li>Engineering diagnosis of uncertainty collapse / scale mismatch.</li>
+<li>Engineering diagnosis of reweighting / NLL scale mismatch.</li>
 <li>Evidence that multimodal SST synergy can outperform added SQG/adv on a constrained OSSE — a caution for “physics always helps” narratives.</li>
 <li>Transparent contrast to dynamical joint SSH–SST mapping (VarDyn) without claiming SSC Table superiority.</li>
 </ul>
@@ -443,7 +452,7 @@ L_{\mathrm{uv}}^{\sigma}
 <ol>
 <li><strong>Full-grid / longer NATL60</strong> (uncropped, ≥ paper epoch budget) for B2/M3/M4 with fixed seeds — <strong>blocked on 4GB GPU</strong> until hardware upgrades or off-machine compute.</li>
 <li><strong>B1 crop96/20ep</strong> when GPU is free, for ablation completeness (SSH-only vs SST synergy).</li>
-<li><strong>λ_sqg / λ_adv / uncertainty sweep</strong> on a small grid before locking Table configs.</li>
+<li><strong>λ_sqg / λ_adv / reweighting (M4) sweep</strong> on a small grid before locking Table configs.</li>
 <li>~~Re-train M4 with normalized NLL~~ <strong>Done</strong> (SSH 0.063); next: multi-seed short runs if memory allows.</li>
 <li><strong>OSE / drifters</strong> (<code>scripts/evaluate_drifters.py</code>) once OSSE Table rows exist.</li>
 <li>Optional: M1/M2 single-term ablations to separate SQG vs advection on full protocol.</li>
@@ -460,10 +469,10 @@ L_{\mathrm{uv}}^{\sigma}
 </ul>
 <h1>5. Conclusions</h1>
 <ol>
-<li>Explicit eSQG-style SQG, SST-advection, and optional strain-aware UV uncertainty can be embedded in a Fablet-like 4DVarNet cost without changing the ConvLSTM solver.</li>
-<li>On NATL60 <strong>crop96/20ep</strong>, ranking is <strong>B2 &gt; M3 ≳ M4</strong> on τ_uv; all beat geostrophy. Physics extras are <strong>not universally additive</strong> under this protocol; divergence/vorticity/strain explained variances favor B2 in the same measured JSON.</li>
-<li>M4 SSH degradation was an NLL scale bug; post-fix retrain recovers rmse_ssh ≈ 0.063 while UV still trails B2.</li>
-<li>Paper-table claims require uncropped, long-epoch NATL60 (+ optional OSE/drifters). On current 4GB hardware we strengthen measured crop96 diagnostics rather than invent Table scores.</li>
+<li>Explicit eSQG-style SQG, SST-advection, and optional strain-aware UV <strong>reweighting</strong> can be embedded in a compact 4DVarNet-<strong>inspired</strong> cost (solver autodiff graph corrected; not an unchanged / byte-faithful Fablet clone).</li>
+<li>Historical NATL60 <strong>crop96/20ep</strong> scores (<strong><code>pre_p0_fix</code></strong>) ranked <strong>B2 &gt; M3 ≳ M4</strong> on τ_uv; all beat geostrophy. Physics extras are <strong>not universally additive</strong> under that protocol.</li>
+<li>M4 SSH degradation was an NLL scale bug; σ-normalized reweight + retrain recovered SSH while UV still trailed B2.</li>
+<li>Paper-table claims require post-P0 retrain on uncropped, long-epoch NATL60 (+ optional OSE/drifters). On current 4GB hardware we strengthen measured crop96 diagnostics rather than invent Table scores.</li>
 </ol>
 <h1>Open Research</h1>
 <p>Code, metrics JSON, and figures: https://github.com/Coucou2016/4DVarNets-sea-current (excludes large <code>*.nc</code> / <code>*.pt</code> weights). NATL60 source data follow the Fablet/Oceanix OSSE distribution cited in Fablet et al. (2024).</p>

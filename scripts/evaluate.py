@@ -15,9 +15,9 @@ from torch.utils.data import DataLoader
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from data.dataset import make_datasets
-from fourdvarnet.metrics import batch_metrics
-from fourdvarnet.model import build_fourdvarnet, physics_scales_from_config
+from data.dataset import make_datasets, scales_from_dataset
+from fourdvarnet.metrics import batch_metrics, resolved_timescale
+from fourdvarnet.model import build_fourdvarnet
 
 
 def _fmt(v: float) -> str:
@@ -44,6 +44,18 @@ def _jsonable(obj):
             return None
         return obj
     return obj
+
+
+def _batch_scales(batch: dict, fallback: dict[str, float]) -> tuple[float, float]:
+    dx = batch.get("dx")
+    dy = batch.get("dy")
+    if dx is None or dy is None:
+        return float(fallback["dx"]), float(fallback["dy"])
+    if isinstance(dx, torch.Tensor):
+        dx = float(dx.float().mean().item())
+    if isinstance(dy, torch.Tensor):
+        dy = float(dy.float().mean().item())
+    return float(dx), float(dy)
 
 
 def main() -> None:
@@ -85,22 +97,30 @@ def main() -> None:
     use_adv = ckpt.get("use_adv", mcfg.get("use_adv", False))
     use_uncert = ckpt.get("use_uncert", mcfg.get("use_uncert", False))
 
+    scales = scales_from_dataset(test_ds, ckpt_cfg)
     model = build_fourdvarnet(
         ckpt_cfg,
         use_sst=use_sst,
         use_sqg=use_sqg,
         use_adv=use_adv,
         use_uncert=use_uncert,
+        dx=scales["dx"],
+        dy=scales["dy"],
+        f0=scales["f0"],
     )
     model.load_state_dict(ckpt["model"])
     model.eval()
 
-    scales = physics_scales_from_config(ckpt_cfg)
-    dx_km = float((ckpt_cfg.get("physics") or {}).get("dx_deg", 0.05)) * 111.0
+    dx_km = float(scales["dx"]) / 1000.0
+    dt_s = float(scales.get("dt", (ckpt_cfg.get("model") or {}).get("dt_seconds", 86400.0)))
 
     model_ms, geo_ms = [], []
+    # Domain-mean UV time series for temporal λ (need ≥8 samples).
+    pred_uv_ts: list[float] = []
+    truth_uv_ts: list[float] = []
     # Inner 4DVar loop needs autograd even at inference - do not wrap in no_grad.
     for batch in loader:
+        dx_b, dy_b = _batch_scales(batch, scales)
         pred = model(
             batch["y_ssh"],
             batch["z_sst"],
@@ -108,23 +128,58 @@ def main() -> None:
             batch["mask_sst"],
             batch["u_geo"],
             batch["v_geo"],
+            dx=dx_b,
+            dy=dy_b,
         )
         truth = batch["truth"]
         pred_d = pred.detach()
-        geo_state = torch.cat([batch["y_ssh"], batch["u_geo"], batch["v_geo"]], dim=1)
-        kw = dict(dx=scales["dx"], dy=scales["dy"], dx_km=dx_km)
+        # Fair geostrophic baseline: pure OI/DUACS SSH + OI-only geostrophy.
+        y_oi = batch.get("y_oi", batch["y_ssh"])
+        u_g = batch.get("u_geo_oi", batch["u_geo"])
+        v_g = batch.get("v_geo_oi", batch["v_geo"])
+        geo_state = torch.cat([y_oi, u_g, v_g], dim=1)
+        kw = dict(dx=dx_b, dy=dy_b, dx_km=dx_km)
         model_ms.append(batch_metrics(pred_d, truth, **kw))
         geo_ms.append(batch_metrics(geo_state, truth, **kw))
+
+        # Per-sample domain-mean |UV| proxies for temporal resolved scale.
+        for i in range(pred_d.shape[0]):
+            pu = pred_d[i, 1].mean().item()
+            pv = pred_d[i, 2].mean().item()
+            tu = truth[i, 1].mean().item()
+            tv = truth[i, 2].mean().item()
+            pred_uv_ts.append(0.5 * (pu + pv))
+            truth_uv_ts.append(0.5 * (tu + tv))
 
     mean_m = _mean_dicts(model_ms)
     mean_geo = _mean_dicts(geo_ms)
 
+    # Temporal λ: only meaningful with a long enough ordered series.
+    lam_t_note = "待补充"
+    if len(pred_uv_ts) >= 8:
+        lam_t_model = float(resolved_timescale(pred_uv_ts, truth_uv_ts, dt=dt_s))
+        mean_m["lambda_t_uv_s"] = lam_t_model
+        mean_m["lambda_t_uv_days"] = lam_t_model / 86400.0 if lam_t_model == lam_t_model else float("nan")
+        lam_t_note = "resolved_timescale on domain-mean UV series"
+    else:
+        mean_m["lambda_t_uv_s"] = float("nan")
+        mean_m["lambda_t_uv_days"] = float("nan")
+        mean_m["lambda_t_status"] = "待补充"
+        print(
+            f"NOTE: resolved_timescale 待补充 "
+            f"(need ≥8 test windows, got {len(pred_uv_ts)}; short smoke / crop runs skip temporal λ)"
+        )
+
     print("=== 4DVarNet test metrics ===")
+    print(f"  physics scales: dx={scales['dx']:.1f} m  dy={scales['dy']:.1f} m")
+    print("  geostrophic baseline: OI/DUACS-only (not hybrid OI+sparse)")
     for k, v in mean_m.items():
         g = mean_geo.get(k, float("nan"))
         print(f"  {k}: {_fmt(v)}   (geostrophic {_fmt(g)})")
     print(f"  tau_uv (geostrophic baseline): {_fmt(mean_geo.get('tau_uv', float('nan')))}")
     print(f"  tau_uv (4DVarNet): {_fmt(mean_m.get('tau_uv', float('nan')))}")
+    if len(pred_uv_ts) >= 8:
+        print(f"  lambda_t_uv_days (model): {_fmt(mean_m.get('lambda_t_uv_days', float('nan')))}  [{lam_t_note}]")
     if mean_m.get("tau_uv", float("nan")) > mean_geo.get("tau_uv", float("-inf")):
         print("OK: model beats geostrophic baseline on this test split")
     else:
@@ -140,8 +195,11 @@ def main() -> None:
                 "use_adv": bool(use_adv),
                 "use_uncert": bool(use_uncert),
             },
+            "physics_scales": {"dx": scales["dx"], "dy": scales["dy"], "f0": scales["f0"]},
+            "geostrophic_baseline": "oi_only",
             "model": mean_m,
             "geostrophic": mean_geo,
+            "lambda_t_note": lam_t_note if len(pred_uv_ts) >= 8 else "待补充 (need ≥8 windows)",
         }
         out_path = Path(args.out)
         if not out_path.is_absolute():

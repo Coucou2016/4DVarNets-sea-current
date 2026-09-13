@@ -22,17 +22,17 @@ FRONT = f"""# Physics-constrained 4DVarNet for SST–SSH sea-surface current inv
 
 ## Key Points
 
-- Explicit eSQG-style SQG, SST-advection, and optional strain-aware UV uncertainty residuals can be embedded in a Fablet-like 4DVarNet cost without replacing the ConvLSTM solver.
-- On a preliminary NATL60 **crop96 / 20-epoch** OSSE, measured ranking is **B2 > M3 ≳ M4** on τ_uv (0.848 / 0.811 / 0.801); all beat geostrophy (τ_uv ≈ −3.74). Physics extras are not universally additive.
-- A raw heteroscedastic NLL scale bug starved M4 SSH (rmse_ssh 0.122); σ-normalized UV loss + retrain recovers rmse_ssh ≈ 0.063 while UV still trails B2. Cropped short runs are **not** paper Table rows.
+- Explicit eSQG-style SQG, SST-advection, and optional strain-aware UV **reweighting** can be embedded in a compact 4DVarNet-**inspired** cost (solver graph was updated for full unrolled autodiff; not a byte-faithful Fablet clone).
+- Historical NATL60 **crop96 / 20-epoch** OSSE scores (**`pre_p0_fix` / obsolete for claims**) ranked **B2 > M3 ≳ M4** on τ_uv; all beat geostrophy. Physics extras are not universally additive.
+- A raw heteroscedastic NLL scale bug starved M4 SSH; σ-normalized UV reweight + retrain recovered SSH while UV still trailed B2. Cropped short runs are **not** paper Table rows. Post-P0 retrain required before any formal score.
 
 ## Plain Language Summary
 
-Satellites measure sea level and sea-surface temperature more easily than they measure ocean currents directly. Learning models that combine those measurements can estimate currents better than the classical geostrophic approximation. We test whether adding explicit physics “checks” (surface quasi-geostrophy and temperature advection) inside a variational neural solver helps further. In our short, cropped simulation tests, the simpler sea-level + temperature model still wins; the physics checks remain useful to implement and diagnose, but they do not automatically improve scores. We also show how a poorly scaled uncertainty loss can quietly damage sea-level skill, and how to fix that scaling.
+Satellites measure sea level and sea-surface temperature more easily than they measure ocean currents directly. Learning models that combine those measurements can estimate currents better than the classical geostrophic approximation. We test whether adding explicit physics “checks” (surface quasi-geostrophy and temperature advection) inside a variational neural solver helps further. In our short, cropped simulation tests, the simpler sea-level + temperature model still wins; the physics checks remain useful to implement and diagnose, but they do not automatically improve scores. We also show how a poorly scaled strain-reweighting loss can quietly damage sea-level skill, and how to fix that scaling.
 
 ## Abstract
 
-Estimating sea-surface currents (SSC) from satellite sea-surface height (SSH) remains limited by altimeter resolution and by the geostrophic approximation. Multimodal 4DVarNet solvers that synergize SSH with sea-surface temperature (SST) already improve SSC relative to geostrophy in NATL60 observing-system simulation experiments (OSSEs). Here we keep a Fablet-style unrolled ConvLSTM 4DVarNet and extend only the variational cost / supervised loss with (i) an effective eSQG-style SQG residual, (ii) an SST advection residual, and (iii) optional strain-heteroscedastic UV uncertainty. Under a controlled ablation (B2: SSH+SST; M3: +SQG+advection; M4: +uncertainty), synthetic short runs can favor physics extras, but on a preliminary NATL60 **crop_size=96, 20-epoch** protocol the measured ranking is **B2 > M3 ≳ M4** on explained variance τ_uv (0.848 / 0.811 / 0.801), with all configurations beating geostrophy (τ_uv ≈ −3.74; rmse_uv ≈ 1.029). Expanded diagnostics from the same evaluations show positive τ_div / τ_vort / τ_strain only for B2. An M4 SSH degradation (rmse_ssh 0.122) is traced to raw NLL scale mismatch and repaired by a σ-normalized UV term (post-fix rmse_ssh 0.063). We therefore frame physics residuals as implementable, ablatable, and **regime-/hyperparameter-dependent**, not universally additive. Cropped short-epoch scores are preliminary and must not be read as JAMES Table rows; uncropped long-epoch NATL60 Table claims remain gated on hardware beyond a 4GB GPU.
+Estimating sea-surface currents (SSC) from satellite sea-surface height (SSH) remains limited by altimeter resolution and by the geostrophic approximation. Multimodal 4DVarNet solvers that synergize SSH with sea-surface temperature (SST) already improve SSC relative to geostrophy in NATL60 observing-system simulation experiments (OSSEs). Here we use a compact 4DVarNet-**inspired** ConvLSTM unrolled solver (not a byte-faithful Fablet reproduction; the solver autodiff graph was corrected) and extend the variational cost / supervised loss with (i) an effective eSQG-style SQG residual, (ii) an SST advection residual, and (iii) optional strain-aware spatial UV **reweighting** (M4 — not uncertainty estimation). Under a controlled ablation (B2: SSH+SST; M3: +SQG+advection; M4: +reweighting), synthetic short runs can favor physics extras, but historical NATL60 **crop_size=96, 20-epoch** scores (**`pre_p0_fix`**) ranked **B2 > M3 ≳ M4** on explained variance τ_uv, with all configurations beating geostrophy. An M4 SSH degradation is traced to raw NLL scale mismatch and repaired by a σ-normalized UV term. We therefore frame physics residuals as implementable, ablatable, and **regime-/hyperparameter-dependent**, not universally additive. Cropped short-epoch scores must not be read as JAMES Table rows; post-P0 retrain and uncropped long-epoch NATL60 claims remain gated.
 
 ---
 
@@ -52,10 +52,10 @@ def assemble_md() -> str:
         _read("04_discussion.md"),
         """# 5. Conclusions
 
-1. Explicit eSQG-style SQG, SST-advection, and optional strain-aware UV uncertainty can be embedded in a Fablet-like 4DVarNet cost without changing the ConvLSTM solver.
-2. On NATL60 **crop96/20ep**, ranking is **B2 > M3 ≳ M4** on τ_uv; all beat geostrophy. Physics extras are **not universally additive** under this protocol; divergence/vorticity/strain explained variances favor B2 in the same measured JSON.
-3. M4 SSH degradation was an NLL scale bug; post-fix retrain recovers rmse_ssh ≈ 0.063 while UV still trails B2.
-4. Paper-table claims require uncropped, long-epoch NATL60 (+ optional OSE/drifters). On current 4GB hardware we strengthen measured crop96 diagnostics rather than invent Table scores.
+1. Explicit eSQG-style SQG, SST-advection, and optional strain-aware UV **reweighting** can be embedded in a compact 4DVarNet-**inspired** cost (solver autodiff graph corrected; not an unchanged / byte-faithful Fablet clone).
+2. Historical NATL60 **crop96/20ep** scores (**`pre_p0_fix`**) ranked **B2 > M3 ≳ M4** on τ_uv; all beat geostrophy. Physics extras are **not universally additive** under that protocol.
+3. M4 SSH degradation was an NLL scale bug; σ-normalized reweight + retrain recovered SSH while UV still trailed B2.
+4. Paper-table claims require post-P0 retrain on uncropped, long-epoch NATL60 (+ optional OSE/drifters). On current 4GB hardware we strengthen measured crop96 diagnostics rather than invent Table scores.
 
 # Open Research
 

@@ -155,7 +155,7 @@ figcaption {
 
 <header class="cover">
   <h1>基于 SST–SSH 协同与物理残差的 4DVarNet 海表流场反演：裁剪 NATL60 OSSE 消融研究报告</h1>
-  <p class="meta">项目：4DVarNets-sea-current　｜　报告日期：2026-08-16　｜　实现与验收：Cursor Agent　｜　公开代码：<a href="https://github.com/Coucou2016/4DVarNets-sea-current">github.com/Coucou2016/4DVarNets-sea-current</a></p>
+  <p class="meta">项目：4DVarNets-sea-current　｜　报告日期：2026-09-14　｜　实现与验收：Cursor Agent　｜　公开代码：<a href="https://github.com/Coucou2016/4DVarNets-sea-current">github.com/Coucou2016/4DVarNets-sea-current</a></p>
   <p class="meta">基线文献：Fablet et al. (2024), JAMES, doi:10.1029/2023MS003609　｜　顾问通道：ChatGPT（本会话浏览器 MCP 与 Codex 配额均受阻；见 docs/chatgpt_collaboration/SESSION_5ROUNDS.md；文献 DOI 由 WebSearch 核验）</p>
   <span class="badge">证据级别：合成短训（方向性）+ NATL60 GPU96 crop96/20ep（初步）· 非正式论文 Table</span>
 </header>
@@ -176,8 +176,8 @@ figcaption {
 
 <section id="abstract">
   <h2>1. 摘要</h2>
-  <p>海表流场（sea surface currents, SSC；海表面水平流速向量场）的卫星反演长期受限于海表高度（sea surface height, SSH；海面动力高度异常）有效分辨率与地转近似（geostrophy；由 SSH 水平梯度经科氏力平衡得到的地转流）对非地转分量的低估。Fablet 等（2024）提出以可训练观测/先验算子嵌入展开变分同化循环的 <span class="term">4DVarNet</span>（四维变分神经网络求解器）框架，利用海表温度（sea surface temperature, SST）与 SSH 的协同提升流场重建。本工作保持 ConvLSTM 展开求解器不变，仅在变分代价与监督损失中引入：（i）有效表面准地转（effective surface quasi-geostrophy, eSQG-style）速度残差；（ii）SST 平流–扩散残差；（iii）可选的应变相关 UV 异方差不确定性项。</p>
-  <p>在受控消融（B2 / M3 / M4）下，合成 OSSE 短训显示 M4 方向性最优；而在 NATL60 <strong>crop96 / 20 epoch</strong> GPU 实验中，实测排序为 <strong>B2 &gt; M3 ≳ M4</strong>（τ_uv：0.848 / 0.811 / 0.801），三者均显著优于地转（τ_uv ≈ −3.74）。M4 曾因 raw NLL 尺度失控导致 SSH 误差恶化，经 σ 归一化修复并重训后 SSH RMSE 恢复至约 0.063。诚实表述为：物理残差可实现且相对地转仍有增益，但在本短裁剪协议上<strong>并非普遍优于纯 SST–SSH 协同</strong>；正式 Table 结论有待全场长训。</p>
+  <p>海表流场（sea surface currents, SSC；海表面水平流速向量场）的卫星反演长期受限于海表高度（sea surface height, SSH；海面动力高度异常）有效分辨率与地转近似（geostrophy；由 SSH 水平梯度经科氏力平衡得到的地转流）对非地转分量的低估。Fablet 等（2024）提出以可训练观测/先验算子嵌入展开变分同化循环的 <span class="term">4DVarNet</span>（四维变分神经网络求解器）框架，利用海表温度（sea surface temperature, SST）与 SSH 的协同提升流场重建。本工作采用<strong>紧凑的 4DVarNet-inspired</strong> ConvLSTM 展开求解器（非字节级忠实复现；求解器自动微分图已按 P0 修正，取消逐步 detach），并在变分代价与监督损失中引入：（i）有效表面准地转（effective surface quasi-geostrophy, eSQG-style）速度残差；（ii）SST 平流–扩散残差；（iii）可选的应变相关 UV <strong>空间重加权</strong>（M4，非不确定性估计头）。</p>
+  <p>在受控消融（B2 / M3 / M4）下，合成 OSSE 短训显示 M4 方向性最优；而在 NATL60 <strong>crop96 / 20 epoch</strong> GPU 历史实验（<strong>pre_p0_fix / 非正式论文 Table</strong>）中，排序为 <strong>B2 &gt; M3 ≳ M4</strong>（τ_uv：0.848 / 0.811 / 0.801），三者均显著优于地转（τ_uv ≈ −3.74）。M4 曾因 raw NLL 尺度失控导致 SSH 误差恶化，经 σ 归一化修复并重训后 SSH RMSE 恢复至约 0.063。诚实表述为：物理残差可实现且相对地转仍有增益，但在本短裁剪协议上<strong>并非普遍优于纯 SST–SSH 协同</strong>；正式 Table 结论有待 P0 后全场长训。</p>
 </section>
 
 <section id="bg">
@@ -188,7 +188,7 @@ figcaption {
   <p>Fablet et al. (2024, JAMES) 已证明可学习的多模态观测项对年龄转分量的价值，但变分代价中并未显式写入 eSQG / SST 平流残差，也未系统消融“物理项是否总是加分”。若缺少显式物理项，难以把增益归因于动力学约束；若盲目加入，则在算子失配、权重不当或混合层/非平衡运动主导时可能损害技能。</p>
   <h3>2.3 研究目标</h3>
   <ol>
-    <li>在不改动 4DVarNet 求解器主干的前提下，实现可开关的 SQG / 平流 / 应变不确定性项；</li>
+    <li>在紧凑 4DVarNet-inspired 求解器上实现可开关的 SQG / 平流 / 应变重加权项（求解器图已按 P0 修正）；</li>
     <li>在合成与裁剪 NATL60 OSSE 上完成 B2/M3/M4 公平消融；</li>
     <li>以实测指标给出诚实的部分/负面结果表述，并为全场长训 Table 设定证据门槛；</li>
     <li>产出可复现图表与自包含研究报告（本 HTML）。</li>
@@ -199,7 +199,7 @@ figcaption {
     <li><strong>OSE</strong>（observing-system experiment）：使用真实卫星观测；本报告尚未给出正式 OSE/漂流浮标评分（待补充）。</li>
     <li><strong>τ_uv</strong>：表面流速相对气候学方差的解释方差，越高越好。</li>
     <li><strong>λ_x</strong>：误差/信号功率谱密度比降至 0.5 的分辨尺度（km），越小通常表示更细的有效分辨（需结合谱定义解读）。</li>
-    <li><strong>B2 / M3 / M4</strong>：消融编号——B2=SSH+SST；M3=+SQG+平流；M4=+应变 UV 不确定性。</li>
+    <li><strong>B2 / M3 / M4</strong>：消融编号——B2=SSH+SST；M3=+SQG+平流；M4=+应变 UV 空间重加权（非不确定性估计）。</li>
   </ul>
 </section>
 

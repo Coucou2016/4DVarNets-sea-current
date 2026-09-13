@@ -8,6 +8,9 @@ data:
   dT: 7
   # Paper/default NATL60 mode: require obs+oi; never fill y_ssh from SSH truth.
   allow_truth_background: false
+  # Drop train windows whose SST history overlaps val targets (paper mode default = dT-1).
+  # Set to 0 to disable; omit / null → auto dT-1 when allow_truth_background is false.
+  # purge_days: 6
   # NATL60 CPU smoke only (null = full paper grid / all windows):
   # crop_size: 48
   # max_samples: 4

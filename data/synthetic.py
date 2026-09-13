@@ -113,10 +113,13 @@ def generate_synthetic_osse(cfg: SyntheticOSSEConfig, out_path: str | Path | Non
         "sst": sst_obs,
         "sst_truth": sst,
         "y_ssh": y_oi,
+        "y_oi": y_oi.copy(),  # synthetic path: OI-only == model SSH input
         "mask_ssh": mask_ssh.astype(np.float32),
         "mask_sst": mask_sst.astype(np.float32),
         "f": np.array([cfg.f0], dtype=np.float32),
         "dx": np.array([cfg.dx_deg], dtype=np.float32),
+        "dx_m": np.array([dx], dtype=np.float32),
+        "dy_m": np.array([dy], dtype=np.float32),
     }
     if out_path is not None:
         out_path = Path(out_path)

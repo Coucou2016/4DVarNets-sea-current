@@ -379,6 +379,9 @@ def load_natl60(
         oi_ds.close()
         mask_ssh = np.ones_like(ssh_np, dtype=np.float32)
 
+    # Pure OI/DUACS SSH for fair geostrophic baseline (before sparse overwrite).
+    y_oi = np.asarray(y_ssh, dtype=np.float32).copy()
+
     if obs_ok:
         obs_ds = xr.open_dataset(paths["obs"])
         try:
@@ -386,7 +389,8 @@ def load_natl60(
             obs_np = _squeeze_hw(obs.values)[:n]
             mask_ssh = np.isfinite(obs_np).astype(np.float32)
             mask_ssh[np.abs(obs_np) < 1e-12] = 0.0
-            # Prefer along-track values on the OI background
+            # Hybrid model *input*: along-track values on the OI background.
+            # Geostrophic baseline must keep using y_oi (OI-only), not this hybrid.
             y_ssh = np.where(mask_ssh > 0, obs_np, y_ssh)
         except KeyError as exc:
             if not allow_truth_background:
@@ -441,6 +445,7 @@ def load_natl60(
         "v": v_np,
         "sst": sst_np,
         "y_ssh": y_ssh.astype(np.float32),
+        "y_oi": y_oi.astype(np.float32),
         "mask_ssh": mask_ssh.astype(np.float32),
         "mask_sst": mask_sst.astype(np.float32),
         "time": times,

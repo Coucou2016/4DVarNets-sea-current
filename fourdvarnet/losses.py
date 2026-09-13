@@ -59,10 +59,19 @@ class TrainingLoss(nn.Module):
         pred: torch.Tensor,
         truth: torch.Tensor,
         phi: nn.Module,
+        dx: float | torch.Tensor | None = None,
+        dy: float | torch.Tensor | None = None,
     ) -> tuple[torch.Tensor, dict[str, float]]:
         ssh_p, ssh_t = pred[:, 0:1], truth[:, 0:1]
         u_p, v_p = pred[:, 1:2], pred[:, 2:3]
         u_t, v_t = truth[:, 1:2], truth[:, 2:3]
+        dx_v = self.dx if dx is None else dx
+        dy_v = self.dy if dy is None else dy
+        # Batch mean when DataLoader stacks per-sample scalars.
+        if isinstance(dx_v, torch.Tensor) and dx_v.ndim > 0:
+            dx_v = float(dx_v.float().mean().item())
+        if isinstance(dy_v, torch.Tensor) and dy_v.ndim > 0:
+            dy_v = float(dy_v.float().mean().item())
 
         l_ssh = torch.mean((ssh_p - ssh_t) ** 2)
         gx_p, gy_p = self.grad_op(ssh_p)
@@ -70,8 +79,8 @@ class TrainingLoss(nn.Module):
         l_gssh = torch.mean((gx_p - gx_t) ** 2 + (gy_p - gy_t) ** 2)
         l_uv = torch.mean((u_p - u_t) ** 2 + (v_p - v_t) ** 2)
         # Same metric spacing as train/eval physics operators.
-        div_p = self.div_op(u_p, v_p, self.dx, self.dy)
-        div_t = self.div_op(u_t, v_t, self.dx, self.dy)
+        div_p = self.div_op(u_p, v_p, dx_v, dy_v)
+        div_t = self.div_op(u_t, v_t, dx_v, dy_v)
         l_div = torch.mean((div_p - div_t) ** 2)
         l_phi = torch.mean((truth - phi(truth)) ** 2 + (pred - phi(pred)) ** 2)
 
@@ -82,7 +91,7 @@ class TrainingLoss(nn.Module):
                 u_sig, v_sig = u_t, v_t
             else:
                 u_sig, v_sig = u_p.detach(), v_p.detach()
-            sig = strain_uncertainty(u_sig, v_sig, self.sigma0, self.alpha, self.dx, self.dy)
+            sig = strain_uncertainty(u_sig, v_sig, self.sigma0, self.alpha, dx_v, dy_v)
             if self.uncert_max_mult > 1.0:
                 sig = torch.clamp(sig, max=float(self.sigma0) * self.uncert_max_mult)
             uv_err2 = (u_p - u_t) ** 2 + (v_p - v_t) ** 2

@@ -78,7 +78,7 @@ Training diagnostics (val loss at best ckpt): B2 ≈ 4.53; M3 ≈ 5.19; M4 **pos
 ### Figures (captions)
 
 **Figure 2 (synthetic).** `fig_synth_ablation_tau_uv`, `fig_synth_ablation_rmse_uv`  
-*Caption:* Synthetic OSSE ablation (8 epochs). Directional only; not NATL60 Table metrics. On this short synthetic run, M4 ranked best among B2/M3/M4 after the truth-σ uncertainty fix.
+*Caption:* Synthetic OSSE ablation (8 epochs). Directional only; not NATL60 Table metrics. On this short synthetic run, M4 ranked best among B2/M3/M4 after the truth-σ reweight fix.
 
 **Figure 3 (GPU96 primary).** `fig_GPU96_tau_uv`, `fig_GPU96_rmse_uv`, `fig_{B2,M3,M4}_GPU96_loss`  
 *Caption:* NATL60 OSSE, **cropped 96×96, 20 epochs**. Explained variance and RMSE of surface currents for B2/M3/M4 vs geostrophy; loss curves for each run. **Preliminary / not paper Table.** B2 leads; M3 and M4 remain far above geostrophy but do not improve on B2.

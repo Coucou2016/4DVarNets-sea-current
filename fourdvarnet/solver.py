@@ -91,16 +91,25 @@ class VariationalCost(nn.Module):
         z_sst: torch.Tensor,
         mask_ssh: torch.Tensor,
         mask_sst: torch.Tensor,
+        dx: float | torch.Tensor | None = None,
+        dy: float | torch.Tensor | None = None,
     ) -> torch.Tensor:
-        dy = self.obs(x, y_ssh, z_sst, mask_ssh, mask_sst, use_sst=self.use_sst)
+        dx_v = self.dx if dx is None else dx
+        dy_v = self.dy if dy is None else dy
+        if isinstance(dx_v, torch.Tensor) and dx_v.ndim > 0:
+            dx_v = float(dx_v.float().mean().item())
+        if isinstance(dy_v, torch.Tensor) and dy_v.ndim > 0:
+            dy_v = float(dy_v.float().mean().item())
+
+        dy_obs = self.obs(x, y_ssh, z_sst, mask_ssh, mask_sst, use_sst=self.use_sst)
         # SSH residual is already (y-x)*mask; denom uses mask so zeros do not dilute.
-        loss = self.lam_obs * _masked_mse(dy[0], mask_ssh)
-        if self.use_sst and len(dy) > 1:
+        loss = self.lam_obs * _masked_mse(dy_obs[0], mask_ssh)
+        if self.use_sst and len(dy_obs) > 1:
             # Synergy residual is soft-gated; weight by SST validity over the window.
             m_sst = mask_sst
             if m_sst.ndim == 4 and m_sst.shape[1] > 1:
                 m_sst = m_sst[:, -1:]  # spatial weight at analysis time
-            loss = loss + self.lam_sst * _masked_mse(dy[1], m_sst)
+            loss = loss + self.lam_sst * _masked_mse(dy_obs[1], m_sst)
         dx_prior = x - self.phi(x)
         loss = loss + self.lam_prior * torch.mean(dx_prior**2)
 
@@ -111,7 +120,7 @@ class VariationalCost(nn.Module):
 
         if self.use_sqg and self.lam_sqg != 0.0:
             u_sqg, v_sqg = sqg_velocity(
-                sst_last, ssh, Ld=self.Ld, f=self.f0, g=self.g, dx=self.dx, dy=self.dy
+                sst_last, ssh, Ld=self.Ld, f=self.f0, g=self.g, dx=dx_v, dy=dy_v
             )
             loss = loss + self.lam_sqg * (torch.mean((u - u_sqg) ** 2) + torch.mean((v - v_sqg) ** 2))
 
@@ -122,8 +131,8 @@ class VariationalCost(nn.Module):
                 v,
                 kappa=self.kappa,
                 dt=self.dt,
-                dx=self.dx,
-                dy=self.dy,
+                dx=dx_v,
+                dy=dy_v,
                 mask_sst=mask_sst,
             )
             # Mean over valid cells only (zeros elsewhere from mask).
@@ -201,13 +210,15 @@ class Solver4DVarNet(nn.Module):
         z_sst: torch.Tensor,
         mask_ssh: torch.Tensor,
         mask_sst: torch.Tensor,
+        dx: float | torch.Tensor | None = None,
+        dy: float | torch.Tensor | None = None,
     ) -> torch.Tensor:
         x = x0
         h = c = None
         norm = 0.0
         for _ in range(self.n_iter):
             x = x.requires_grad_(True)
-            loss = self.cost(x, y_ssh, z_sst, mask_ssh, mask_sst)
+            loss = self.cost(x, y_ssh, z_sst, mask_ssh, mask_sst, dx=dx, dy=dy)
             grad = torch.autograd.grad(loss, x, create_graph=True)[0]
             if norm == 0.0:
                 norm = torch.sqrt(torch.mean(grad**2) + 1e-12).item()
@@ -230,13 +241,15 @@ class Solver4DVarNetTruncated(Solver4DVarNet):
         z_sst: torch.Tensor,
         mask_ssh: torch.Tensor,
         mask_sst: torch.Tensor,
+        dx: float | torch.Tensor | None = None,
+        dy: float | torch.Tensor | None = None,
     ) -> torch.Tensor:
         x = x0
         h = c = None
         norm = 0.0
         for _ in range(self.n_iter):
             x = x.detach().requires_grad_(True)
-            loss = self.cost(x, y_ssh, z_sst, mask_ssh, mask_sst)
+            loss = self.cost(x, y_ssh, z_sst, mask_ssh, mask_sst, dx=dx, dy=dy)
             grad = torch.autograd.grad(loss, x, create_graph=True)[0]
             if norm == 0.0:
                 norm = torch.sqrt(torch.mean(grad**2) + 1e-12).item()

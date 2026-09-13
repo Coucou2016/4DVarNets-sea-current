@@ -15,9 +15,9 @@ from torch.utils.data import DataLoader
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from data.dataset import make_datasets
+from data.dataset import make_datasets, scales_from_dataset
 from fourdvarnet.losses import LossWeights, TrainingLoss
-from fourdvarnet.model import build_fourdvarnet, physics_scales_from_config
+from fourdvarnet.model import build_fourdvarnet
 
 
 def load_config(path: Path) -> dict:
@@ -33,12 +33,25 @@ def load_paths(root: Path) -> dict:
         return yaml.safe_load(f) or {}
 
 
+def _batch_scales(batch: dict) -> tuple[float | None, float | None]:
+    dx = batch.get("dx")
+    dy = batch.get("dy")
+    if dx is None or dy is None:
+        return None, None
+    if isinstance(dx, torch.Tensor):
+        dx = float(dx.float().mean().item())
+    if isinstance(dy, torch.Tensor):
+        dy = float(dy.float().mean().item())
+    return float(dx), float(dy)
+
+
 def train_epoch(model, loader, opt, criterion, device):
     model.train()
     total = 0.0
     n = 0
     for batch in loader:
         batch = {k: v.to(device) for k, v in batch.items()}
+        dx_b, dy_b = _batch_scales(batch)
         pred = model(
             batch["y_ssh"],
             batch["z_sst"],
@@ -46,8 +59,10 @@ def train_epoch(model, loader, opt, criterion, device):
             batch["mask_sst"],
             batch["u_geo"],
             batch["v_geo"],
+            dx=dx_b,
+            dy=dy_b,
         )
-        loss, _ = criterion(pred, batch["truth"], model.phi)
+        loss, _ = criterion(pred, batch["truth"], model.phi, dx=dx_b, dy=dy_b)
         opt.zero_grad()
         loss.backward()
         opt.step()
@@ -63,6 +78,7 @@ def eval_epoch(model, loader, criterion, device):
     n = 0
     for batch in loader:
         batch = {k: v.to(device) for k, v in batch.items()}
+        dx_b, dy_b = _batch_scales(batch)
         pred = model(
             batch["y_ssh"],
             batch["z_sst"],
@@ -70,8 +86,10 @@ def eval_epoch(model, loader, criterion, device):
             batch["mask_sst"],
             batch["u_geo"],
             batch["v_geo"],
+            dx=dx_b,
+            dy=dy_b,
         )
-        loss, _ = criterion(pred, batch["truth"], model.phi)
+        loss, _ = criterion(pred, batch["truth"], model.phi, dx=dx_b, dy=dy_b)
         total += loss.item()
         n += 1
     return total / max(n, 1)
@@ -160,15 +178,19 @@ def main() -> None:
     train_loader = DataLoader(train_ds, batch_size=tcfg["batch_size"], shuffle=True)
     val_loader = DataLoader(val_ds, batch_size=tcfg["batch_size"])
 
+    # Prefer NATL60/synthetic dataset meter spacings over isotropic config fallback.
+    scales = scales_from_dataset(train_ds, cfg)
     model = build_fourdvarnet(
         cfg,
         use_sst=use_sst,
         use_sqg=use_sqg,
         use_adv=use_adv,
         use_uncert=use_uncert,
+        dx=scales["dx"],
+        dy=scales["dy"],
+        f0=scales["f0"],
     ).to(device)
 
-    scales = physics_scales_from_config(cfg)
     lw = LossWeights(**cfg["loss"])
     criterion = TrainingLoss(
         lw,
@@ -181,6 +203,7 @@ def main() -> None:
         uncert_max_mult=float(mcfg.get("uncert_max_mult", 10.0)),
         uncert_mse_mix=float(mcfg.get("uncert_mse_mix", 0.25)),
     ).to(device)
+    print(f"physics scales: dx={scales['dx']:.1f} m  dy={scales['dy']:.1f} m  f0={scales['f0']:.3e}")
     opt = torch.optim.Adam(model.parameters(), lr=tcfg["lr"])
 
     ckpt_dir = ROOT / tcfg["checkpoint_dir"]

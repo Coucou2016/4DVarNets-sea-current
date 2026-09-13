@@ -149,6 +149,8 @@ def test_dataset_uses_full_sst_mask_window():
         "mask_sst": mask_sst,
         "f": np.array([7e-5], dtype=np.float32),
         "dx": np.array([0.05], dtype=np.float32),
+        "dx_m": np.array([5.5e3], dtype=np.float32),
+        "dy_m": np.array([5.5e3], dtype=np.float32),
     }
     ds = SSTSSHCurrentDataset(data, dT=dT, time_indices=[dT - 1])
     batch = ds[0]
@@ -158,3 +160,54 @@ def test_dataset_uses_full_sst_mask_window():
         batch["mask_sst"][:, 0, 0],
         torch.arange(1, dT + 1, dtype=torch.float32),
     )
+    assert "dx" in batch and "dy" in batch
+    assert "u_geo_oi" in batch and "y_oi" in batch
+
+
+def test_align_like_time_mismatch_raises():
+    """Strict xarray align: length / Δt mismatch → RuntimeError, no silent fallback."""
+    xr = pytest.importorskip("xarray")
+    from data.natl60 import _align_like
+
+    times_ref = np.arange("2013-01-01", "2013-01-06", dtype="datetime64[D]")
+    times_bad = np.arange("2013-01-01", "2013-01-04", dtype="datetime64[D]")  # shorter
+    lat = np.linspace(30.0, 40.0, 4)
+    lon = np.linspace(-65.0, -55.0, 5)
+    ref = xr.DataArray(
+        np.zeros((len(times_ref), len(lat), len(lon)), dtype=np.float32),
+        dims=("time", "lat", "lon"),
+        coords={"time": times_ref, "lat": lat, "lon": lon},
+    )
+    da = xr.DataArray(
+        np.zeros((len(times_bad), len(lat), len(lon)), dtype=np.float32),
+        dims=("time", "lat", "lon"),
+        coords={"time": times_bad, "lat": lat, "lon": lon},
+    )
+    with pytest.raises(RuntimeError, match="time length mismatch|refusing silent"):
+        _align_like(da, ref, strict=True)
+
+    # Same length but >12h offset
+    times_shift = times_ref + np.timedelta64(2, "D")
+    da2 = xr.DataArray(
+        np.zeros_like(ref.values),
+        dims=("time", "lat", "lon"),
+        coords={"time": times_shift, "lat": lat, "lon": lon},
+    )
+    with pytest.raises(RuntimeError, match="misaligned|>12h|refusing silent"):
+        _align_like(da2, ref, strict=True)
+
+
+def test_purge_train_vs_val_gap():
+    from data.dataset import _purge_train_vs_val
+
+    dT = 7
+    purge = dT - 1
+    val_idx = list(range(10, 20))
+    train_idx = list(range(20, 40))
+    kept = _purge_train_vs_val(train_idx, val_idx, dT, purge)
+    # First kept must clear last_val + purge
+    assert kept
+    assert min(kept) > max(val_idx) + purge
+    # History of kept must not include val indices
+    for t in kept:
+        assert not any(i in set(val_idx) for i in range(t - dT + 1, t + 1))

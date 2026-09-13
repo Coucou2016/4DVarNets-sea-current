@@ -27,6 +27,8 @@ class SSTSSHCurrentDataset(Dataset):
         self.v = data["v"]
         self.sst = data["sst"]
         self.y_ssh = data["y_ssh"]
+        # Pure OI/DUACS SSH for fair geostrophic baseline (falls back to y_ssh).
+        self.y_oi = data["y_oi"] if "y_oi" in data else data["y_ssh"]
         self.mask_ssh = data["mask_ssh"]
         self.mask_sst = data["mask_sst"]
         self.lat = data.get("lat")
@@ -76,6 +78,7 @@ class SSTSSHCurrentDataset(Dataset):
         u_t = self.u[t : t + 1]
         v_t = self.v[t : t + 1]
         y = self.y_ssh[t : t + 1]
+        y_oi = self.y_oi[t : t + 1]
         m_ssh = self.mask_ssh[t : t + 1]
         # Full dT SST mask window (do not broadcast last-frame mask only).
         m_sst = self.mask_sst[t - self.dT + 1 : t + 1]
@@ -85,17 +88,33 @@ class SSTSSHCurrentDataset(Dataset):
             )
 
         y_t = torch.from_numpy(np.asarray(y, dtype=np.float32))
+        y_oi_t = torch.from_numpy(np.asarray(y_oi, dtype=np.float32))
         f_s, dx_s, dy_s = self._geo_scales()
+        # Model init: geostrophy from hybrid (or OI) observation background.
         u_g, v_g = geostrophic_velocity(y_t, f_s, dx=dx_s, dy=dy_s)
+        # Fair baseline: geostrophy from pure OI/DUACS SSH only.
+        u_g_oi, v_g_oi = geostrophic_velocity(y_oi_t, f_s, dx=dx_s, dy=dy_s)
+
+        # Scalar mean spacing for TrainingLoss / VariationalCost / metrics.
+        if isinstance(dx_s, torch.Tensor):
+            dx_mean = float(dx_s.mean().item())
+        else:
+            dx_mean = float(dx_s)
+        dy_mean = float(dy_s.mean().item()) if isinstance(dy_s, torch.Tensor) else float(dy_s)
 
         return {
             "truth": torch.from_numpy(np.concatenate([ssh_t, u_t, v_t], axis=0).astype(np.float32)),
             "y_ssh": y_t,
+            "y_oi": y_oi_t,
             "z_sst": torch.from_numpy(sst_win.astype(np.float32)),
             "mask_ssh": torch.from_numpy(m_ssh.astype(np.float32)),
             "mask_sst": torch.from_numpy(np.asarray(m_sst, dtype=np.float32)),
             "u_geo": u_g,
             "v_geo": v_g,
+            "u_geo_oi": u_g_oi,
+            "v_geo_oi": v_g_oi,
+            "dx": torch.tensor(dx_mean, dtype=torch.float32),
+            "dy": torch.tensor(dy_mean, dtype=torch.float32),
         }
 
 
@@ -122,9 +141,9 @@ def make_synthetic_datasets(
 def _center_crop_spatial(data: dict[str, np.ndarray], crop_size: int) -> dict[str, np.ndarray]:
     """Center-crop 3-D (T,H,W) fields for CPU/NATL60 smoke. Leaves 1-D coords alone."""
     out = dict(data)
-    for key in ("ssh", "u", "v", "sst", "y_ssh", "mask_ssh", "mask_sst"):
-        arr = out[key]
-        if arr.ndim != 3:
+    for key in ("ssh", "u", "v", "sst", "y_ssh", "y_oi", "mask_ssh", "mask_sst"):
+        arr = out.get(key)
+        if arr is None or not hasattr(arr, "ndim") or arr.ndim != 3:
             continue
         _, height, width = arr.shape
         if height < crop_size or width < crop_size:
@@ -157,6 +176,31 @@ def _cap_indices(indices: list[int], max_samples: int | None) -> list[int]:
     return capped
 
 
+def _purge_train_vs_val(
+    train_idx: list[int],
+    val_idx: list[int],
+    dT: int,
+    purge_days: int,
+) -> list[int]:
+    """Drop train windows whose SST history overlaps any val analysis day.
+
+    With ``purge_days = dT - 1``, require ``t > max(val_idx) + purge_days`` so the
+    dT-day SST window does not share calendar days with val targets.
+    """
+    if purge_days <= 0 or not val_idx:
+        return train_idx
+    val_set = set(val_idx)
+    last_val = max(val_idx)
+    kept: list[int] = []
+    for t in train_idx:
+        if any(i in val_set for i in range(t - dT + 1, t + 1)):
+            continue
+        if t - purge_days <= last_val:
+            continue
+        kept.append(t)
+    return kept
+
+
 def make_natl60_datasets(
     paths: dict[str, str],
     dT: int = 7,
@@ -166,11 +210,14 @@ def make_natl60_datasets(
     crop_size: int | None = None,
     max_samples: int | None = None,
     allow_truth_background: bool = False,
+    purge_days: int | None = None,
 ) -> tuple[SSTSSHCurrentDataset, SSTSSHCurrentDataset, SSTSSHCurrentDataset]:
     """Sliding dT windows on the Gulf Stream NATL60 OSSE with paper date splits.
 
     ``crop_size`` / ``max_samples`` are CPU smoke helpers only — not for paper tables.
     ``allow_truth_background`` is debug-only (default False; never for paper claims).
+    ``purge_days`` (default ``dT-1`` in paper mode) drops train windows whose SST
+    history overlaps val analysis times.
     """
     from data.natl60 import indices_for_split, load_natl60
 
@@ -184,9 +231,18 @@ def make_natl60_datasets(
     if crop_size is not None:
         data = _center_crop_spatial(data, int(crop_size))
     times = data["time"]
-    train_idx = _cap_indices(indices_for_split(times, "train", dT), max_samples)
-    val_idx = _cap_indices(indices_for_split(times, "val", dT), max_samples)
-    test_idx = _cap_indices(indices_for_split(times, "test", dT), max_samples)
+    train_idx = indices_for_split(times, "train", dT)
+    val_idx = indices_for_split(times, "val", dT)
+    test_idx = indices_for_split(times, "test", dT)
+
+    if purge_days is None and not allow_truth_background:
+        purge_days = max(int(dT) - 1, 0)
+    if purge_days is not None and int(purge_days) > 0:
+        train_idx = _purge_train_vs_val(train_idx, val_idx, dT, int(purge_days))
+
+    train_idx = _cap_indices(train_idx, max_samples)
+    val_idx = _cap_indices(val_idx, max_samples)
+    test_idx = _cap_indices(test_idx, max_samples)
     empty = [name for name, idx in (("train", train_idx), ("val", val_idx), ("test", test_idx)) if not idx]
     if empty:
         raise RuntimeError(
@@ -217,6 +273,7 @@ def make_datasets(
             raise FileNotFoundError("NATL60 source requested but paths.yaml mapping is empty")
         crop = dcfg.get("crop_size")
         max_s = dcfg.get("max_samples")
+        purge = dcfg.get("purge_days", None)
         return make_natl60_datasets(
             paths,
             dT=int(dcfg.get("dT", 7)),
@@ -226,6 +283,7 @@ def make_datasets(
             crop_size=int(crop) if crop is not None else None,
             max_samples=int(max_s) if max_s is not None else None,
             allow_truth_background=bool(dcfg.get("allow_truth_background", False)),
+            purge_days=int(purge) if purge is not None else None,
         )
     scfg = SyntheticOSSEConfig(
         n_time=int(dcfg.get("n_time", 40)),
@@ -238,3 +296,18 @@ def make_datasets(
     cache = dcfg.get("cache")
     cache_path = root_p / cache if cache else None
     return make_synthetic_datasets(scfg, cache_path)
+
+
+def scales_from_dataset(
+    ds: SSTSSHCurrentDataset,
+    cfg: dict | None = None,
+) -> dict[str, float]:
+    """Prefer dataset meter spacings over isotropic ``dx_deg * 111e3`` config fallback."""
+    from fourdvarnet.model import physics_scales_from_config
+
+    base = physics_scales_from_config(cfg or {})
+    base["dx"] = float(ds.dx_m)
+    base["dy"] = float(ds.dy_m)
+    if getattr(ds, "f", None) is not None:
+        base["f0"] = float(ds.f)
+    return base

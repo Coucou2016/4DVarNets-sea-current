@@ -6,9 +6,9 @@
 
 ## 4.1 Main interpretation
 
-On the **short cropped NATL60 OSSE**, explicit SQG + advection residuals (M3) and strain uncertainty (M4) **do not improve** surface-current skill over the pure SST–SSH synergy baseline (B2). All three learned configurations still **strongly outperform geostrophy** on τ_uv and rmse_uv. Expanded diagnostics reinforce the message: only B2 shows positive τ_div / τ_vort / τ_strain on this protocol. The honest claim is therefore:
+On the **short cropped NATL60 OSSE** (historical **`pre_p0_fix`** scores), explicit SQG + advection residuals (M3) and strain **reweighting** (M4) **do not improve** surface-current skill over the pure SST–SSH synergy baseline (B2). All three learned configurations still **strongly outperform geostrophy** on τ_uv and rmse_uv. Expanded diagnostics reinforce the message: only B2 shows positive τ_div / τ_vort / τ_strain on this protocol. The honest claim is therefore:
 
-> Physics-constrained cost terms are implementable inside 4DVarNet and remain competitive with geostrophy, but **SST synergy alone can dominate** under this cropped/short-epoch protocol; SQG/advection/uncertainty are **not universally additive**.
+> Physics-constrained cost terms are implementable inside a 4DVarNet-**inspired** solver and remain competitive with geostrophy, but **SST synergy alone can dominate** under this cropped/short-epoch protocol; SQG/advection/reweighting are **not universally additive**.
 
 This is a useful **partial / negative result** for methods papers: it bounds when “more physics in the cost” helps, and it documents a concrete loss-scale failure mode (raw NLL) that can masquerade as a dynamical failure.
 
@@ -32,7 +32,7 @@ Synthetic 8-ep ranking (M4 best) vs GPU96 ranking (B2 best) supports **regime de
 **Pre-fix GPU96** matched M3 on tau_uv but roughly **doubled** rmse_ssh (0.122 vs ~0.06). Best-val ~682 vs ~5 for B2/M3 was a **loss-scale bug**, not a deep dynamical failure:
 
 - Raw heteroscedastic NLL `||e||^2/sigma^2` with `sigma_0≈0.05` is `~1/sigma_0^2` larger than MSE.
-- UV gradients then dominate; SSH terms become relatively weak — SSH fit suffers while UV remains OK via the uncertainty weighting.
+- UV gradients then dominate; SSH terms become relatively weak — SSH fit suffers while UV remains OK via the strain reweighting.
 
 **Mitigation + retrain (2026-08-16):** sigma-normalized UV term + `uncert_mse_mix: 0.5`; full M4-GPU96 **20ep retrain** on faceswap CUDA. Post-fix: best val **4.83**, rmse_ssh **0.063**, tau_uv **0.801**, rmse_uv **0.211**. SSH recovered near B2/M3; currents still trail B2 (ranking unchanged: B2 > M3 ≳ M4). Pre-fix metrics archived as `results/metrics_M4_GPU96_pre_nllfix.json`.
 
@@ -43,7 +43,7 @@ Synthetic 8-ep ranking (M4 best) vs GPU96 ranking (B2 best) supports **regime de
 Defensible:
 
 - Explicit, ablatable physics residuals inside a Fablet-like 4DVarNet cost.
-- Engineering diagnosis of uncertainty collapse / scale mismatch.
+- Engineering diagnosis of reweighting / NLL scale mismatch.
 - Evidence that multimodal SST synergy can outperform added SQG/adv on a constrained OSSE — a caution for “physics always helps” narratives.
 - Transparent contrast to dynamical joint SSH–SST mapping (VarDyn) without claiming SSC Table superiority.
 
@@ -60,7 +60,7 @@ Not claimed:
 
 1. **Full-grid / longer NATL60** (uncropped, ≥ paper epoch budget) for B2/M3/M4 with fixed seeds — **blocked on 4GB GPU** until hardware upgrades or off-machine compute.
 2. **B1 crop96/20ep** when GPU is free, for ablation completeness (SSH-only vs SST synergy).
-3. **λ_sqg / λ_adv / uncertainty sweep** on a small grid before locking Table configs.
+3. **λ_sqg / λ_adv / reweighting (M4) sweep** on a small grid before locking Table configs.
 4. ~~Re-train M4 with normalized NLL~~ **Done** (SSH 0.063); next: multi-seed short runs if memory allows.
 5. **OSE / drifters** (`scripts/evaluate_drifters.py`) once OSSE Table rows exist.
 6. Optional: M1/M2 single-term ablations to separate SQG vs advection on full protocol.

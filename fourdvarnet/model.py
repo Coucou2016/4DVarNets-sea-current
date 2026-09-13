@@ -99,18 +99,25 @@ class FourDVarNetUV(nn.Module):
         mask_sst: torch.Tensor,
         u_geo: torch.Tensor,
         v_geo: torch.Tensor,
+        dx: float | torch.Tensor | None = None,
+        dy: float | torch.Tensor | None = None,
     ) -> torch.Tensor:
         x0 = self.build_initial_state(y_ssh, u_geo, v_geo)
-        return self.solver(x0, y_ssh, z_sst, mask_ssh, mask_sst)
+        return self.solver(x0, y_ssh, z_sst, mask_ssh, mask_sst, dx=dx, dy=dy)
 
 
 def physics_scales_from_config(cfg: dict[str, Any]) -> dict[str, float]:
+    """Config fallback: isotropic ``dx_deg * 111e3``. Prefer ``scales_from_dataset`` when NATL60 metrics exist."""
     phys = cfg.get("physics") or {}
     model = cfg.get("model") or {}
     dx_m = float(phys.get("dx_deg", 0.05)) * DEG_TO_M
+    # Allow explicit meter overrides in config (optional).
+    if "dx_m" in phys:
+        dx_m = float(phys["dx_m"])
+    dy_m = float(phys["dy_m"]) if "dy_m" in phys else dx_m
     return {
         "dx": dx_m,
-        "dy": dx_m,
+        "dy": dy_m,
         "f0": float(phys.get("f0", 7.0e-5)),
         "Ld": float(model.get("Ld_km", 30.0)) * 1e3,
         "kappa": float(model.get("kappa", 50.0)),
