@@ -1,4 +1,9 @@
-"""Unrolled gradient descent on variational cost (paper Eq. 9)."""
+"""Unrolled gradient descent on variational cost (paper Eq. 9).
+
+Default ``Solver4DVarNet`` keeps a faithful unrolled autodiff graph across
+iterations (``create_graph=True``, no per-iter ``detach``).
+``Solver4DVarNetTruncated`` is an explicit ablation that detaches each iterate.
+"""
 
 from __future__ import annotations
 
@@ -11,12 +16,23 @@ from fourdvarnet.physics import sqg_velocity, sst_advection_residual
 from fourdvarnet.prior import PhiPrior
 
 
-def _masked_mse(residual: torch.Tensor) -> torch.Tensor:
-    valid = torch.isfinite(residual)
-    if valid.sum() == 0:
+def _masked_mse(residual: torch.Tensor, mask: torch.Tensor | None = None) -> torch.Tensor:
+    """Average squared residual only over valid observation locations.
+
+    Computes ``sum(r² * m) / sum(m)``. When ``residual`` is already zeroed by a
+    binary mask (``r = err * m``), this equals the mean of ``err²`` on valid cells.
+    """
+    if mask is None:
+        m = torch.isfinite(residual).to(dtype=residual.dtype)
+    else:
+        m = mask.to(device=residual.device, dtype=residual.dtype)
+        # Invalid / NaN residual cells do not contribute.
+        m = m * torch.isfinite(residual).to(dtype=residual.dtype)
+    denom = m.sum()
+    if float(denom.item()) <= 0.0:
         return residual.new_tensor(0.0)
-    r = residual[valid]
-    return torch.mean(r**2)
+    r = torch.where(torch.isfinite(residual), residual, residual.new_zeros(()))
+    return (r.pow(2) * m).sum() / denom
 
 
 class VariationalCost(nn.Module):
@@ -77,9 +93,14 @@ class VariationalCost(nn.Module):
         mask_sst: torch.Tensor,
     ) -> torch.Tensor:
         dy = self.obs(x, y_ssh, z_sst, mask_ssh, mask_sst, use_sst=self.use_sst)
-        loss = self.lam_obs * _masked_mse(dy[0])
+        # SSH residual is already (y-x)*mask; denom uses mask so zeros do not dilute.
+        loss = self.lam_obs * _masked_mse(dy[0], mask_ssh)
         if self.use_sst and len(dy) > 1:
-            loss = loss + self.lam_sst * _masked_mse(dy[1])
+            # Synergy residual is soft-gated; weight by SST validity over the window.
+            m_sst = mask_sst
+            if m_sst.ndim == 4 and m_sst.shape[1] > 1:
+                m_sst = m_sst[:, -1:]  # spatial weight at analysis time
+            loss = loss + self.lam_sst * _masked_mse(dy[1], m_sst)
         dx_prior = x - self.phi(x)
         loss = loss + self.lam_prior * torch.mean(dx_prior**2)
 
@@ -96,14 +117,31 @@ class VariationalCost(nn.Module):
 
         if self.use_adv and self.lam_adv != 0.0 and z_sst.ndim == 4 and z_sst.shape[1] >= 2:
             adv = sst_advection_residual(
-                z_sst, u, v, kappa=self.kappa, dt=self.dt, dx=self.dx, dy=self.dy
+                z_sst,
+                u,
+                v,
+                kappa=self.kappa,
+                dt=self.dt,
+                dx=self.dx,
+                dy=self.dy,
+                mask_sst=mask_sst,
             )
-            loss = loss + self.lam_adv * torch.mean(adv**2)
+            # Mean over valid cells only (zeros elsewhere from mask).
+            if mask_sst is not None:
+                m = mask_sst[:, -1] if mask_sst.ndim == 4 else mask_sst
+                loss = loss + self.lam_adv * _masked_mse(adv.unsqueeze(1) if adv.ndim == 3 else adv, m)
+            else:
+                loss = loss + self.lam_adv * torch.mean(adv**2)
         return loss
 
 
 class Solver4DVarNet(nn.Module):
-    """K iterations of LSTM gradient updates."""
+    """K iterations of LSTM gradient updates with a full unrolled graph.
+
+    Each iteration computes ``grad = ∂U/∂x`` with ``create_graph=True`` and
+    applies the ConvLSTM step **without** detaching ``x``, so supervised
+    losses back-propagate through all K inner steps.
+    """
 
     def __init__(
         self,
@@ -155,6 +193,35 @@ class Solver4DVarNet(nn.Module):
             g=g,
         )
         self.grad_step = GradUpdateLSTM(n_channels, hidden_lstm)
+
+    def forward(
+        self,
+        x0: torch.Tensor,
+        y_ssh: torch.Tensor,
+        z_sst: torch.Tensor,
+        mask_ssh: torch.Tensor,
+        mask_sst: torch.Tensor,
+    ) -> torch.Tensor:
+        x = x0
+        h = c = None
+        norm = 0.0
+        for _ in range(self.n_iter):
+            x = x.requires_grad_(True)
+            loss = self.cost(x, y_ssh, z_sst, mask_ssh, mask_sst)
+            grad = torch.autograd.grad(loss, x, create_graph=True)[0]
+            if norm == 0.0:
+                norm = torch.sqrt(torch.mean(grad**2) + 1e-12).item()
+            step, h, c = self.grad_step(grad, h, c, norm)
+            step = step / self.n_iter
+            x = x - step
+        return x
+
+
+class Solver4DVarNetTruncated(Solver4DVarNet):
+    """Ablation: detach state each iteration (truncated BPTT through the solver).
+
+    Not the default — use only when comparing against the faithful unrolled graph.
+    """
 
     def forward(
         self,

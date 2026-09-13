@@ -48,7 +48,9 @@ python scripts/download_natl60.py
 python scripts/verify_natl60.py
 ```
 
-Required for loader: `ssh_ref`, `sst_ref`, `u_ref`, `v_ref`. Optional but preferred: `oi`, `obs` (along-track mask / OI background).
+Required for **paper/default** loader: `ssh_ref`, `sst_ref`, `u_ref`, `v_ref`, **`obs`**, **`oi`**.
+Debug-only `allow_truth_background: true` may omit obs/oi (never for Table claims).
+The loader **never** sets `y_ssh = ssh_truth` in paper mode.
 
 NetCDF `time` is stored as **seconds since 2012-10-01** (often without CF units). The loader maps that epoch so paper splits apply (coverage ≈ 2012-10-01 → 2013-09-30).
 
@@ -61,7 +63,7 @@ NetCDF `time` is stored as **seconds since 2012-10-01** (often without CF units)
 | M1 | + SQG residual | `--use-sst 1 --use-sqg 1 --use-adv 0 --use-uncert 0` |
 | M2 | + advection residual | `--use-sst 1 --use-sqg 0 --use-adv 1 --use-uncert 0` |
 | M3 | SQG + advection | `--use-sst 1 --use-sqg 1 --use-adv 1 --use-uncert 0` |
-| M4 | + strain uncertainty | `--use-sst 1 --use-sqg 1 --use-adv 1 --use-uncert 1` |
+| M4 | + strain-aware spatial reweighting (not σ head) | `--use-sst 1 --use-sqg 1 --use-adv 1 --use-uncert 1` |
 
 ## Exact commands
 

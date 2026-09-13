@@ -9,6 +9,7 @@ import torch
 from torch.utils.data import Dataset
 
 from data.synthetic import SyntheticOSSEConfig, generate_synthetic_osse, load_synthetic_npz
+from fourdvarnet.geometry import coriolis, metric_dx, metric_dy
 from fourdvarnet.physics import geostrophic_velocity
 
 
@@ -28,13 +29,45 @@ class SSTSSHCurrentDataset(Dataset):
         self.y_ssh = data["y_ssh"]
         self.mask_ssh = data["mask_ssh"]
         self.mask_sst = data["mask_sst"]
+        self.lat = data.get("lat")
+        self.lon = data.get("lon")
         n = self.ssh.shape[0]
         self.indices = time_indices if time_indices is not None else list(range(dT - 1, n))
         self.f = float(data["f"][0]) if f is None and "f" in data else (f or 7e-5)
-        self.dx = float(data["dx"][0]) if "dx" in data else 0.05
+        self.dx_deg = float(data["dx"][0]) if "dx" in data else 0.05
+        # Prefer meter spacings from loader when present (lat-aware).
+        if "dx_m" in data and "dy_m" in data:
+            self.dx_m = float(data["dx_m"][0])
+            self.dy_m = float(data["dy_m"][0])
+        else:
+            self.dx_m = self.dx_deg * 111e3
+            self.dy_m = self.dx_deg * 111e3
+        # Legacy attribute used by older call sites
+        self.dx = self.dx_deg
 
     def __len__(self) -> int:
         return len(self.indices)
+
+    def _geo_scales(self) -> tuple[float | torch.Tensor, float | torch.Tensor, float | torch.Tensor]:
+        """Coriolis and metric spacing shared with train/eval physics."""
+        lat = self.lat
+        if lat is None:
+            return self.f, self.dx_m, self.dy_m
+        lat_arr = np.asarray(lat, dtype=np.float32)
+        if lat_arr.ndim == 1 and lat_arr.size == self.ssh.shape[1]:
+            f_map = torch.tensor([float(coriolis(float(y))) for y in lat_arr], dtype=torch.float32)
+            f_map = f_map.view(1, 1, -1, 1)
+            lon = np.asarray(self.lon, dtype=np.float32) if self.lon is not None else None
+            dlon = self.dx_deg
+            if lon is not None and lon.ndim == 1 and lon.size > 1:
+                dlon = float(np.abs(np.diff(lon)).mean())
+            dlat = float(np.abs(np.diff(lat_arr)).mean()) if lat_arr.size > 1 else self.dx_deg
+            dx_map = torch.tensor(
+                [float(metric_dx(dlon, float(y))) for y in lat_arr], dtype=torch.float32
+            ).view(1, 1, -1, 1)
+            dy_v = float(metric_dy(dlat))
+            return f_map, dx_map, dy_v
+        return self.f, self.dx_m, self.dy_m
 
     def __getitem__(self, idx: int) -> dict[str, torch.Tensor]:
         t = self.indices[idx]
@@ -44,18 +77,23 @@ class SSTSSHCurrentDataset(Dataset):
         v_t = self.v[t : t + 1]
         y = self.y_ssh[t : t + 1]
         m_ssh = self.mask_ssh[t : t + 1]
-        m_sst = self.mask_sst[t : t + 1]
-        m_sst = np.broadcast_to(m_sst, (self.dT, *m_sst.shape[1:]))
+        # Full dT SST mask window (do not broadcast last-frame mask only).
+        m_sst = self.mask_sst[t - self.dT + 1 : t + 1]
+        if m_sst.shape[0] != self.dT:
+            raise RuntimeError(
+                f"mask_sst window length {m_sst.shape[0]} != dT={self.dT} at index {t}"
+            )
 
-        y_t = torch.from_numpy(y)
-        u_g, v_g = geostrophic_velocity(y_t, self.f, dx=self.dx * 111e3, dy=self.dx * 111e3)
+        y_t = torch.from_numpy(np.asarray(y, dtype=np.float32))
+        f_s, dx_s, dy_s = self._geo_scales()
+        u_g, v_g = geostrophic_velocity(y_t, f_s, dx=dx_s, dy=dy_s)
 
         return {
-            "truth": torch.from_numpy(np.concatenate([ssh_t, u_t, v_t], axis=0)),
+            "truth": torch.from_numpy(np.concatenate([ssh_t, u_t, v_t], axis=0).astype(np.float32)),
             "y_ssh": y_t,
             "z_sst": torch.from_numpy(sst_win.astype(np.float32)),
             "mask_ssh": torch.from_numpy(m_ssh.astype(np.float32)),
-            "mask_sst": torch.from_numpy(m_sst.astype(np.float32)),
+            "mask_sst": torch.from_numpy(np.asarray(m_sst, dtype=np.float32)),
             "u_geo": u_g,
             "v_geo": v_g,
         }
@@ -94,6 +132,19 @@ def _center_crop_spatial(data: dict[str, np.ndarray], crop_size: int) -> dict[st
         y0 = (height - crop_size) // 2
         x0 = (width - crop_size) // 2
         out[key] = arr[:, y0 : y0 + crop_size, x0 : x0 + crop_size]
+    # Crop 1-D lat/lon to match spatial crop when present
+    if "lat" in out and np.asarray(out["lat"]).ndim == 1 and out["ssh"].ndim == 3:
+        height = out["ssh"].shape[1]
+        lat = np.asarray(out["lat"])
+        if lat.size >= height + (np.asarray(data["ssh"]).shape[1] - height):
+            y0 = (np.asarray(data["ssh"]).shape[1] - crop_size) // 2
+            out["lat"] = lat[y0 : y0 + crop_size]
+    if "lon" in out and np.asarray(out["lon"]).ndim == 1 and out["ssh"].ndim == 3:
+        width = out["ssh"].shape[2]
+        lon = np.asarray(out["lon"])
+        if lon.size >= width:
+            x0 = (np.asarray(data["ssh"]).shape[2] - crop_size) // 2
+            out["lon"] = lon[x0 : x0 + crop_size]
     return out
 
 
@@ -114,14 +165,22 @@ def make_natl60_datasets(
     dx_deg: float = 0.05,
     crop_size: int | None = None,
     max_samples: int | None = None,
+    allow_truth_background: bool = False,
 ) -> tuple[SSTSSHCurrentDataset, SSTSSHCurrentDataset, SSTSSHCurrentDataset]:
     """Sliding dT windows on the Gulf Stream NATL60 OSSE with paper date splits.
 
     ``crop_size`` / ``max_samples`` are CPU smoke helpers only — not for paper tables.
+    ``allow_truth_background`` is debug-only (default False; never for paper claims).
     """
     from data.natl60 import indices_for_split, load_natl60
 
-    data = load_natl60(paths, root=root, f0=f0, dx_deg=dx_deg)
+    data = load_natl60(
+        paths,
+        root=root,
+        f0=f0,
+        dx_deg=dx_deg,
+        allow_truth_background=allow_truth_background,
+    )
     if crop_size is not None:
         data = _center_crop_spatial(data, int(crop_size))
     times = data["time"]
@@ -166,6 +225,7 @@ def make_datasets(
             dx_deg=float(phys.get("dx_deg", 0.05)),
             crop_size=int(crop) if crop is not None else None,
             max_samples=int(max_s) if max_s is not None else None,
+            allow_truth_background=bool(dcfg.get("allow_truth_background", False)),
         )
     scfg = SyntheticOSSEConfig(
         n_time=int(dcfg.get("n_time", 40)),

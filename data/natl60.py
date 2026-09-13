@@ -45,9 +45,22 @@ _LON_NAMES = ("lon", "longitude", "nav_lon", "x")
 _TIME_NAMES = ("time", "time_counter", "date")
 
 
-def check_natl60_paths(paths: dict[str, str], required: tuple[str, ...] | None = None) -> list[str]:
-    """Return missing path messages. Default required = SSH/SST/u/v refs (obs/oi optional)."""
-    required = required if required is not None else ("ssh_ref", "sst_ref", "u_ref", "v_ref")
+def check_natl60_paths(
+    paths: dict[str, str],
+    required: tuple[str, ...] | None = None,
+    *,
+    allow_truth_background: bool = False,
+) -> list[str]:
+    """Return missing path messages.
+
+    Paper/default mode requires refs **and** ``obs`` + ``oi`` so the background
+    is never silently filled from SSH truth. Debug-only
+    ``allow_truth_background=True`` drops the obs/oi requirement.
+    """
+    if required is None:
+        required = ("ssh_ref", "sst_ref", "u_ref", "v_ref")
+        if not allow_truth_background:
+            required = required + ("obs", "oi")
     missing = []
     for key in required:
         p = paths.get(key)
@@ -56,11 +69,24 @@ def check_natl60_paths(paths: dict[str, str], required: tuple[str, ...] | None =
     return missing
 
 
-def missing_files_message(paths: dict[str, str], missing: list[str] | None = None) -> str:
-    missing = missing if missing is not None else check_natl60_paths(paths)
+def missing_files_message(
+    paths: dict[str, str],
+    missing: list[str] | None = None,
+    *,
+    allow_truth_background: bool = False,
+) -> str:
+    missing = missing if missing is not None else check_natl60_paths(
+        paths, allow_truth_background=allow_truth_background
+    )
+    if allow_truth_background:
+        req_txt = "required: ssh_ref, sst_ref, u_ref, v_ref (obs/oi optional; truth background allowed)."
+    else:
+        req_txt = (
+            "required: ssh_ref, sst_ref, u_ref, v_ref, obs, oi "
+            "(paper mode — no SSH-truth background fallback)."
+        )
     lines = [
-        "NATL60 NetCDF files are missing (required: ssh_ref, sst_ref, u_ref, v_ref).",
-        "obs / oi are optional (OI background + along-track mask).",
+        f"NATL60 NetCDF files are missing ({req_txt}).",
         "Download with: python scripts/download_natl60.py",
         "Resume is supported (re-run the same command; *.part files continue).",
         "Then set paths in config/paths.yaml.",
@@ -201,22 +227,88 @@ def _time_values(da: Any) -> np.ndarray:
         return t
 
 
-def _interp_like(da: Any, ref: Any) -> Any:
+def _align_like(da: Any, ref: Any, *, strict: bool = True) -> Any:
+    """Align ``da`` onto ``ref`` coordinates.
+
+    - Asserts time axes match when both exist (no silent time misalignment).
+    - Prefers exact ``xarray.align``; otherwise interpolates onto ``ref`` and
+      asserts the result shares ref's time length / values.
+    - Never returns the original array after a failed align/interp.
+    """
+    import xarray as xr
+
+    rename = {}
+    for names in (_TIME_NAMES, _LAT_NAMES, _LON_NAMES):
+        src = _coord_name(da, names)
+        dst = _coord_name(ref, names)
+        if src and dst and src != dst and src in getattr(da, "coords", {}):
+            rename[src] = dst
+    if rename:
+        da = da.rename(rename)
+
+    t_src = _coord_name(da, _TIME_NAMES)
+    t_dst = _coord_name(ref, _TIME_NAMES)
+    if t_src and t_dst:
+        ts = np.asarray(_time_values(da))
+        tr = np.asarray(_time_values(ref))
+        if ts.shape != tr.shape or not np.array_equal(ts.astype("datetime64[ns]"), tr.astype("datetime64[ns]")):
+            # Allow nearest reindex only when lengths match and max |Δt| ≤ 12 h
+            if ts.shape == tr.shape:
+                try:
+                    delta = np.abs(ts.astype("datetime64[ns]") - tr.astype("datetime64[ns]"))
+                    if np.max(delta) > np.timedelta64(12, "h"):
+                        raise RuntimeError(
+                            f"NATL60 time misaligned by >12h (max Δ={np.max(delta)}); "
+                            "refusing silent fallback."
+                        )
+                except (TypeError, ValueError) as exc:
+                    raise RuntimeError(
+                        "NATL60 time coordinates are not comparable; refusing silent fallback."
+                    ) from exc
+            else:
+                raise RuntimeError(
+                    f"NATL60 time length mismatch: da={ts.shape} vs ref={tr.shape}; "
+                    "refusing silent fallback."
+                )
+
+    try:
+        aligned, _ = xr.align(da, ref, join="exact")
+        return aligned
+    except (ValueError, TypeError):
+        pass
+
     kwargs = {}
     for names in (_TIME_NAMES, _LAT_NAMES, _LON_NAMES):
         src = _coord_name(da, names)
         dst = _coord_name(ref, names)
         if src and dst and src in da.coords and dst in ref.coords:
             kwargs[src] = ref[dst]
-            if src != dst:
-                da = da.rename({src: dst})
-                kwargs = {dst if k == src else k: v for k, v in kwargs.items()}
     if not kwargs:
-        return da
+        if strict:
+            raise RuntimeError("NATL60 align failed: no shared coords for regrid")
+        raise RuntimeError("NATL60 align failed and non-strict path has no coords")
+
     try:
-        return da.interp(**kwargs)
-    except (ValueError, TypeError):
-        return da
+        out = da.interp(**kwargs)
+    except (ValueError, TypeError) as exc:
+        raise RuntimeError(
+            "NATL60 interpolation onto reference grid failed; refusing silent fallback."
+        ) from exc
+
+    # Post-condition: time length must match ref when both have time
+    if t_dst and t_src:
+        out_t = np.asarray(_time_values(out))
+        ref_t = np.asarray(_time_values(ref))
+        if out_t.shape[0] != ref_t.shape[0]:
+            raise RuntimeError(
+                f"NATL60 post-interp time length {out_t.shape[0]} != ref {ref_t.shape[0]}"
+            )
+    return out
+
+
+def _interp_like(da: Any, ref: Any) -> Any:
+    """Backward-compatible name; uses strict align (no silent misalignment)."""
+    return _align_like(da, ref, strict=True)
 
 
 def load_natl60(
@@ -225,12 +317,22 @@ def load_natl60(
     root: str | Path | None = None,
     f0: float = 7.0e-5,
     dx_deg: float = 0.05,
+    *,
+    allow_truth_background: bool = False,
+    strict_align: bool = True,
 ) -> dict[str, np.ndarray]:
-    """Load NATL60 OSSE stacks. Raises FileNotFoundError with download URLs if missing."""
+    """Load NATL60 OSSE stacks.
+
+    Paper/default mode (``allow_truth_background=False``) **requires** ``obs`` and
+    ``oi`` and never sets ``y_ssh = ssh_truth``. Debug-only truth background is
+    opt-in via ``allow_truth_background=True``.
+    """
     paths = _resolve_paths(paths, root)
-    missing = check_natl60_paths(paths)
+    missing = check_natl60_paths(paths, allow_truth_background=allow_truth_background)
     if missing:
-        raise FileNotFoundError(missing_files_message(paths, missing))
+        raise FileNotFoundError(
+            missing_files_message(paths, missing, allow_truth_background=allow_truth_background)
+        )
 
     import xarray as xr
 
@@ -245,9 +347,10 @@ def load_natl60(
     u_ds = xr.open_dataset(paths["u_ref"])
     v_ds = xr.open_dataset(paths["v_ref"])
     ssh = _subset_box(_first_var(ssh_ds, _SSH_NAMES, "SSH"), box)
-    sst = _interp_like(_subset_box(_first_var(sst_ds, _SST_NAMES, "SST"), box), ssh)
-    u = _interp_like(_subset_box(_first_var(u_ds, _U_NAMES, "u"), box), ssh)
-    v = _interp_like(_subset_box(_first_var(v_ds, _V_NAMES, "v"), box), ssh)
+    align = lambda da: _align_like(da, ssh, strict=strict_align)
+    sst = align(_subset_box(_first_var(sst_ds, _SST_NAMES, "SST"), box))
+    u = align(_subset_box(_first_var(u_ds, _U_NAMES, "u"), box))
+    v = align(_subset_box(_first_var(v_ds, _V_NAMES, "v"), box))
 
     ssh_np = _squeeze_hw(ssh.values)
     sst_np = _squeeze_hw(sst.values)
@@ -256,28 +359,49 @@ def load_natl60(
     n = min(ssh_np.shape[0], sst_np.shape[0], u_np.shape[0], v_np.shape[0])
     ssh_np, sst_np, u_np, v_np = ssh_np[:n], sst_np[:n], u_np[:n], v_np[:n]
 
-    y_ssh = np.zeros_like(ssh_np)
-    mask_ssh = np.ones_like(ssh_np, dtype=np.float32)
-    if paths.get("oi") and Path(paths["oi"]).exists():
+    oi_ok = bool(paths.get("oi") and Path(paths["oi"]).exists())
+    obs_ok = bool(paths.get("obs") and Path(paths["obs"]).exists())
+
+    if not oi_ok:
+        if allow_truth_background:
+            y_ssh = ssh_np.copy()
+            mask_ssh = np.ones_like(ssh_np, dtype=np.float32)
+        else:
+            raise RuntimeError(
+                "NATL60 paper mode requires OI SSH background (paths['oi']). "
+                "Refusing y_ssh = ssh_truth leakage. "
+                "Pass allow_truth_background=True only for debug."
+            )
+    else:
         oi_ds = xr.open_dataset(paths["oi"])
-        oi = _interp_like(_subset_box(_first_var(oi_ds, _SSH_NAMES + ("ssh_oi", "oi"), "OI SSH"), box), ssh)
+        oi = align(_subset_box(_first_var(oi_ds, _SSH_NAMES + ("ssh_oi", "oi"), "OI SSH"), box))
         y_ssh = _squeeze_hw(oi.values)[:n]
         oi_ds.close()
-    else:
-        y_ssh = ssh_np.copy()
+        mask_ssh = np.ones_like(ssh_np, dtype=np.float32)
 
-    if paths.get("obs") and Path(paths["obs"]).exists():
+    if obs_ok:
         obs_ds = xr.open_dataset(paths["obs"])
         try:
-            obs = _interp_like(_subset_box(_first_var(obs_ds, _SSH_NAMES, "obs SSH"), box), ssh)
+            obs = align(_subset_box(_first_var(obs_ds, _SSH_NAMES, "obs SSH"), box))
             obs_np = _squeeze_hw(obs.values)[:n]
             mask_ssh = np.isfinite(obs_np).astype(np.float32)
             mask_ssh[np.abs(obs_np) < 1e-12] = 0.0
             # Prefer along-track values on the OI background
             y_ssh = np.where(mask_ssh > 0, obs_np, y_ssh)
-        except KeyError:
-            pass
+        except KeyError as exc:
+            if not allow_truth_background:
+                obs_ds.close()
+                raise RuntimeError(
+                    "NATL60 obs file present but no SSH variable found; "
+                    "refusing to proceed without along-track mask in paper mode."
+                ) from exc
         obs_ds.close()
+    elif not allow_truth_background:
+        raise RuntimeError(
+            "NATL60 paper mode requires along-track obs (paths['obs']). "
+            "Refusing empty/full mask with truth leakage. "
+            "Pass allow_truth_background=True only for debug."
+        )
 
     mask_sst = np.isfinite(sst_np).astype(np.float32)
     sst_np = np.where(np.isfinite(sst_np), sst_np, 0.0).astype(np.float32)
@@ -293,6 +417,24 @@ def load_natl60(
     u_ds.close()
     v_ds.close()
 
+    # Lat-dependent Coriolis / metrics (also stored as scalars for legacy callers)
+    from fourdvarnet.geometry import coriolis as _coriolis
+    from fourdvarnet.geometry import metric_dx as _metric_dx
+    from fourdvarnet.geometry import metric_dy as _metric_dy
+
+    lat_f = np.asarray(lat, dtype=np.float32)
+    if lat_f.ndim == 1 and lat_f.size > 0:
+        f_mean = float(np.mean([_coriolis(float(x)) for x in lat_f]))
+        dlat = float(np.abs(np.diff(lat_f)).mean()) if lat_f.size > 1 else dx_deg
+    else:
+        f_mean = float(_coriolis(38.0))
+        dlat = dx_deg
+    lon_f = np.asarray(lon, dtype=np.float32)
+    dlon = float(np.abs(np.diff(lon_f)).mean()) if lon_f.ndim == 1 and lon_f.size > 1 else dx_deg
+    lat0 = float(np.mean(lat_f)) if lat_f.size else 38.0
+    dx_m = float(_metric_dx(dlon, lat0))
+    dy_m = float(_metric_dy(dlat))
+
     return {
         "ssh": ssh_np,
         "u": u_np,
@@ -304,8 +446,10 @@ def load_natl60(
         "time": times,
         "lat": np.asarray(lat, dtype=np.float32),
         "lon": np.asarray(lon, dtype=np.float32),
-        "f": np.array([f0], dtype=np.float32),
+        "f": np.array([f_mean if np.isfinite(f_mean) else f0], dtype=np.float32),
         "dx": np.array([dx_deg], dtype=np.float32),
+        "dx_m": np.array([dx_m], dtype=np.float32),
+        "dy_m": np.array([dy_m], dtype=np.float32),
     }
 
 

@@ -3,6 +3,10 @@
 Geostrophy follows Fablet et al. JAMES 2024 Eq. 5. The SQG helper is an
 *effective* eSQG-style mix of SSH geostrophy and a spectral SST streamfunction
 ψ̂(k) ∝ θ̂(k)/(k + 1/L_d). It is not a full 3D SQG inversion.
+
+Spatial derivatives use **non-periodic** operators from ``fourdvarnet.geometry``
+(shared by train and eval). SST advection uses a **final-time backward** scheme
+for single-time velocity state: (T_t − T_{t−1})/Δt + u_t·∇T_t − κ∇²T_t.
 """
 
 from __future__ import annotations
@@ -13,15 +17,20 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+from fourdvarnet.geometry import grad_x, grad_y, laplacian_nonperiodic, stencil_valid_mask
+
 
 def geostrophic_velocity(
     ssh: torch.Tensor,
-    f: float,
+    f: float | torch.Tensor,
     g: float = 9.81,
-    dx: float = 1.0,
-    dy: float = 1.0,
+    dx: float | torch.Tensor = 1.0,
+    dy: float | torch.Tensor = 1.0,
 ) -> tuple[torch.Tensor, torch.Tensor]:
-    """SSH-derived geostrophic currents (Eq. 5): u_g = -(g/f)*d_y SSH, v_g = (g/f)*d_x SSH."""
+    """SSH-derived geostrophic currents (Eq. 5): u_g = -(g/f)*d_y SSH, v_g = (g/f)*d_x SSH.
+
+    ``f``, ``dx``, ``dy`` may be scalars or tensors broadcastable to ``ssh``.
+    """
     dssh_dy = central_diff_y(ssh, dy)
     dssh_dx = central_diff_x(ssh, dx)
     u_g = -(g / f) * dssh_dy
@@ -29,19 +38,19 @@ def geostrophic_velocity(
     return u_g, v_g
 
 
-def central_diff_x(field: torch.Tensor, dx: float = 1.0) -> torch.Tensor:
-    return (torch.roll(field, -1, dims=-1) - torch.roll(field, 1, dims=-1)) / (2.0 * dx)
+def central_diff_x(field: torch.Tensor, dx: float | torch.Tensor = 1.0) -> torch.Tensor:
+    """Non-periodic ∂/∂x (alias of ``geometry.grad_x``)."""
+    return grad_x(field, dx)
 
 
-def central_diff_y(field: torch.Tensor, dy: float = 1.0) -> torch.Tensor:
-    return (torch.roll(field, -1, dims=-2) - torch.roll(field, 1, dims=-2)) / (2.0 * dy)
+def central_diff_y(field: torch.Tensor, dy: float | torch.Tensor = 1.0) -> torch.Tensor:
+    """Non-periodic ∂/∂y (alias of ``geometry.grad_y``)."""
+    return grad_y(field, dy)
 
 
-def laplacian(field: torch.Tensor, dx: float = 1.0, dy: float = 1.0) -> torch.Tensor:
-    """Five-point Laplacian with periodic roll (consistent with central_diff)."""
-    dxx = (torch.roll(field, -1, dims=-1) + torch.roll(field, 1, dims=-1) - 2.0 * field) / (dx * dx)
-    dyy = (torch.roll(field, -1, dims=-2) + torch.roll(field, 1, dims=-2) - 2.0 * field) / (dy * dy)
-    return dxx + dyy
+def laplacian(field: torch.Tensor, dx: float | torch.Tensor = 1.0, dy: float | torch.Tensor = 1.0) -> torch.Tensor:
+    """Non-periodic five-point Laplacian (alias of ``geometry.laplacian_nonperiodic``)."""
+    return laplacian_nonperiodic(field, dx, dy)
 
 
 def _rfft2_wavenumbers(
@@ -156,15 +165,19 @@ def sst_advection_residual(
     v: torch.Tensor,
     kappa: float,
     dt: float,
-    dx: float,
-    dy: float,
+    dx: float | torch.Tensor,
+    dy: float | torch.Tensor,
+    mask_sst: torch.Tensor | None = None,
 ) -> torch.Tensor:
-    """Heat-budget residual ∂t T + u ∂x T + v ∂y T − κ ∇²T.
+    """Heat-budget residual at final analysis time (single-time velocity state).
 
-    ``sst_seq`` is (B, dT, H, W) or (dT, H, W). Velocity matches the spatial
-    size; a frozen field is taken at the last-but-one frame (or mid-window
-    when only a time-less u, v is given). Time derivative is central when
-    dT ≥ 3, otherwise forward. Uniform T and any uniform flow → residual ~ 0.
+    Scheme (backward in time, collocated with ``u_t, v_t``)::
+
+        (T_t − T_{t−1}) / Δt + u_t · ∇T_t − κ ∇²T_t
+
+    ``sst_seq`` is (B, dT, H, W) or (dT, H, W). When ``mask_sst`` is provided
+    with the same time axis, the residual is zeroed wherever the time stencil
+    (t and t−1) or the spatial FD stencil is invalid.
     """
     squeeze_batch = sst_seq.ndim == 3
     if squeeze_batch:
@@ -177,19 +190,30 @@ def sst_advection_residual(
         z = sst_seq.new_zeros(batch, height, width)
         return z[0] if squeeze_batch else z
 
-    # Last-but-one analysis frame; central ∂t uses neighbours t-1 and t+1.
-    t_idx = d_t - 2
-    t_field = sst_seq[:, t_idx]
-    if d_t >= 3:
-        dt_t = (sst_seq[:, t_idx + 1] - sst_seq[:, t_idx - 1]) / (2.0 * dt)
-    else:
-        dt_t = (sst_seq[:, -1] - sst_seq[:, 0]) / dt
+    # Final-time backward: align ∂t and advection with analysis velocity (u_t, v_t).
+    t_field = sst_seq[:, -1]
+    dt_t = (sst_seq[:, -1] - sst_seq[:, -2]) / dt
 
-    u_b = _to_bhw(u, batch, height, width, time_index=t_idx)
-    v_b = _to_bhw(v, batch, height, width, time_index=t_idx)
+    u_b = _to_bhw(u, batch, height, width, time_index=-1)
+    v_b = _to_bhw(v, batch, height, width, time_index=-1)
     tx = central_diff_x(t_field, dx)
     ty = central_diff_y(t_field, dy)
     residual = dt_t + u_b * tx + v_b * ty - float(kappa) * laplacian(t_field, dx, dy)
+
+    if mask_sst is not None:
+        m = mask_sst
+        if m.ndim == 3:
+            m = m.unsqueeze(0)
+        if m.ndim != 4:
+            raise ValueError(f"mask_sst must be (B,dT,H,W) or (dT,H,W), got {tuple(mask_sst.shape)}")
+        if m.shape[0] == 1 and batch > 1:
+            m = m.expand(batch, -1, -1, -1)
+        m_t = m[:, -1] > 0.5
+        m_tm1 = m[:, -2] > 0.5
+        spatial_ok = stencil_valid_mask(m_t)
+        valid = m_t & m_tm1 & spatial_ok
+        residual = torch.where(valid, residual, residual.new_zeros(()))
+
     return residual[0] if squeeze_batch else residual
 
 
@@ -198,14 +222,15 @@ def strain_uncertainty(
     v: torch.Tensor,
     sigma0: float,
     alpha: float,
-    dx: float = 1.0,
-    dy: float = 1.0,
+    dx: float | torch.Tensor = 1.0,
+    dy: float | torch.Tensor = 1.0,
 ) -> torch.Tensor:
-    """Heteroscedastic scale σ = σ0 (1 + α strain). Always ≥ σ0 for α ≥ 0.
+    """Strain-aware spatial reweighting scale σ = σ0 (1 + α strain).
 
-    Callers that use this inside a training loss should pass truth velocities or
-    ``u.detach()`` / ``v.detach()`` so the optimizer cannot inflate strain to
-    shrink the Gaussian NLL (M4 collapse mode).
+    This is **not** a learned uncertainty head (no σ network). M4 uses it only
+    to down-weight high-strain cells in the supervised UV term. Always ≥ σ0
+    for α ≥ 0. Callers should pass truth velocities or detached predictions so
+    the optimizer cannot inflate strain to shrink the NLL (M4 collapse mode).
     """
     return float(sigma0) * (1.0 + float(alpha) * strain(u, v, dx, dy))
 
@@ -231,19 +256,35 @@ class FixedGradient2d(nn.Module):
 
 
 class FixedDivergence2d(nn.Module):
-    """Non-trainable divergence for loss L_div (Eq. 13)."""
+    """Non-trainable divergence for loss L_div (Eq. 13). Uses shared non-periodic grads."""
 
-    def forward(self, u: torch.Tensor, v: torch.Tensor, dx: float = 1.0, dy: float = 1.0) -> torch.Tensor:
+    def forward(
+        self,
+        u: torch.Tensor,
+        v: torch.Tensor,
+        dx: float | torch.Tensor = 1.0,
+        dy: float | torch.Tensor = 1.0,
+    ) -> torch.Tensor:
         du_dx = central_diff_x(u, dx)
         dv_dy = central_diff_y(v, dy)
         return du_dx + dv_dy
 
 
-def vorticity(u: torch.Tensor, v: torch.Tensor, dx: float = 1.0, dy: float = 1.0) -> torch.Tensor:
+def vorticity(
+    u: torch.Tensor,
+    v: torch.Tensor,
+    dx: float | torch.Tensor = 1.0,
+    dy: float | torch.Tensor = 1.0,
+) -> torch.Tensor:
     return central_diff_x(v, dx) - central_diff_y(u, dy)
 
 
-def strain(u: torch.Tensor, v: torch.Tensor, dx: float = 1.0, dy: float = 1.0) -> torch.Tensor:
+def strain(
+    u: torch.Tensor,
+    v: torch.Tensor,
+    dx: float | torch.Tensor = 1.0,
+    dy: float | torch.Tensor = 1.0,
+) -> torch.Tensor:
     du_dx = central_diff_x(u, dx)
     dv_dy = central_diff_y(v, dy)
     du_dy = central_diff_y(u, dy)

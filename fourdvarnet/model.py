@@ -21,9 +21,10 @@ class FourDVarNetUV(nn.Module):
     Output:
       state (B, 3, H, W): [SSH, u, v]
 
-    Inner solver stays the unrolled ConvLSTM 4DVarNet (Fablet et al. 2024).
-    Optional SQG / advection residuals are extra terms in VariationalCost only.
-    ``use_uncert`` is stored for the supervised loss (not the inner cost).
+    Compact 4DVarNet-inspired unrolled ConvLSTM solver (not a byte-faithful
+    Fablet/IMT reproduction). Optional SQG / advection residuals live in
+    VariationalCost only. ``use_uncert`` is strain-aware spatial reweighting
+    in the supervised loss (not a learned uncertainty head).
     """
 
     def __init__(

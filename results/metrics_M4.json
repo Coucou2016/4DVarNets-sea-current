@@ -40,5 +40,7 @@
     "lambda_x_uv_km": null,
     "lambda_x_uv_min_ratio": 0.7830444303515247,
     "lambda_x_uv_resolved": 0.0
-  }
+  },
+  "pre_p0_fix": true,
+  "disclaimer": "PRE-P0-FIX / OBSOLETE FOR FORMAL PAPER CLAIMS. Trained before Phase-1 P0 correctness fixes (truth-fallback guard, solver detach removal, masked-MSE denom, non-periodic geometry, SST advection time alignment, full-window SST mask). Do not cite as JAMES table rows. See docs/REVIEW_RESPONSE_P0.md."
 }

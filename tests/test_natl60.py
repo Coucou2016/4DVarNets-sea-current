@@ -25,7 +25,8 @@ def test_import_does_not_require_files():
 def test_check_missing_paths():
     missing = check_natl60_paths({"obs": str(ROOT / "does_not_exist.nc")})
     assert any("ssh_ref" in m for m in missing)
-    # obs alone is optional; required refs still reported
+    assert any("obs" in m for m in missing)
+    # refs present but obs/oi still required in paper mode
     assert check_natl60_paths(
         {
             "ssh_ref": str(ROOT / "missing_ssh.nc"),
@@ -34,6 +35,17 @@ def test_check_missing_paths():
             "v_ref": str(ROOT / "missing_v.nc"),
         }
     )
+    # debug mode: refs only
+    missing_dbg = check_natl60_paths(
+        {
+            "ssh_ref": str(ROOT / "missing_ssh.nc"),
+            "sst_ref": str(ROOT / "missing_sst.nc"),
+            "u_ref": str(ROOT / "missing_u.nc"),
+            "v_ref": str(ROOT / "missing_v.nc"),
+        },
+        allow_truth_background=True,
+    )
+    assert all(not m.startswith("obs:") and not m.startswith("oi:") for m in missing_dbg)
 
 
 def test_load_natl60_missing_raises_with_urls():

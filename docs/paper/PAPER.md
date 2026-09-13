@@ -2,7 +2,17 @@
 
 **Assembled manuscript (working).** Crop96/20ep ≠ JAMES Table.  
 **Public code:** https://github.com/Coucou2016/4DVarNets-sea-current  
-**Assembled:** 2026-08-16
+**Assembled:** 2026-08-16 · **P0 disclaimer updated:** 2026-09-13
+
+> **CRITICAL (Phase-1 P0):** B2/M3/M4 GPU96 metrics in `results/` are tagged
+> `pre_p0_fix` and are **obsolete for formal claims** after correctness fixes
+> (observation leakage guard, unrolled solver without detach, masked-MSE denom,
+> non-periodic lat-aware geometry, SST advection time scheme, full-window SST mask).
+> See `docs/REVIEW_RESPONSE_P0.md`. Do **not** invent JAMES table scores.
+> Historical note only: under the old crop96/20ep protocol, **B2 beat M3 ≳ M4**;
+> physics extras did not beat B2. Compact solver is **4DVarNet-inspired**, not a
+> faithful unchanged Fablet reproduction. M4 denotes **strain-aware spatial
+> reweighting**, not uncertainty estimation.
 
 **Axes (nature-writing):** `task=manuscript`, `paper_type=methods`, `journal=generic` (JAMES / GMD-style methods paper; Nature-family *clarity*, not flagship Nature format), `language=en`.
 
@@ -10,9 +20,9 @@
 
 ## Key Points
 
-- Explicit eSQG-style SQG, SST-advection, and optional strain-aware UV uncertainty residuals can be embedded in a Fablet-like 4DVarNet cost without replacing the ConvLSTM solver.
-- On a preliminary NATL60 **crop96 / 20-epoch** OSSE, measured ranking is **B2 > M3 ≳ M4** on τ_uv (0.848 / 0.811 / 0.801); all beat geostrophy (τ_uv ≈ −3.74). Physics extras are not universally additive.
-- A raw heteroscedastic NLL scale bug starved M4 SSH (rmse_ssh 0.122); σ-normalized UV loss + retrain recovers rmse_ssh ≈ 0.063 while UV still trails B2. Cropped short runs are **not** paper Table rows.
+- Explicit eSQG-style SQG, SST-advection, and optional strain-aware UV **reweighting** can be embedded in a compact 4DVarNet-**inspired** cost (not a byte-faithful Fablet solver clone).
+- Pre-P0 GPU96 crop96/20ep runs (now obsolete for claims) ranked **B2 > M3 ≳ M4** on τ_uv; all beat geostrophy. Physics extras were not universally additive.
+- A raw heteroscedastic NLL scale bug starved M4 SSH; σ-normalized UV reweight + retrain recovered SSH while UV still trailed B2. Cropped short runs are **not** paper Table rows. Post-P0 retrain required before any formal score.
 
 ## Plain Language Summary
 

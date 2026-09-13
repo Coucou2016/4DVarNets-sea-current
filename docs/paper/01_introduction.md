@@ -11,14 +11,14 @@ Fablet et al. (2024, JAMES) established a multimodal 4DVarNet solver for SST–S
 
 **Gap.** Without explicit physics residuals, it is hard to attribute gains to dynamical constraints versus learned multimodal synergy alone, and harder to diagnose when SQG/advection priors help or hurt. Conversely, naively adding physics terms can degrade skill if operators are misspecified, poorly scaled, or regime-dependent—e.g. when SST is a weak proxy for surface density, mixed-layer motions dominate, or interior potential vorticity contributes strongly to surface velocity (Isern-Fontanet / González-Haro transfer-function literature; Miracca-Lage et al., 2022; Yassin & Griffies, 2023, on variable-stratification SQG regimes).
 
-**This work.** We keep the Fablet-style ConvLSTM 4DVarNet solver and extend only the variational cost / supervised loss with (i) an *effective* eSQG-style SQG residual, (ii) an SST advection residual, and (iii) optional strain-heteroscedastic UV uncertainty. We evaluate a controlled ablation matrix (B2 / M3 / M4) under identical training protocols on synthetic and cropped NATL60 OSSEs.
+**This work.** We use a compact 4DVarNet-**inspired** ConvLSTM unrolled solver (not a byte-faithful Fablet/IMT reproduction) and extend the variational cost / supervised loss with (i) an *effective* eSQG-style SQG residual, (ii) an SST advection residual (final-time backward for single-time state), and (iii) optional strain-aware spatial UV **reweighting** (M4 — not a learned uncertainty head). We evaluate a controlled ablation matrix (B2 / M3 / M4) under identical training protocols on synthetic and cropped NATL60 OSSEs.
 
 **Contributions (honest).**
 
-1. **Physics residuals inside the unrolled cost** — code-mapped operators for SQG, advection, and strain-aware UV uncertainty, without replacing the solver architecture.
-2. **Ablation evidence under a fair protocol** — isolating SST synergy (B2) vs SQG+adv (M3) vs +uncertainty (M4), with geostrophy co-reported.
-3. **Partial / negative result on short cropped NATL60** — on GPU96 crop96/20ep, **B2 outperforms M3 ≳ M4** on τ_uv; all still beat geostrophy on currents. Physics extras are **regime- and hyperparameter-dependent**, not universally additive. (M4 SSH degradation from raw NLL was diagnosed and repaired; post-fix SSH ≈ B2/M3 while UV still trails B2.)
-4. **M4 loss-scale diagnosis** — raw heteroscedastic NLL with σ₀≪1 can swamp SSH terms; we document and mitigate the scale mismatch (σ-normalized UV term + retrain).
+1. **Physics residuals inside the unrolled cost** — code-mapped operators for SQG, advection, and strain-aware UV reweighting.
+2. **Ablation evidence under a fair protocol** — isolating SST synergy (B2) vs SQG+adv (M3) vs +reweighting (M4), with geostrophy co-reported.
+3. **Partial / negative result on short cropped NATL60 (pre-P0 historical)** — on GPU96 crop96/20ep, **B2 outperformed M3 ≳ M4** on τ_uv; all still beat geostrophy. Those scores are **`pre_p0_fix` / obsolete for claims** after Phase-1 correctness fixes (`docs/REVIEW_RESPONSE_P0.md`). Physics extras are **regime- and hyperparameter-dependent**, not universally additive.
+4. **M4 loss-scale diagnosis** — raw heteroscedastic NLL with σ₀≪1 can swamp SSH terms; we document and mitigate the scale mismatch (σ-normalized UV reweight + retrain).
 
 **Boundary.** Cropped / short-epoch GPU runs are **preliminary** and are **not** JAMES Table rows. Full-domain NATL60 long training and OSE/drifter evaluation remain future evidence gates. Hardware (GTX 950M 4GB) currently precludes uncropped 200×200 / ~200-ep Table runs; we therefore strengthen what *is* measured (expanded diagnostics τ_div, λ_x; honest ranking) rather than invent Table scores.
 

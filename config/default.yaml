@@ -6,6 +6,8 @@ data:
   height: 48
   width: 48
   dT: 7
+  # Paper/default NATL60 mode: require obs+oi; never fill y_ssh from SSH truth.
+  allow_truth_background: false
   # NATL60 CPU smoke only (null = full paper grid / all windows):
   # crop_size: 48
   # max_samples: 4

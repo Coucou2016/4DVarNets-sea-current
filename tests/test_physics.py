@@ -25,14 +25,20 @@ def test_geostrophic_recovers_ssh_gradient():
     f = float(data["f"][0])
     dx = float(data["dx"][0]) * 111e3
     u_g, v_g = geostrophic_velocity(ssh, f, dx=dx, dy=dx)
-    # Recompute from numpy reference
-    s = data["ssh"][0]
-    ddy = (np.roll(s, -1, 0) - np.roll(s, 1, 0)) / (2 * dx)
-    ddx = (np.roll(s, -1, 1) - np.roll(s, 1, 1)) / (2 * dx)
+    # Non-periodic reference (matches geometry.grad_*)
+    s = torch.from_numpy(data["ssh"][0:1])
+    ddy = torch.empty_like(s)
+    ddx = torch.empty_like(s)
+    ddy[..., 1:-1, :] = (s[..., 2:, :] - s[..., :-2, :]) / (2 * dx)
+    ddy[..., 0, :] = (s[..., 1, :] - s[..., 0, :]) / dx
+    ddy[..., -1, :] = (s[..., -1, :] - s[..., -2, :]) / dx
+    ddx[..., :, 1:-1] = (s[..., :, 2:] - s[..., :, :-2]) / (2 * dx)
+    ddx[..., :, 0] = (s[..., :, 1] - s[..., :, 0]) / dx
+    ddx[..., :, -1] = (s[..., :, -1] - s[..., :, -2]) / dx
     u_ref = -(9.81 / f) * ddy
     v_ref = (9.81 / f) * ddx
-    assert np.allclose(u_g.squeeze().numpy(), u_ref, atol=1e-4)
-    assert np.allclose(v_g.squeeze().numpy(), v_ref, atol=1e-4)
+    assert torch.allclose(u_g, u_ref, atol=1e-4)
+    assert torch.allclose(v_g, v_ref, atol=1e-4)
 
 
 def test_total_currents_differ_from_geostrophic():

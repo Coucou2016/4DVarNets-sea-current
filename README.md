@@ -2,25 +2,28 @@
 
 **Public repo:** [github.com/Coucou2016/4DVarNets-sea-current](https://github.com/Coucou2016/4DVarNets-sea-current)
 
-Implementation of **Fablet et al. (2024)**, *Inversion of Sea Surface Currents From Satellite-Derived SST-SSH Synergies With 4DVarNets*, JAMES ([doi:10.1029/2023MS003609](https://doi.org/10.1029/2023MS003609)), plus a physics-augmented variational cost for follow-on experiments.
+**Compact 4DVarNet-inspired** implementation motivated by **Fablet et al. (2024)**, *Inversion of Sea Surface Currents From Satellite-Derived SST-SSH Synergies With 4DVarNets*, JAMES ([doi:10.1029/2023MS003609](https://doi.org/10.1029/2023MS003609)), plus physics-augmented variational cost terms for follow-on ablations.
 
-Reference code: [CIA-Oceanix/4dvarnet-james-uv-ssc](https://github.com/CIA-Oceanix/4dvarnet-james-uv-ssc).
+Reference code (full IMT stack): [CIA-Oceanix/4dvarnet-james-uv-ssc](https://github.com/CIA-Oceanix/4dvarnet-james-uv-ssc). This repo is **not** a byte-faithful Fablet reproduction (R0); a faithful R0 port is a later phase.
 
-**Honest GPU96 note (crop96 / 20ep, ≠ JAMES table):** measured ranking **B2 > M3 ≳ M4** (τ_uv 0.848 / 0.811 / 0.801). See `results/metrics_*_GPU96.json` and `docs/report/`.
+> **P0 correctness (2026-09):** Phase-1 fixes landed (no SSH-truth observation leakage; unrolled solver without per-iter detach; masked-MSE denom; non-periodic lat-aware geometry; final-time SST advection; full-window SST mask; strict align). See [`docs/REVIEW_RESPONSE_P0.md`](docs/REVIEW_RESPONSE_P0.md).
+>
+> **GPU96 B2/M3/M4 scores are `pre_p0_fix` and obsolete for formal claims.** Do not cite `results/metrics_*_GPU96.json` as paper Table rows until a post-P0 retrain. Historical directional note only: under crop96/20ep, B2 beat M3 ≳ M4 and geostrophy; physics extras did **not** beat B2.
 
-## Innovation vs Fablet 2024
+## Innovation vs Fablet 2024 (honest)
 
-The unrolled ConvLSTM 4DVarNet solver is unchanged (state `x = (SSH, u, v)`, learned `G`/`H`, prior `Φ`). The inner cost is extended with explicit physics residuals:
+This codebase uses a **compact** unrolled ConvLSTM solver (state `x = (SSH, u, v)`, learned `G`/`H`, prior `Φ`). It is **4DVarNet-inspired**, not an unchanged / faithful Fablet solver. The inner cost can add explicit physics residuals:
 
 ```
 U = λ_ssh ||SSH − SSH_obs||²_Ω
   + λ_mm  ||G(x) − H(SST)||²
   + λ_sqg ||u − A_SQG(SST, SSH)||²
-  + λ_adv ||∂t T + u·∇T − κ∇²T||²
+  + λ_adv ||∂t T + u·∇T − κ∇²T||²   # final-time backward for single-time state
   + λ_Φ   ||x − Φ(x)||²
 ```
 
-Optional supervised term: strain-aware UV uncertainty `||u − u_gt||² / σ²(strain) + log σ²` with `σ = σ0 (1 + α strain)`.
+Optional supervised term (**M4**): **strain-aware spatial reweighting** of UV error
+`σ = σ0 (1 + α strain)` — **not** a learned uncertainty / σ head.
 
 `A_SQG` is an **effective eSQG-style** operator (geostrophic SSH mixed with a spectral SST streamfunction `ψ̂(k) ∝ θ̂(k)/(k + 1/L_d)`). It is not a full 3D SQG inversion.
 
@@ -30,9 +33,11 @@ Optional supervised term: strain-aware UV uncertainty `||u − u_gt||² / σ²(s
 | Cost **U** (Eq. 8 + SQG/advection) | `fourdvarnet/solver.py` `VariationalCost` |
 | **G**, **H** multimodal conv nets | `fourdvarnet/observation.py` |
 | Prior **Φ** | `fourdvarnet/prior.py` |
-| Unrolled ConvLSTM (Eq. 9) | `fourdvarnet/convlstm.py` |
-| eSQG / advection / strain σ | `fourdvarnet/physics.py` |
-| Supervised losses + UV NLL | `fourdvarnet/losses.py` |
+| Unrolled ConvLSTM (Eq. 9) | `fourdvarnet/convlstm.py` + `Solver4DVarNet` |
+| Truncated-BPTT ablation | `Solver4DVarNetTruncated` |
+| Geometry (f, dx, dy, non-periodic grads) | `fourdvarnet/geometry.py` |
+| eSQG / advection / strain reweight | `fourdvarnet/physics.py` |
+| Supervised losses + UV reweight | `fourdvarnet/losses.py` |
 | τ, RMSE, λ_x, Lagrangian | `fourdvarnet/metrics.py` |
 
 ## Install
@@ -62,7 +67,7 @@ YAML is always opened with UTF-8. Evaluation does **not** wrap the inner 4DVar s
 
 ## Train (synthetic OSSE)
 
-Default `config/default.yaml` uses `data.source: synthetic` and turns SST, SQG, advection, and uncertainty **on**. CPU CI does not need NATL60.
+Default `config/default.yaml` uses `data.source: synthetic` and turns SST, SQG, advection, and strain reweighting **on**. CPU CI does not need NATL60.
 
 ```bash
 python scripts/train.py --config config/default.yaml
@@ -76,11 +81,11 @@ Checkpoints: `checkpoints/4dvarnet-<tag>-best.pt`
 | ID | Setup | Command |
 |----|--------|---------|
 | B1 | SSH-only | `python scripts/train.py --exp-name B1 --use-sst 0 --use-sqg 0 --use-adv 0 --use-uncert 0` |
-| B2 | SSH+SST (Fablet-like) | `python scripts/train.py --exp-name B2 --use-sst 1 --use-sqg 0 --use-adv 0 --use-uncert 0` |
+| B2 | SSH+SST (Fablet-like cost terms) | `python scripts/train.py --exp-name B2 --use-sst 1 --use-sqg 0 --use-adv 0 --use-uncert 0` |
 | M1 | + SQG residual | `python scripts/train.py --exp-name M1 --use-sst 1 --use-sqg 1 --use-adv 0 --use-uncert 0` |
 | M2 | + advection residual | `python scripts/train.py --exp-name M2 --use-sst 1 --use-sqg 0 --use-adv 1 --use-uncert 0` |
 | M3 | SQG + advection | `python scripts/train.py --exp-name M3 --use-sst 1 --use-sqg 1 --use-adv 1 --use-uncert 0` |
-| M4 | + strain uncertainty | `python scripts/train.py --exp-name M4 --use-sst 1 --use-sqg 1 --use-adv 1 --use-uncert 1` |
+| M4 | + strain-aware spatial reweighting | `python scripts/train.py --exp-name M4 --use-sst 1 --use-sqg 1 --use-adv 1 --use-uncert 1` |
 
 Run the whole matrix (2 epochs when `--quick`):
 
@@ -114,9 +119,9 @@ URLs live in `data/natl60.py`. Paths default to `config/paths.yaml` (`data/natl6
 python scripts/train.py --source natl60
 ```
 
-If files are missing, `load_natl60` / `train.py --source natl60` exit with the download command and URLs (no traceback spam).
+**Paper/default mode** requires `ssh_ref`, `sst_ref`, `u_ref`, `v_ref`, **`obs`**, and **`oi`**. The loader never sets `y_ssh = ssh_truth`. Debug-only `data.allow_truth_background: true` is off by default.
 
-Paper experiment checklist, metric names, and valid Table-row criteria: [`docs/PAPER_EXPERIMENTS.md`](docs/PAPER_EXPERIMENTS.md).
+Paper experiment checklist: [`docs/PAPER_EXPERIMENTS.md`](docs/PAPER_EXPERIMENTS.md). P0 fix map: [`docs/REVIEW_RESPONSE_P0.md`](docs/REVIEW_RESPONSE_P0.md).
 
 Paper splits (§3.2), Gulf Stream box 33–43N, 65–55W:
 
@@ -124,7 +129,7 @@ Paper splits (§3.2), Gulf Stream box 33–43N, 65–55W:
 - Val: 2013-01-01 → 2013-02-04 (shared day assigned to train)
 - Test: 2012-10-20 → 2012-12-04
 
-Sliding windows use `dT = 7`, same as the synthetic dataset. Ablation metrics JSON: `results/`.
+Sliding windows use `dT = 7`. Ablation metrics JSON: `results/` (**pre_p0_fix** until retrain).
 
 ## Metrics
 
@@ -139,9 +144,11 @@ Sliding windows use `dT = 7`, same as the synthetic dataset. Ablation metrics JS
 
 ## Limitations (honest)
 
-- Synthetic OSSE scores are **not** JAMES 2024 Table numbers. Quote NATL60 GPU runs for the paper table.
+- Synthetic OSSE scores are **not** JAMES 2024 Table numbers.
+- GPU96 crop96/20ep metrics are **pre-P0-fix** and **obsolete for claims**.
+- Compact Φ / G/H port ≠ official IMT `lit_model_uv.py` (~1.4M params, 200 epochs, Lightning/Hydra).
 - `A_SQG` is a discrete eSQG-style mix, not a 3D inversion.
-- Φ and G/H are a compact port of the official IMT `lit_model_uv.py` (~1.4M params, 200 epochs, Lightning/Hydra).
+- M4 is strain reweighting, not uncertainty estimation (learned σ head = future M5).
 - Full NATL60 + SWOT/OSTIA/GDP OSE needs downloaded cubes and a GPU.
 - Lagrangian path is RK2 on the analysis grid, not a full FSLE package.
 

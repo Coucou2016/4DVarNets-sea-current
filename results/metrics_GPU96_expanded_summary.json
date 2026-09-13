@@ -46,5 +46,7 @@
       "lambda_x_ssh_km": 122.24415584415586,
       "lambda_x_uv_km": 101.56456876456878
     }
-  ]
+  ],
+  "pre_p0_fix": true,
+  "disclaimer": "PRE-P0-FIX / OBSOLETE FOR FORMAL PAPER CLAIMS. Trained before Phase-1 P0 correctness fixes (truth-fallback guard, solver detach removal, masked-MSE denom, non-periodic geometry, SST advection time alignment, full-window SST mask). Do not cite as JAMES table rows. See docs/REVIEW_RESPONSE_P0.md."
 }

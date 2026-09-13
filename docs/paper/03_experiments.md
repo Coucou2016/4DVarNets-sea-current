@@ -3,6 +3,10 @@
 **Status:** matured draft. All numeric values below are **local measured** results.  
 **Hard caveat:** GPU96 = NATL60 **crop_size=96**, **20 epochs** — **not** JAMES Table / full-domain 200-ep protocol.
 
+> **P0 (2026-09):** GPU96 / synthetic metrics JSON are tagged `pre_p0_fix` and are
+> **obsolete for formal claims** after Phase-1 correctness fixes. See
+> `docs/REVIEW_RESPONSE_P0.md`. Numbers below are **historical pre-fix** context only.
+
 Figures: SciencePlots + Times New Roman via `scripts/plot_science.py` → `results/figures/` (mirrored in `docs/paper/figures/`). Expanded summary JSON: `results/metrics_GPU96_expanded_summary.json`.
 
 ---
@@ -37,7 +41,7 @@ Paper-ready rows require (`docs/PAPER_EXPERIMENTS.md`):
 | B1 | | | | | SSH-only baseline | **Not measured** this session |
 | B2 | ✓ | | | | Multimodal synergy (Fablet-like) | Measured GPU96 |
 | M3 | ✓ | ✓ | ✓ | | Physics residuals in cost | Measured GPU96 |
-| M4 | ✓ | ✓ | ✓ | ✓ | + strain UV uncertainty | Measured GPU96 (post-NLL-fix) |
+| M4 | ✓ | ✓ | ✓ | ✓ | + strain-aware spatial reweighting | Measured GPU96 (post-NLL-fix; **pre_p0_fix**) |
 | geo | — | — | — | — | Geostrophic baseline | Always co-reported |
 
 ---

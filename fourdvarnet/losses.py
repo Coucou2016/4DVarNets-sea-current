@@ -1,8 +1,9 @@
-"""Supervised training losses (paper Eqs 10–14) plus optional strain-aware UV term.
+"""Supervised training losses (paper Eqs 10–14) plus optional strain reweighting.
 
 When ``use_uncert`` is on, the UV term mixes MSE with a σ-normalized
-heteroscedastic penalty so that σ≈σ0 recovers MSE scale (avoids raw
-err²/σ² swamping SSH when σ0≪1).
+**strain-aware spatial reweighting** (not a learned uncertainty head):
+σ = σ0 (1 + α strain). σ≈σ0 recovers MSE scale (avoids raw err²/σ²
+swamping SSH when σ0≪1). M4 in this repo means reweighting, not σ-estimation.
 """
 
 from __future__ import annotations
@@ -68,8 +69,9 @@ class TrainingLoss(nn.Module):
         gx_t, gy_t = self.grad_op(ssh_t)
         l_gssh = torch.mean((gx_p - gx_t) ** 2 + (gy_p - gy_t) ** 2)
         l_uv = torch.mean((u_p - u_t) ** 2 + (v_p - v_t) ** 2)
-        div_p = self.div_op(u_p, v_p)
-        div_t = self.div_op(u_t, v_t)
+        # Same metric spacing as train/eval physics operators.
+        div_p = self.div_op(u_p, v_p, self.dx, self.dy)
+        div_t = self.div_op(u_t, v_t, self.dx, self.dy)
         l_div = torch.mean((div_p - div_t) ** 2)
         l_phi = torch.mean((truth - phi(truth)) ** 2 + (pred - phi(pred)) ** 2)
 
