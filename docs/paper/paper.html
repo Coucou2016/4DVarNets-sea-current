@@ -183,7 +183,7 @@ L_{\mathrm{uv}}^{\sigma}
 <strong>obsolete for formal claims</strong> after Phase-1 correctness fixes. See
 <code>docs/REVIEW_RESPONSE_P0.md</code>. Numbers below are <strong>historical pre-fix</strong> context only.</p>
 </blockquote>
-<p>Figures: SciencePlots + Times New Roman via <code>scripts/plot_science.py</code> → <code>results/figures/</code> (mirrored in <code>docs/paper/figures/</code>). Expanded summary JSON: <code>results/metrics_GPU96_expanded_summary.json</code>.</p>
+<p>Figures: SciencePlots + Times New Roman via <code>scripts/plot_science.py</code> → <code>results/figures/</code> (mirrored in <code>docs/paper/figures/</code>). Expanded summary JSON: <code>results/legacy_pre_review2/metrics_GPU96_expanded_summary.json</code> (<code>legacy_pre_review2</code> / <code>pre_p0_fix</code>).</p>
 <hr />
 <h2>3.1 OSSE protocols</h2>
 <h3>Synthetic (directional)</h3>
@@ -266,7 +266,7 @@ L_{\mathrm{uv}}^{\sigma}
 </table>
 <hr />
 <h2>3.3 Preliminary results — GPU96 crop96 / 20ep</h2>
-<p>Source JSON: <code>results/metrics_{B2,M3,M4}_GPU96.json</code> (+ pre-fix archive).</p>
+<p>Source JSON: <code>results/legacy_pre_review2/metrics_{B2,M3,M4}_GPU96.json</code> (+ pre-fix archive).</p>
 <h3>Table A — primary UV / SSH skill</h3>
 <table>
 <thead>
@@ -430,7 +430,7 @@ L_{\mathrm{uv}}^{\sigma}
 <li>Raw heteroscedastic NLL <code>||e||^2/sigma^2</code> with <code>sigma_0≈0.05</code> is <code>~1/sigma_0^2</code> larger than MSE.</li>
 <li>UV gradients then dominate; SSH terms become relatively weak — SSH fit suffers while UV remains OK via the strain reweighting.</li>
 </ul>
-<p><strong>Mitigation + retrain (2026-08-16):</strong> sigma-normalized UV term + <code>uncert_mse_mix: 0.5</code>; full M4-GPU96 <strong>20ep retrain</strong> on faceswap CUDA. Post-fix: best val <strong>4.83</strong>, rmse_ssh <strong>0.063</strong>, tau_uv <strong>0.801</strong>, rmse_uv <strong>0.211</strong>. SSH recovered near B2/M3; currents still trail B2 (ranking unchanged: B2 &gt; M3 ≳ M4). Pre-fix metrics archived as <code>results/metrics_M4_GPU96_pre_nllfix.json</code>.</p>
+<p><strong>Mitigation + retrain (2026-08-16):</strong> sigma-normalized UV term + <code>uncert_mse_mix: 0.5</code>; full M4-GPU96 <strong>20ep retrain</strong> on faceswap CUDA. Post-fix: best val <strong>4.83</strong>, rmse_ssh <strong>0.063</strong>, tau_uv <strong>0.801</strong>, rmse_uv <strong>0.211</strong>. SSH recovered near B2/M3; currents still trail B2 (ranking unchanged: B2 &gt; M3 ≳ M4). Pre-fix metrics archived as <code>results/legacy_pre_review2/metrics_M4_GPU96_pre_nllfix.json</code>.</p>
 <hr />
 <h2>4.4 Framing innovation without overclaim</h2>
 <p>Defensible:</p>

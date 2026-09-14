@@ -34,7 +34,7 @@ Synthetic 8-ep ranking (M4 best) vs GPU96 ranking (B2 best) supports **regime de
 - Raw heteroscedastic NLL `||e||^2/sigma^2` with `sigma_0≈0.05` is `~1/sigma_0^2` larger than MSE.
 - UV gradients then dominate; SSH terms become relatively weak — SSH fit suffers while UV remains OK via the strain reweighting.
 
-**Mitigation + retrain (2026-08-16):** sigma-normalized UV term + `uncert_mse_mix: 0.5`; full M4-GPU96 **20ep retrain** on faceswap CUDA. Post-fix: best val **4.83**, rmse_ssh **0.063**, tau_uv **0.801**, rmse_uv **0.211**. SSH recovered near B2/M3; currents still trail B2 (ranking unchanged: B2 > M3 ≳ M4). Pre-fix metrics archived as `results/metrics_M4_GPU96_pre_nllfix.json`.
+**Mitigation + retrain (2026-08-16):** sigma-normalized UV term + `uncert_mse_mix: 0.5`; full M4-GPU96 **20ep retrain** on faceswap CUDA. Post-fix: best val **4.83**, rmse_ssh **0.063**, tau_uv **0.801**, rmse_uv **0.211**. SSH recovered near B2/M3; currents still trail B2 (ranking unchanged: B2 > M3 ≳ M4). Pre-fix metrics archived as `results/legacy_pre_review2/metrics_M4_GPU96_pre_nllfix.json`.
 
 ---
 

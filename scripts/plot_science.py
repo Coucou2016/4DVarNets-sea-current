@@ -92,15 +92,18 @@ def main() -> None:
     for exp in ("B2-GPU96", "M3-GPU96", "M4-GPU96"):
         _plot_gpu96_loss(exp, fig_dir, written)
 
-    # --- GPU96 metrics bars; JSON uses underscores: metrics_B2_GPU96.json ---
+    # --- GPU96 metrics bars; JSON under results/legacy_pre_review2/ ---
     gpu_ids = []
     gpu_tau = []
     gpu_geo = []
     gpu_rmse = []
     gpu_tau_div = []
     gpu_lam_uv = []
+    legacy = results / "legacy_pre_review2"
     for name in ("B2_GPU96", "M3_GPU96", "M4_GPU96"):
-        path = results / f"metrics_{name}.json"
+        path = legacy / f"metrics_{name}.json"
+        if not path.is_file():
+            path = results / f"metrics_{name}.json"
         if not path.is_file():
             continue
         blob = _load(path)

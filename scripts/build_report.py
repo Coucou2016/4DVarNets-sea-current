@@ -74,11 +74,16 @@ def _fig_block(fig_id: str, title: str, png_name: str, explanation: str, b64_map
 
 def collect_metrics() -> dict:
     gpu = {}
+    legacy = RESULTS / "legacy_pre_review2"
     for name in ("B2_GPU96", "M3_GPU96", "M4_GPU96"):
-        p = RESULTS / f"metrics_{name}.json"
+        p = legacy / f"metrics_{name}.json"
+        if not p.is_file():
+            p = RESULTS / f"metrics_{name}.json"
         if p.is_file():
             gpu[name] = _load(p)
-    pre = RESULTS / "metrics_M4_GPU96_pre_nllfix.json"
+    pre = legacy / "metrics_M4_GPU96_pre_nllfix.json"
+    if not pre.is_file():
+        pre = RESULTS / "metrics_M4_GPU96_pre_nllfix.json"
     if pre.is_file():
         gpu["M4_GPU96_pre"] = _load(pre)
     synth = {}
@@ -288,7 +293,7 @@ def html_table_gpu(metrics: dict) -> str:
 {body}
 </tbody>
 </table>
-<p class="table-note">表注：数值来自本地 <code>results/metrics_*_GPU96.json</code>（汇总见 <code>results/metrics_GPU96_expanded_summary.json</code>）。协议为 NATL60 <strong>crop_size=96、20 epochs</strong>，<strong>不等于</strong> Fablet 2024 JAMES 论文 Table 全场长训结果。请勿将本表数字当作论文正式 Table 行引用。B1 SSH-only 本会话未测；全场 200ep 受 4GB GPU 限制暂不可行。</p>"""
+<p class="table-note">表注：数值来自 <code>results/legacy_pre_review2/metrics_*_GPU96.json</code>（汇总见同目录 <code>metrics_GPU96_expanded_summary.json</code>；标签 <code>legacy_pre_review2</code> / <code>pre_p0_fix</code>）。协议为 NATL60 <strong>crop_size=96、20 epochs</strong>，<strong>不等于</strong> Fablet 2024 JAMES 论文 Table 全场长训结果。请勿将本表数字当作论文正式 Table 行引用。B1 SSH-only 本会话未测；全场 200ep 受 4GB GPU 限制暂不可行。</p>"""
 
 
 def html_table_synth(metrics: dict) -> str:

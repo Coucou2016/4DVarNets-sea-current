@@ -356,8 +356,18 @@ def load_natl60(
     sst_np = _squeeze_hw(sst.values)
     u_np = _squeeze_hw(u.values)
     v_np = _squeeze_hw(v.values)
-    n = min(ssh_np.shape[0], sst_np.shape[0], u_np.shape[0], v_np.shape[0])
-    ssh_np, sst_np, u_np, v_np = ssh_np[:n], sst_np[:n], u_np[:n], v_np[:n]
+    lengths = {
+        "ssh": ssh_np.shape[0],
+        "sst": sst_np.shape[0],
+        "u": u_np.shape[0],
+        "v": v_np.shape[0],
+    }
+    if len(set(lengths.values())) != 1:
+        raise RuntimeError(
+            f"NATL60 ref time lengths differ after align: {lengths}; "
+            "refusing quiet min-length truncate."
+        )
+    n = ssh_np.shape[0]
 
     oi_ok = bool(paths.get("oi") and Path(paths["oi"]).exists())
     obs_ok = bool(paths.get("obs") and Path(paths["obs"]).exists())
@@ -375,7 +385,12 @@ def load_natl60(
     else:
         oi_ds = xr.open_dataset(paths["oi"])
         oi = align(_subset_box(_first_var(oi_ds, _SSH_NAMES + ("ssh_oi", "oi"), "OI SSH"), box))
-        y_ssh = _squeeze_hw(oi.values)[:n]
+        y_ssh = _squeeze_hw(oi.values)
+        if y_ssh.shape[0] != n:
+            oi_ds.close()
+            raise RuntimeError(
+                f"NATL60 OI time length {y_ssh.shape[0]} != ref {n}; refusing quiet truncate."
+            )
         oi_ds.close()
         mask_ssh = np.ones_like(ssh_np, dtype=np.float32)
 
@@ -386,7 +401,12 @@ def load_natl60(
         obs_ds = xr.open_dataset(paths["obs"])
         try:
             obs = align(_subset_box(_first_var(obs_ds, _SSH_NAMES, "obs SSH"), box))
-            obs_np = _squeeze_hw(obs.values)[:n]
+            obs_np = _squeeze_hw(obs.values)
+            if obs_np.shape[0] != n:
+                obs_ds.close()
+                raise RuntimeError(
+                    f"NATL60 obs time length {obs_np.shape[0]} != ref {n}; refusing quiet truncate."
+                )
             mask_ssh = np.isfinite(obs_np).astype(np.float32)
             mask_ssh[np.abs(obs_np) < 1e-12] = 0.0
             # Hybrid model *input*: along-track values on the OI background.

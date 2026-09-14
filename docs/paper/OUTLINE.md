@@ -2,10 +2,17 @@
 
 **Axes (nature-writing):** `task=manuscript`, `paper_type=methods`, `journal=generic` (target venue: **JAMES / GMD-style** methods paper; Nature-family *style* for clarity, not flagship Nature format), `language=en`.
 
-**One-sentence argument (updated 2026-08-16 cont):**  
-We embed explicit eSQG-style SQG, SST-advection, and optional strain-aware UV uncertainty into a Fablet-like 4DVarNet cost and show, under a fair ablation, that on short cropped NATL60 OSSE **SST synergy (B2) can outperform physics extras (M3/M4)** while all beat geostrophy — framing physics residuals as useful but **regime-/hyperparameter-dependent**, with full Table claims gated on uncropped long runs.
+**One-sentence argument (updated 2026-09-14 Round-2):**  
+We embed explicit eSQG-style SQG, SST-advection, and optional strain-aware UV
+**reweighting** (M4 — not uncertainty estimation) into a compact 4DVarNet-**inspired**
+cost (not a byte-faithful Fablet clone) and show, under a fair ablation, that on short
+cropped NATL60 OSSE **SST synergy (B2) can outperform physics extras (M3/M4)** while all
+beat geostrophy — framing physics residuals as useful but **regime-/hyperparameter-dependent**,
+with full Table claims gated on uncropped post-P0 long runs.
 
-**Evidence strength today:** synthetic 8-ep directional ablation + B2/M3/M4-GPU96 crop96/20ep train+eval (local only). Do **not** claim JAMES Table numbers from Fablet 2024 as our results. Crop96/20ep != paper table.
+**Evidence strength today:** synthetic 8-ep directional ablation + historical B2/M3/M4-GPU96
+crop96/20ep (`results/legacy_pre_review2/`, tagged `pre_p0_fix` / `legacy_pre_review2`).
+Do **not** claim JAMES Table numbers from Fablet 2024 as our results. Crop96/20ep != paper table.
 
 **Draft sections (this session):** `01_introduction.md`, `02_methods.md`, `03_experiments.md`, `04_discussion.md`.
 
@@ -32,10 +39,10 @@ Style cues from JAMES/GMD methods papers: Key Points (3 bullets); Plain Language
 ## 2. Defensible innovation points (vs Fablet 2024)
 
 **In scope (ours):**
-1. **Physics residuals inside the unrolled cost** — effective eSQG operator + SST advection residual + optional strain-heteroscedastic UV term — without replacing the ConvLSTM 4DVarNet solver.
-2. **Ablation matrix B1/B2/M1–M4** isolating SQG, advection, and uncertainty contributions under identical training protocol.
+1. **Physics residuals inside the unrolled cost** — effective eSQG operator + SST advection residual + optional strain-aware UV **reweighting** — without claiming a byte-faithful Fablet solver.
+2. **Ablation matrix B1/B2/M1–M4** isolating SQG, advection, and reweighting contributions under identical training protocol.
 3. **M4 collapse / scale diagnosis & mitigation** — σ from truth strain + clamp + MSE mix + σ-normalized UV term (engineering contribution with physical motivation).
-4. **Honest partial result** — B2 > M3 ≳ M4 on GPU96 crop96/20ep; physics extras not universally additive.
+4. **Honest partial result** — B2 > M3 ≳ M4 on GPU96 crop96/20ep (`legacy_pre_review2`); physics extras not universally additive.
 5. **Reproducible OSSE→OSE path** — NATL60 paper splits documented; OSE/drifter eval hooks reserved.
 
 **Out of scope / not claimed as novelty:**
@@ -114,4 +121,4 @@ Paths: `results/figures/` and mirrored `docs/paper/figures/`. Caption drafts in 
 - ChatGPT browser: tabs creatable but navigate to chatgpt.com failed (2+ attempts) → Cursor WebSearch citations + pastes with public GitHub URL (`PASTE_ChatA_GH_LIT_2026-08-16.txt`, `PASTE_ChatB_REPORT_REVIEW_2026-08-16.txt`). No conversation URL this turn.
 - **Public GitHub:** https://github.com/Coucou2016/4DVarNets-sea-current (code+docs+metrics+figures; excludes `*.nc` / `*.pt` / wheels / secrets).
 - M4 GPU96 **post**-σ-normalization-fix retrain done (2026-08-16); SSH recovered (0.063). Still crop96/20ep ≠ paper table.
-- Strain–uncertainty physical calibration (α, dx) still under review.
+- Strain–reweighting physical calibration (α, dx) still under review.

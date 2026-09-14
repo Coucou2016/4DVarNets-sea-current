@@ -7,7 +7,7 @@
 > **obsolete for formal claims** after Phase-1 correctness fixes. See
 > `docs/REVIEW_RESPONSE_P0.md`. Numbers below are **historical pre-fix** context only.
 
-Figures: SciencePlots + Times New Roman via `scripts/plot_science.py` → `results/figures/` (mirrored in `docs/paper/figures/`). Expanded summary JSON: `results/metrics_GPU96_expanded_summary.json`.
+Figures: SciencePlots + Times New Roman via `scripts/plot_science.py` → `results/figures/` (mirrored in `docs/paper/figures/`). Expanded summary JSON: `results/legacy_pre_review2/metrics_GPU96_expanded_summary.json` (`legacy_pre_review2` / `pre_p0_fix`).
 
 ---
 
@@ -48,7 +48,7 @@ Paper-ready rows require (`docs/PAPER_EXPERIMENTS.md`):
 
 ## 3.3 Preliminary results — GPU96 crop96 / 20ep
 
-Source JSON: `results/metrics_{B2,M3,M4}_GPU96.json` (+ pre-fix archive).
+Source JSON: `results/legacy_pre_review2/metrics_{B2,M3,M4}_GPU96.json` (+ pre-fix archive).
 
 ### Table A — primary UV / SSH skill
 

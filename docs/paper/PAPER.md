@@ -178,7 +178,7 @@ Primary: \(\tau_{uv}\) (explained variance), `rmse_uv`, `rmse_ssh`. Diagnostics 
 > **obsolete for formal claims** after Phase-1 correctness fixes. See
 > `docs/REVIEW_RESPONSE_P0.md`. Numbers below are **historical pre-fix** context only.
 
-Figures: SciencePlots + Times New Roman via `scripts/plot_science.py` → `results/figures/` (mirrored in `docs/paper/figures/`). Expanded summary JSON: `results/metrics_GPU96_expanded_summary.json`.
+Figures: SciencePlots + Times New Roman via `scripts/plot_science.py` → `results/figures/` (mirrored in `docs/paper/figures/`). Expanded summary JSON: `results/legacy_pre_review2/metrics_GPU96_expanded_summary.json` (`legacy_pre_review2` / `pre_p0_fix`).
 
 ---
 
@@ -219,7 +219,7 @@ Paper-ready rows require (`docs/PAPER_EXPERIMENTS.md`):
 
 ## 3.3 Preliminary results — GPU96 crop96 / 20ep
 
-Source JSON: `results/metrics_{B2,M3,M4}_GPU96.json` (+ pre-fix archive).
+Source JSON: `results/legacy_pre_review2/metrics_{B2,M3,M4}_GPU96.json` (+ pre-fix archive).
 
 ### Table A — primary UV / SSH skill
 
@@ -315,7 +315,7 @@ Synthetic 8-ep ranking (M4 best) vs GPU96 ranking (B2 best) supports **regime de
 - Raw heteroscedastic NLL `||e||^2/sigma^2` with `sigma_0≈0.05` is `~1/sigma_0^2` larger than MSE.
 - UV gradients then dominate; SSH terms become relatively weak — SSH fit suffers while UV remains OK via the strain reweighting.
 
-**Mitigation + retrain (2026-08-16):** sigma-normalized UV term + `uncert_mse_mix: 0.5`; full M4-GPU96 **20ep retrain** on faceswap CUDA. Post-fix: best val **4.83**, rmse_ssh **0.063**, tau_uv **0.801**, rmse_uv **0.211**. SSH recovered near B2/M3; currents still trail B2 (ranking unchanged: B2 > M3 ≳ M4). Pre-fix metrics archived as `results/metrics_M4_GPU96_pre_nllfix.json`.
+**Mitigation + retrain (2026-08-16):** sigma-normalized UV term + `uncert_mse_mix: 0.5`; full M4-GPU96 **20ep retrain** on faceswap CUDA. Post-fix: best val **4.83**, rmse_ssh **0.063**, tau_uv **0.801**, rmse_uv **0.211**. SSH recovered near B2/M3; currents still trail B2 (ranking unchanged: B2 > M3 ≳ M4). Pre-fix metrics archived as `results/legacy_pre_review2/metrics_M4_GPU96_pre_nllfix.json`.
 
 ---
 

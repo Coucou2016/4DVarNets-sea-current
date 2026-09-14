@@ -30,11 +30,18 @@ def geostrophic_velocity(
     """SSH-derived geostrophic currents (Eq. 5): u_g = -(g/f)*d_y SSH, v_g = (g/f)*d_x SSH.
 
     ``f``, ``dx``, ``dy`` may be scalars or tensors broadcastable to ``ssh``.
+    Output always matches ``ssh.shape`` (metric / Coriolis maps are coerced).
     """
+    from fourdvarnet.geometry import _broadcast_metric
+
     dssh_dy = central_diff_y(ssh, dy)
     dssh_dx = central_diff_x(ssh, dx)
-    u_g = -(g / f) * dssh_dy
-    v_g = (g / f) * dssh_dx
+    if isinstance(f, torch.Tensor):
+        f_b = _broadcast_metric(f, ssh)
+    else:
+        f_b = f
+    u_g = -(g / f_b) * dssh_dy
+    v_g = (g / f_b) * dssh_dx
     return u_g, v_g
 
 

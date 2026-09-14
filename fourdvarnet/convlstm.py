@@ -48,9 +48,13 @@ class GradUpdateLSTM(nn.Module):
         cell: torch.Tensor | None,
         norm: float | torch.Tensor = 1.0,
     ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
-        norm = float(norm) if isinstance(norm, torch.Tensor) else norm
-        if norm > 0:
-            grad = grad / norm
+        # Keep tensor norms on-device (no float(norm) / .item()) so the unrolled
+        # create_graph path is not forced through a Python scalar barrier.
+        if isinstance(norm, torch.Tensor):
+            scale = norm.to(device=grad.device, dtype=grad.dtype).clamp_min(1e-12)
+            grad = grad / scale
+        elif norm > 0:
+            grad = grad / float(norm)
         state = (hidden, cell) if hidden is not None else None
         h, c = self.lstm(grad, state)
         step = self.proj(h)

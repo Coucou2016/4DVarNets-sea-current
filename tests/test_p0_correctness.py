@@ -69,6 +69,20 @@ def test_masked_mse_denominator_valid_only():
     assert _masked_mse(err, torch.zeros_like(m)).item() == 0.0
 
 
+def test_masked_mse_density_invariant():
+    """Same valid cells / values → same MSE regardless of padded zero density."""
+    err_dense = torch.tensor([[1.0, 2.0], [0.0, 0.0]])
+    m_dense = torch.tensor([[1.0, 1.0], [0.0, 0.0]])
+    err_sparse = torch.zeros(4, 4)
+    m_sparse = torch.zeros(4, 4)
+    err_sparse[0, 0], err_sparse[0, 1] = 1.0, 2.0
+    m_sparse[0, 0], m_sparse[0, 1] = 1.0, 1.0
+    a = _masked_mse(err_dense, m_dense)
+    b = _masked_mse(err_sparse, m_sparse)
+    assert torch.allclose(a, b, atol=1e-6)
+    assert abs(a.item() - 2.5) < 1e-6  # (1+4)/2
+
+
 def test_nonperiodic_grad_boundary_no_wrap():
     # Field increases only in x; periodic roll would wrap and pollute boundaries.
     field = torch.arange(5, dtype=torch.float32).view(1, 1, 1, 5).expand(1, 1, 3, 5).clone()
@@ -82,6 +96,34 @@ def test_nonperiodic_grad_boundary_no_wrap():
     # Contrast: torch.roll periodic would give (f0 - f_{-1})/2 = (0 - 4)/2 = -2 at west
     periodic_west = (torch.roll(field, -1, dims=-1) - torch.roll(field, 1, dims=-1)) / 2.0
     assert not torch.allclose(gx[..., :, 0], periodic_west[..., :, 0])
+
+
+def test_grad_metric_map_broadcast_hxw():
+    """Lat-row and full HxW dx/dy maps must work (sliced denominators)."""
+    from fourdvarnet.geometry import grad_y
+    from fourdvarnet.physics import geostrophic_velocity
+
+    b, h, w = 2, 8, 10
+    field = torch.randn(b, 1, h, w)
+    dx_row = torch.linspace(4e3, 6e3, h).view(1, 1, h, 1)
+    dx_full = dx_row.expand(b, 1, h, w).clone()
+    gx_row = grad_x(field, dx_row)
+    gx_full = grad_x(field, dx_full)
+    assert gx_row.shape == field.shape
+    assert torch.allclose(gx_row, gx_full, atol=1e-5)
+    # Geostrophy with dataset-like (H,1) maps on (1,H,W) SSH
+    ssh = torch.randn(1, h, w)
+    f_map = torch.full((h, 1), 7e-5)
+    dx_hw = torch.linspace(4e3, 6e3, h).view(h, 1)
+    u, v = geostrophic_velocity(ssh, f_map, dx=dx_hw, dy=5.5e3)
+    assert u.shape == ssh.shape and v.shape == ssh.shape
+    # Non-periodic geostrophy matches geometry grads
+    from fourdvarnet.geometry import grad_x as gx_g, grad_y as gy_g
+
+    f_b = f_map.expand_as(ssh)
+    assert torch.allclose(u, -(9.81 / f_b) * gy_g(ssh, 5.5e3), atol=1e-5)
+    assert torch.allclose(v, (9.81 / f_b) * gx_g(ssh, dx_hw), atol=1e-5)
+    _ = grad_y(field, 5.5e3)  # smoke
 
 
 def test_advection_final_time_backward_scheme():
@@ -118,6 +160,24 @@ def test_solver_unrolled_create_graph_no_detach_smoke():
     # Gradients reached model parameters (unrolled graph wired)
     grads = [p.grad for p in model.parameters() if p.requires_grad]
     assert any(g is not None and torch.isfinite(g).all() and g.abs().sum() > 0 for g in grads)
+
+
+def test_solver_graph_across_iterations_strong():
+    """x0 must receive grad through the full K-step unroll (no per-iter detach)."""
+    torch.manual_seed(1)
+    solver = Solver4DVarNet(n_channels=3, n_iter=3, hidden_lstm=8, feat_dim=4, dT_sst=3)
+    x0 = torch.randn(1, 3, 8, 8, requires_grad=True)
+    y = torch.randn(1, 1, 8, 8)
+    z = torch.randn(1, 3, 8, 8)
+    out = solver(x0, y, z, torch.ones(1, 1, 8, 8), torch.ones(1, 3, 8, 8))
+    g_x0 = torch.autograd.grad(out.sum(), x0, retain_graph=True)[0]
+    assert g_x0 is not None and torch.isfinite(g_x0).all() and g_x0.abs().sum() > 0
+    # Truncated ablation: after detach, x0 is not an ancestor of the final state
+    trunc = Solver4DVarNetTruncated(n_channels=3, n_iter=3, hidden_lstm=8, feat_dim=4, dT_sst=3)
+    x0_t = torch.randn(1, 3, 8, 8, requires_grad=True)
+    out_t = trunc(x0_t, y, z, torch.ones(1, 1, 8, 8), torch.ones(1, 3, 8, 8))
+    g_list = torch.autograd.grad(out_t.sum(), x0_t, allow_unused=True)
+    assert g_list[0] is None
 
 
 def test_truncated_solver_exists_as_ablation():

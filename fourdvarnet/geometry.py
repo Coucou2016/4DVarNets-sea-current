@@ -45,42 +45,94 @@ def _as_spacing(spacing: float | torch.Tensor, ref: torch.Tensor) -> torch.Tenso
     return spacing
 
 
+def _broadcast_metric(spacing: float | torch.Tensor, field: torch.Tensor) -> torch.Tensor | float:
+    """Broadcast scalar/map spacing to ``field.shape`` (supports lat-row or HxW maps).
+
+    Accepts scalars, ``(..., H, 1)``, ``(..., 1, W)``, or full ``(..., H, W)`` tensors.
+    Leading dims are padded/truncated to match ``field.ndim`` before broadcast.
+    """
+    if not isinstance(spacing, torch.Tensor):
+        return spacing
+    s = spacing.to(device=field.device, dtype=field.dtype)
+    while s.ndim < field.ndim:
+        s = s.unsqueeze(0)
+    if s.ndim > field.ndim:
+        s = s.reshape(*s.shape[-field.ndim :])
+    try:
+        return torch.broadcast_to(s, field.shape)
+    except RuntimeError as exc:
+        raise RuntimeError(
+            f"cannot broadcast spacing shape {tuple(spacing.shape)} to field {tuple(field.shape)}"
+        ) from exc
+
+
 def grad_x(field: torch.Tensor, dx: float | torch.Tensor = 1.0) -> torch.Tensor:
-    """∂/∂x with interior central differences and one-sided boundaries (no wrap)."""
-    dx_v = _as_spacing(dx, field)
+    """∂/∂x with interior central differences and one-sided boundaries (no wrap).
+
+    ``dx`` may be a scalar or a metric map broadcastable to ``field`` (e.g. lat-row
+    ``(..., H, 1)`` or full ``(..., H, W)``). Denominators are **sliced** to the
+    same spatial cells as the numerator (avoids HxW broadcast bugs).
+    """
+    dx_b = _broadcast_metric(dx, field)
     out = torch.empty_like(field)
-    # Interior: (f[..., :, i+1] - f[..., :, i-1]) / (2 dx)
-    out[..., :, 1:-1] = (field[..., :, 2:] - field[..., :, :-2]) / (2.0 * dx_v)
-    # West / east boundaries: forward / backward
-    out[..., :, 0] = (field[..., :, 1] - field[..., :, 0]) / dx_v
-    out[..., :, -1] = (field[..., :, -1] - field[..., :, -2]) / dx_v
+    if isinstance(dx_b, torch.Tensor):
+        # Interior: (f[..., i+1] - f[..., i-1]) / (2 dx_i)
+        out[..., :, 1:-1] = (field[..., :, 2:] - field[..., :, :-2]) / (2.0 * dx_b[..., :, 1:-1])
+        out[..., :, 0] = (field[..., :, 1] - field[..., :, 0]) / dx_b[..., :, 0]
+        out[..., :, -1] = (field[..., :, -1] - field[..., :, -2]) / dx_b[..., :, -1]
+    else:
+        out[..., :, 1:-1] = (field[..., :, 2:] - field[..., :, :-2]) / (2.0 * dx_b)
+        out[..., :, 0] = (field[..., :, 1] - field[..., :, 0]) / dx_b
+        out[..., :, -1] = (field[..., :, -1] - field[..., :, -2]) / dx_b
     return out
 
 
 def grad_y(field: torch.Tensor, dy: float | torch.Tensor = 1.0) -> torch.Tensor:
-    """∂/∂y with interior central differences and one-sided boundaries (no wrap)."""
-    dy_v = _as_spacing(dy, field)
+    """∂/∂y with interior central differences and one-sided boundaries (no wrap).
+
+    ``dy`` may be a scalar or a metric map; denominators are sliced like ``grad_x``.
+    """
+    dy_b = _broadcast_metric(dy, field)
     out = torch.empty_like(field)
-    out[..., 1:-1, :] = (field[..., 2:, :] - field[..., :-2, :]) / (2.0 * dy_v)
-    out[..., 0, :] = (field[..., 1, :] - field[..., 0, :]) / dy_v
-    out[..., -1, :] = (field[..., -1, :] - field[..., -2, :]) / dy_v
+    if isinstance(dy_b, torch.Tensor):
+        out[..., 1:-1, :] = (field[..., 2:, :] - field[..., :-2, :]) / (2.0 * dy_b[..., 1:-1, :])
+        out[..., 0, :] = (field[..., 1, :] - field[..., 0, :]) / dy_b[..., 0, :]
+        out[..., -1, :] = (field[..., -1, :] - field[..., -2, :]) / dy_b[..., -1, :]
+    else:
+        out[..., 1:-1, :] = (field[..., 2:, :] - field[..., :-2, :]) / (2.0 * dy_b)
+        out[..., 0, :] = (field[..., 1, :] - field[..., 0, :]) / dy_b
+        out[..., -1, :] = (field[..., -1, :] - field[..., -2, :]) / dy_b
     return out
 
 
 def laplacian_nonperiodic(field: torch.Tensor, dx: float | torch.Tensor = 1.0, dy: float | torch.Tensor = 1.0) -> torch.Tensor:
     """Five-point Laplacian with one-sided second differences at boundaries."""
-    dx_v = _as_spacing(dx, field)
-    dy_v = _as_spacing(dy, field)
+    dx_b = _broadcast_metric(dx, field)
+    dy_b = _broadcast_metric(dy, field)
     dxx = torch.empty_like(field)
     dyy = torch.empty_like(field)
-    # Interior
-    dxx[..., :, 1:-1] = (field[..., :, 2:] - 2.0 * field[..., :, 1:-1] + field[..., :, :-2]) / (dx_v * dx_v)
-    dyy[..., 1:-1, :] = (field[..., 2:, :] - 2.0 * field[..., 1:-1, :] + field[..., :-2, :]) / (dy_v * dy_v)
-    # Boundaries: one-sided second difference (f0 - 2 f1 + f2) / h²
-    dxx[..., :, 0] = (field[..., :, 0] - 2.0 * field[..., :, 1] + field[..., :, 2]) / (dx_v * dx_v)
-    dxx[..., :, -1] = (field[..., :, -1] - 2.0 * field[..., :, -2] + field[..., :, -3]) / (dx_v * dx_v)
-    dyy[..., 0, :] = (field[..., 0, :] - 2.0 * field[..., 1, :] + field[..., 2, :]) / (dy_v * dy_v)
-    dyy[..., -1, :] = (field[..., -1, :] - 2.0 * field[..., -2, :] + field[..., -3, :]) / (dy_v * dy_v)
+    if isinstance(dx_b, torch.Tensor):
+        dx_i = dx_b[..., :, 1:-1]
+        dxx[..., :, 1:-1] = (field[..., :, 2:] - 2.0 * field[..., :, 1:-1] + field[..., :, :-2]) / (dx_i * dx_i)
+        dx0 = dx_b[..., :, 0]
+        dxn = dx_b[..., :, -1]
+        dxx[..., :, 0] = (field[..., :, 0] - 2.0 * field[..., :, 1] + field[..., :, 2]) / (dx0 * dx0)
+        dxx[..., :, -1] = (field[..., :, -1] - 2.0 * field[..., :, -2] + field[..., :, -3]) / (dxn * dxn)
+    else:
+        dxx[..., :, 1:-1] = (field[..., :, 2:] - 2.0 * field[..., :, 1:-1] + field[..., :, :-2]) / (dx_b * dx_b)
+        dxx[..., :, 0] = (field[..., :, 0] - 2.0 * field[..., :, 1] + field[..., :, 2]) / (dx_b * dx_b)
+        dxx[..., :, -1] = (field[..., :, -1] - 2.0 * field[..., :, -2] + field[..., :, -3]) / (dx_b * dx_b)
+    if isinstance(dy_b, torch.Tensor):
+        dy_i = dy_b[..., 1:-1, :]
+        dyy[..., 1:-1, :] = (field[..., 2:, :] - 2.0 * field[..., 1:-1, :] + field[..., :-2, :]) / (dy_i * dy_i)
+        dy0 = dy_b[..., 0, :]
+        dyn = dy_b[..., -1, :]
+        dyy[..., 0, :] = (field[..., 0, :] - 2.0 * field[..., 1, :] + field[..., 2, :]) / (dy0 * dy0)
+        dyy[..., -1, :] = (field[..., -1, :] - 2.0 * field[..., -2, :] + field[..., -3, :]) / (dyn * dyn)
+    else:
+        dyy[..., 1:-1, :] = (field[..., 2:, :] - 2.0 * field[..., 1:-1, :] + field[..., :-2, :]) / (dy_b * dy_b)
+        dyy[..., 0, :] = (field[..., 0, :] - 2.0 * field[..., 1, :] + field[..., 2, :]) / (dy_b * dy_b)
+        dyy[..., -1, :] = (field[..., -1, :] - 2.0 * field[..., -2, :] + field[..., -3, :]) / (dy_b * dy_b)
     return dxx + dyy
 
 

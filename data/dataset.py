@@ -51,14 +51,19 @@ class SSTSSHCurrentDataset(Dataset):
         return len(self.indices)
 
     def _geo_scales(self) -> tuple[float | torch.Tensor, float | torch.Tensor, float | torch.Tensor]:
-        """Coriolis and metric spacing shared with train/eval physics."""
+        """Coriolis and metric spacing shared with train/eval physics.
+
+        Map tensors use trailing ``(H, 1)`` so they broadcast to both
+        ``(1, H, W)`` samples and ``(B, 1, H, W)`` batches without an extra
+        leading singleton that would expand SSH to 4-D unexpectedly.
+        """
         lat = self.lat
         if lat is None:
             return self.f, self.dx_m, self.dy_m
         lat_arr = np.asarray(lat, dtype=np.float32)
         if lat_arr.ndim == 1 and lat_arr.size == self.ssh.shape[1]:
             f_map = torch.tensor([float(coriolis(float(y))) for y in lat_arr], dtype=torch.float32)
-            f_map = f_map.view(1, 1, -1, 1)
+            f_map = f_map.view(-1, 1)  # (H, 1)
             lon = np.asarray(self.lon, dtype=np.float32) if self.lon is not None else None
             dlon = self.dx_deg
             if lon is not None and lon.ndim == 1 and lon.size > 1:
@@ -66,7 +71,7 @@ class SSTSSHCurrentDataset(Dataset):
             dlat = float(np.abs(np.diff(lat_arr)).mean()) if lat_arr.size > 1 else self.dx_deg
             dx_map = torch.tensor(
                 [float(metric_dx(dlon, float(y))) for y in lat_arr], dtype=torch.float32
-            ).view(1, 1, -1, 1)
+            ).view(-1, 1)
             dy_v = float(metric_dy(dlat))
             return f_map, dx_map, dy_v
         return self.f, self.dx_m, self.dy_m

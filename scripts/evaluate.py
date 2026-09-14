@@ -118,6 +118,9 @@ def main() -> None:
     # Domain-mean UV time series for temporal λ (need ≥8 samples).
     pred_uv_ts: list[float] = []
     truth_uv_ts: list[float] = []
+    # NOTE: metrics below are **batch-mean of per-batch batch_metrics** (fine for
+    # smoke / short runs). Full-test pooled statistics (concat all windows then
+    # score once) are a Stage-B refinement — not claimed as paper Table numbers.
     # Inner 4DVar loop needs autograd even at inference - do not wrap in no_grad.
     for batch in loader:
         dx_b, dy_b = _batch_scales(batch, scales)

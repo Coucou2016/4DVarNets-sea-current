@@ -1,0 +1,23 @@
+NOTICE
+======
+
+This repository (`Coucou2016/4DVarNets-sea-current`) is an independent, compact
+4DVarNet-*inspired* research codebase for SST–SSH sea-surface current inversion.
+It is **not** a byte-faithful reproduction of the official Fablet / IMT stack.
+
+Upstream reference (ideas, OSSE protocol, NATL60 data URLs, variational framing)
+------------------------------------------------------------------------------
+  Project:  CIA-Oceanix / 4dvarnet-james-uv-ssc
+  URL:      https://github.com/CIA-Oceanix/4dvarnet-james-uv-ssc
+  Paper:    Fablet et al., JAMES 2024, https://doi.org/10.1029/2023MS003609
+  License:  CeCILL-C (CEA / CNRS / INRIA)
+            http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html
+
+Any redistribution or derivative work that incorporates substantial portions of
+the upstream CIA-Oceanix sources must also comply with CeCILL-C. This compact
+reimplementation retains its own MIT license for original contributions here;
+when in doubt, treat upstream-derived modules under CeCILL-C terms and preserve
+upstream copyright / warranty notices.
+
+NATL60 OSSE NetCDF products referenced in `data/natl60.py` are hosted by third
+parties (Wasabi / MELODY); their data licenses are separate from this code.

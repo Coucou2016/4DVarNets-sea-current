@@ -11,6 +11,7 @@ import torch
 import torch.nn as nn
 
 from fourdvarnet.convlstm import GradUpdateLSTM
+from fourdvarnet.geometry import stencil_valid_mask
 from fourdvarnet.observation import ObservationOperator
 from fourdvarnet.physics import sqg_velocity, sst_advection_residual
 from fourdvarnet.prior import PhiPrior
@@ -21,6 +22,7 @@ def _masked_mse(residual: torch.Tensor, mask: torch.Tensor | None = None) -> tor
 
     Computes ``sum(r² * m) / sum(m)``. When ``residual`` is already zeroed by a
     binary mask (``r = err * m``), this equals the mean of ``err²`` on valid cells.
+    Density-invariant: padding zeros outside the mask do not dilute the mean.
     """
     if mask is None:
         m = torch.isfinite(residual).to(dtype=residual.dtype)
@@ -29,7 +31,8 @@ def _masked_mse(residual: torch.Tensor, mask: torch.Tensor | None = None) -> tor
         # Invalid / NaN residual cells do not contribute.
         m = m * torch.isfinite(residual).to(dtype=residual.dtype)
     denom = m.sum()
-    if float(denom.item()) <= 0.0:
+    # Compare without .item() so autograd tracing stays on tensors when needed.
+    if denom <= 0:
         return residual.new_tensor(0.0)
     r = torch.where(torch.isfinite(residual), residual, residual.new_zeros(()))
     return (r.pow(2) * m).sum() / denom
@@ -135,10 +138,18 @@ class VariationalCost(nn.Module):
                 dy=dy_v,
                 mask_sst=mask_sst,
             )
-            # Mean over valid cells only (zeros elsewhere from mask).
+            # L_adv: mean over stencil-valid cells (t, t−1, spatial FD), not global mean.
             if mask_sst is not None:
-                m = mask_sst[:, -1] if mask_sst.ndim == 4 else mask_sst
-                loss = loss + self.lam_adv * _masked_mse(adv.unsqueeze(1) if adv.ndim == 3 else adv, m)
+                if mask_sst.ndim == 4:
+                    m_t = mask_sst[:, -1] > 0.5
+                    m_tm1 = mask_sst[:, -2] > 0.5
+                else:
+                    m_t = mask_sst > 0.5
+                    m_tm1 = m_t
+                m_adv = (m_t & m_tm1 & stencil_valid_mask(m_t)).to(dtype=adv.dtype)
+                adv_t = adv if adv.ndim == 4 else adv.unsqueeze(1)
+                m_use = m_adv if m_adv.ndim == adv_t.ndim else m_adv.unsqueeze(1)
+                loss = loss + self.lam_adv * _masked_mse(adv_t, m_use)
             else:
                 loss = loss + self.lam_adv * torch.mean(adv**2)
         return loss
@@ -215,13 +226,14 @@ class Solver4DVarNet(nn.Module):
     ) -> torch.Tensor:
         x = x0
         h = c = None
-        norm = 0.0
+        norm: torch.Tensor | None = None
         for _ in range(self.n_iter):
             x = x.requires_grad_(True)
             loss = self.cost(x, y_ssh, z_sst, mask_ssh, mask_sst, dx=dx, dy=dy)
             grad = torch.autograd.grad(loss, x, create_graph=True)[0]
-            if norm == 0.0:
-                norm = torch.sqrt(torch.mean(grad**2) + 1e-12).item()
+            if norm is None:
+                # Detached tensor scale (no .item()/float) — constant across iters.
+                norm = torch.sqrt(torch.mean(grad**2) + 1e-12).detach()
             step, h, c = self.grad_step(grad, h, c, norm)
             step = step / self.n_iter
             x = x - step
@@ -231,7 +243,7 @@ class Solver4DVarNet(nn.Module):
 class Solver4DVarNetTruncated(Solver4DVarNet):
     """Ablation: detach state each iteration (truncated BPTT through the solver).
 
-    Not the default — use only when comparing against the faithful unrolled graph.
+    Not the default — use only when comparing against the full unrolled graph.
     """
 
     def forward(
@@ -246,13 +258,13 @@ class Solver4DVarNetTruncated(Solver4DVarNet):
     ) -> torch.Tensor:
         x = x0
         h = c = None
-        norm = 0.0
+        norm: torch.Tensor | None = None
         for _ in range(self.n_iter):
             x = x.detach().requires_grad_(True)
             loss = self.cost(x, y_ssh, z_sst, mask_ssh, mask_sst, dx=dx, dy=dy)
             grad = torch.autograd.grad(loss, x, create_graph=True)[0]
-            if norm == 0.0:
-                norm = torch.sqrt(torch.mean(grad**2) + 1e-12).item()
+            if norm is None:
+                norm = torch.sqrt(torch.mean(grad**2) + 1e-12).detach()
             step, h, c = self.grad_step(grad, h, c, norm)
             step = step / self.n_iter
             x = x - step

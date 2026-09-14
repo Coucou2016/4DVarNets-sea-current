@@ -8,7 +8,9 @@ Reference code (full IMT stack): [CIA-Oceanix/4dvarnet-james-uv-ssc](https://git
 
 > **P0 correctness (2026-09):** Phase-1 fixes landed (no SSH-truth observation leakage; unrolled solver without per-iter detach; masked-MSE denom; non-periodic lat-aware geometry; final-time SST advection; full-window SST mask; strict align). See [`docs/REVIEW_RESPONSE_P0.md`](docs/REVIEW_RESPONSE_P0.md).
 >
-> **GPU96 B2/M3/M4 scores are `pre_p0_fix` and obsolete for formal claims.** Do not cite `results/metrics_*_GPU96.json` as paper Table rows until a post-P0 retrain. Historical directional note only: under crop96/20ep, B2 beat M3 ≳ M4 and geostrophy; physics extras did **not** beat B2.
+> **GPU96 B2/M3/M4 scores live under `results/legacy_pre_review2/` and are tagged `legacy_pre_review2` / `pre_p0_fix` — obsolete for formal claims.** Do not cite them as paper Table rows until a post-P0 retrain. Historical directional note only: under crop96/20ep, B2 beat M3 ≳ M4 and geostrophy; physics extras did **not** beat B2.
+>
+> Conceptual Stage-A consistency tag: **`v0.2.0-review2-fixed`**.
 
 ## Innovation vs Fablet 2024 (honest)
 
