@@ -144,6 +144,36 @@ def test_advection_final_time_backward_scheme():
     assert r2.abs().max().item() < 1e-8
 
 
+def test_faithful_solver_source_has_no_detach_or_float_norm():
+    """Static guard: default path must not use x.detach() / float(norm) / norm.item()."""
+    import inspect
+
+    from fourdvarnet.convlstm import GradUpdateLSTM
+
+    sol_src = inspect.getsource(Solver4DVarNet.forward)
+    assert "x.detach()" not in sol_src
+    assert "norm.item()" not in sol_src
+    assert "float(norm)" not in sol_src
+    lstm_src = inspect.getsource(GradUpdateLSTM.forward)
+    assert "float(norm)" not in lstm_src
+    assert ".item()" not in lstm_src
+    # Truncated ablation is the only place that detaches state
+    trunc_src = inspect.getsource(Solver4DVarNetTruncated.forward)
+    assert "x.detach()" in trunc_src
+
+
+def test_physics_uses_geometry_not_torch_roll():
+    import inspect
+
+    import fourdvarnet.physics as phys
+
+    src = inspect.getsource(phys)
+    assert "from fourdvarnet.geometry import" in src
+    assert "grad_x" in src and "grad_y" in src
+    # Default scientific path must not call torch.roll
+    assert "torch.roll" not in src
+
+
 def test_solver_unrolled_create_graph_no_detach_smoke():
     """Faithful solver: create_graph path runs and grads flow past iter 0."""
     torch.manual_seed(0)
@@ -178,6 +208,44 @@ def test_solver_graph_across_iterations_strong():
     out_t = trunc(x0_t, y, z, torch.ones(1, 1, 8, 8), torch.ones(1, 3, 8, 8))
     g_list = torch.autograd.grad(out_t.sum(), x0_t, allow_unused=True)
     assert g_list[0] is None
+
+
+def test_early_iter_params_affect_final_loss_grads():
+    """Extra unrolled iters must change LSTM param grads under a supervised final loss.
+
+    Proves early-iteration graph edges matter — not merely that *some* p.grad exists.
+    """
+    torch.manual_seed(2)
+    y = torch.randn(1, 1, 8, 8)
+    z = torch.randn(1, 3, 8, 8)
+    m_ssh = torch.ones(1, 1, 8, 8)
+    m_sst = torch.ones(1, 3, 8, 8)
+    x0 = torch.randn(1, 3, 8, 8)
+    truth = torch.randn(1, 3, 8, 8)
+
+    s3 = Solver4DVarNet(n_channels=3, n_iter=3, hidden_lstm=8, feat_dim=4, dT_sst=3)
+    s1 = Solver4DVarNet(n_channels=3, n_iter=1, hidden_lstm=8, feat_dim=4, dT_sst=3)
+    s1.load_state_dict(s3.state_dict())
+
+    out3 = s3(x0, y, z, m_ssh, m_sst)
+    ((out3 - truth) ** 2).mean().backward()
+    g3 = s3.grad_step.proj.weight.grad.detach().clone()
+    assert g3.abs().sum() > 0
+
+    out1 = s1(x0, y, z, m_ssh, m_sst)
+    ((out1 - truth) ** 2).mean().backward()
+    g1 = s1.grad_step.proj.weight.grad.detach().clone()
+    assert g1.abs().sum() > 0
+    # Faithful K=3 graph ≠ single-step graph for the shared LSTM projector
+    assert not torch.allclose(g3, g1, atol=1e-8, rtol=1e-5)
+
+    # Truncated K=3 must NOT match faithful K=3 (early iters cut from the graph)
+    trunc = Solver4DVarNetTruncated(n_channels=3, n_iter=3, hidden_lstm=8, feat_dim=4, dT_sst=3)
+    trunc.load_state_dict(s3.state_dict())
+    out_t = trunc(x0, y, z, m_ssh, m_sst)
+    ((out_t - truth) ** 2).mean().backward()
+    gt = trunc.grad_step.proj.weight.grad.detach().clone()
+    assert not torch.allclose(g3, gt, atol=1e-8, rtol=1e-5)
 
 
 def test_truncated_solver_exists_as_ablation():

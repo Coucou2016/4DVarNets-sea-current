@@ -133,3 +133,7 @@ python scripts/evaluate.py --source natl60 --ckpt checkpoints/4dvarnet-NATL60smo
 ```
 
 `crop_size` / `max_samples` are smoke helpers only. Never quote those metrics as JAMES/NATL60 table rows. Evaluation must **not** wrap the inner 4DVar solver in `torch.no_grad()`.
+
+`evaluate.py` reports **full-test pooled** metrics (concat windows, score once). JSON also stores `provisional_batch_mean` for diagnostics — do not use batch-mean as the Table path. Temporal `lambda_t` is filled when ≥8 test windows exist; otherwise marked **待补充**.
+
+Historical GPU96 NATL60 crop96/20ep scores: `results/legacy_pre_review2/` only (`pre_p0_fix`). Synthetic `results/metrics_B2.json` etc. are directional, not NATL60 Table rows.

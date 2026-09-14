@@ -114,16 +114,22 @@ def main() -> None:
     dx_km = float(scales["dx"]) / 1000.0
     dt_s = float(scales.get("dt", (ckpt_cfg.get("model") or {}).get("dt_seconds", 86400.0)))
 
+    # Collect full-test tensors, then score once (honest pooled metrics).
+    # Batch-mean of per-batch scores is kept only as a provisional diagnostic.
+    pred_chunks: list[torch.Tensor] = []
+    truth_chunks: list[torch.Tensor] = []
+    geo_chunks: list[torch.Tensor] = []
     model_ms, geo_ms = [], []
     # Domain-mean UV time series for temporal λ (need ≥8 samples).
     pred_uv_ts: list[float] = []
     truth_uv_ts: list[float] = []
-    # NOTE: metrics below are **batch-mean of per-batch batch_metrics** (fine for
-    # smoke / short runs). Full-test pooled statistics (concat all windows then
-    # score once) are a Stage-B refinement — not claimed as paper Table numbers.
+    dx_acc, dy_acc, n_scale = 0.0, 0.0, 0
     # Inner 4DVar loop needs autograd even at inference - do not wrap in no_grad.
     for batch in loader:
         dx_b, dy_b = _batch_scales(batch, scales)
+        dx_acc += dx_b
+        dy_acc += dy_b
+        n_scale += 1
         pred = model(
             batch["y_ssh"],
             batch["z_sst"],
@@ -141,11 +147,14 @@ def main() -> None:
         u_g = batch.get("u_geo_oi", batch["u_geo"])
         v_g = batch.get("v_geo_oi", batch["v_geo"])
         geo_state = torch.cat([y_oi, u_g, v_g], dim=1)
+        pred_chunks.append(pred_d.cpu())
+        truth_chunks.append(truth.detach().cpu())
+        geo_chunks.append(geo_state.detach().cpu())
         kw = dict(dx=dx_b, dy=dy_b, dx_km=dx_km)
         model_ms.append(batch_metrics(pred_d, truth, **kw))
         geo_ms.append(batch_metrics(geo_state, truth, **kw))
 
-        # Per-sample domain-mean |UV| proxies for temporal resolved scale.
+        # Per-sample domain-mean UV proxies for temporal resolved scale.
         for i in range(pred_d.shape[0]):
             pu = pred_d[i, 1].mean().item()
             pv = pred_d[i, 2].mean().item()
@@ -154,8 +163,15 @@ def main() -> None:
             pred_uv_ts.append(0.5 * (pu + pv))
             truth_uv_ts.append(0.5 * (tu + tv))
 
-    mean_m = _mean_dicts(model_ms)
-    mean_geo = _mean_dicts(geo_ms)
+    dx_pool = dx_acc / max(n_scale, 1)
+    dy_pool = dy_acc / max(n_scale, 1)
+    pred_all = torch.cat(pred_chunks, dim=0)
+    truth_all = torch.cat(truth_chunks, dim=0)
+    geo_all = torch.cat(geo_chunks, dim=0)
+    mean_m = batch_metrics(pred_all, truth_all, dx=dx_pool, dy=dy_pool, dx_km=dx_km)
+    mean_geo = batch_metrics(geo_all, truth_all, dx=dx_pool, dy=dy_pool, dx_km=dx_km)
+    provisional_batch_mean_model = _mean_dicts(model_ms)
+    provisional_batch_mean_geo = _mean_dicts(geo_ms)
 
     # Temporal λ: only meaningful with a long enough ordered series.
     lam_t_note = "待补充"
@@ -175,12 +191,18 @@ def main() -> None:
 
     print("=== 4DVarNet test metrics ===")
     print(f"  physics scales: dx={scales['dx']:.1f} m  dy={scales['dy']:.1f} m")
+    print("  aggregation: full-test pooled (concat windows, score once)")
     print("  geostrophic baseline: OI/DUACS-only (not hybrid OI+sparse)")
     for k, v in mean_m.items():
         g = mean_geo.get(k, float("nan"))
         print(f"  {k}: {_fmt(v)}   (geostrophic {_fmt(g)})")
     print(f"  tau_uv (geostrophic baseline): {_fmt(mean_geo.get('tau_uv', float('nan')))}")
     print(f"  tau_uv (4DVarNet): {_fmt(mean_m.get('tau_uv', float('nan')))}")
+    print(
+        f"  provisional batch-mean tau_uv: "
+        f"{_fmt(provisional_batch_mean_model.get('tau_uv', float('nan')))} "
+        f"(geo {_fmt(provisional_batch_mean_geo.get('tau_uv', float('nan')))})"
+    )
     if len(pred_uv_ts) >= 8:
         print(f"  lambda_t_uv_days (model): {_fmt(mean_m.get('lambda_t_uv_days', float('nan')))}  [{lam_t_note}]")
     if mean_m.get("tau_uv", float("nan")) > mean_geo.get("tau_uv", float("-inf")):
@@ -200,8 +222,14 @@ def main() -> None:
             },
             "physics_scales": {"dx": scales["dx"], "dy": scales["dy"], "f0": scales["f0"]},
             "geostrophic_baseline": "oi_only",
+            "metrics_aggregation": "full_test_pooled",
             "model": mean_m,
             "geostrophic": mean_geo,
+            "provisional_batch_mean": {
+                "model": provisional_batch_mean_model,
+                "geostrophic": provisional_batch_mean_geo,
+                "note": "Mean of per-batch batch_metrics; not the primary Table path.",
+            },
             "lambda_t_note": lam_t_note if len(pred_uv_ts) >= 8 else "待补充 (need ≥8 windows)",
         }
         out_path = Path(args.out)

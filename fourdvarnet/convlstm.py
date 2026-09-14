@@ -48,13 +48,16 @@ class GradUpdateLSTM(nn.Module):
         cell: torch.Tensor | None,
         norm: float | torch.Tensor = 1.0,
     ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
-        # Keep tensor norms on-device (no float(norm) / .item()) so the unrolled
-        # create_graph path is not forced through a Python scalar barrier.
+        # Always divide by an on-device tensor scale — never a Python-float barrier
+        # via casting the scale tensor — so the faithful unrolled create_graph
+        # path stays fully differentiable.
         if isinstance(norm, torch.Tensor):
-            scale = norm.to(device=grad.device, dtype=grad.dtype).clamp_min(1e-12)
-            grad = grad / scale
-        elif norm > 0:
-            grad = grad / float(norm)
+            scale = norm.to(device=grad.device, dtype=grad.dtype)
+        else:
+            # Python scalar → tensor (never cast a Tensor scale through Python float).
+            scale = grad.new_tensor(1.0 if not norm else norm)
+        scale = scale.clamp_min(1e-12)
+        grad = grad / scale
         state = (hidden, cell) if hidden is not None else None
         h, c = self.lstm(grad, state)
         step = self.proj(h)
