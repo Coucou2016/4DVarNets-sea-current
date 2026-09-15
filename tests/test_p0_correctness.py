@@ -325,6 +325,31 @@ def test_align_like_time_mismatch_raises():
         _align_like(da2, ref, strict=True)
 
 
+def test_align_like_float_vs_datetime_time():
+    """OI-style datetime64 vs NATL60-ref float seconds (same calendar) must align."""
+    xr = pytest.importorskip("xarray")
+    from data.natl60 import NATL60_TIME_EPOCH, _align_like
+
+    n = 5
+    lat = np.linspace(33.0, 43.0, 4)
+    lon = np.linspace(-65.0, -55.0, 5)
+    # Noon-centered seconds since 2012-10-01 (matches NATL60 refs)
+    secs = (np.arange(n, dtype=np.float64) + 0.5) * 86400.0
+    times_dt = (NATL60_TIME_EPOCH + (secs * 1e9).astype("timedelta64[ns]")).astype("datetime64[ns]")
+    ref = xr.DataArray(
+        np.random.randn(n, len(lat), len(lon)).astype(np.float32),
+        dims=("time", "lat", "lon"),
+        coords={"time": secs, "lat": lat, "lon": lon},
+    )
+    da = xr.DataArray(
+        np.random.randn(n, len(lat), len(lon)).astype(np.float32),
+        dims=("time", "lat", "lon"),
+        coords={"time": times_dt, "lat": lat, "lon": lon},
+    )
+    out = _align_like(da, ref, strict=True)
+    assert out.shape == ref.shape
+
+
 def test_purge_train_vs_val_gap():
     from data.dataset import _purge_train_vs_val
 

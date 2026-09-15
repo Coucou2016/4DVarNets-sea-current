@@ -1,77 +1,23 @@
 # 4. Discussion
 
-**Status:** matured draft. Interprets measured crop96/20ep and synthetic evidence only.
+## 4.1 Soft physics inside a learned solver
 
----
+A central empirical point is the gap between Stage E and Stages F–G. The standalone eSQG-style map has near-zero τ_uv against truth UV on the same crop, yet enabling a soft SQG residual inside the unrolled cost (M1/M3/M4) improves mean post_p0 τ_uv relative to B2. In other words, the residual acts as a regularizer coupled to multimodal observations and the learned prior, not as a hard current estimate. This distinction matters for interpretation: “physics helps” here means soft constraints in a neural variational loop, not that SQG inversion alone solves SSC.
 
-## 4.1 Main interpretation
+Advection alone (M2) yields scores close to B2, consistent with Stage E evidence that the heat-budget residual can be dominated by \(\partial_t - \kappa\nabla^2\) on daily frames. Combining SQG and advection (M3) behaves similarly to SQG alone (M1) under this protocol; strain reweighting (M4) yields a further small mean τ_uv gain with reduced seed scatter.
 
-On the **short cropped NATL60 OSSE** (historical **`pre_p0_fix`** scores), explicit SQG + advection residuals (M3) and strain **reweighting** (M4) **do not improve** surface-current skill over the pure SST–SSH synergy baseline (B2). All three learned configurations still **strongly outperform geostrophy** on τ_uv and rmse_uv. Expanded diagnostics reinforce the message: only B2 shows positive τ_div / τ_vort / τ_strain on this protocol. The honest claim is therefore:
+## 4.2 When physics helps or fails
 
-> Physics-constrained cost terms are implementable inside a 4DVarNet-**inspired** solver and remain competitive with geostrophy, but **SST synergy alone can dominate** under this cropped/short-epoch protocol; SQG/advection/reweighting are **not universally additive**.
+**Helps (this protocol).** Soft SQG-containing losses improve UV skill and SSH RMSE relative to B2 on post_p0 crop96/15ep multi-seed runs, while all learned models beat OI-only geostrophy.
 
-This is a useful **partial / negative result** for methods papers: it bounds when “more physics in the cost” helps, and it documents a concrete loss-scale failure mode (raw NLL) that can masquerade as a dynamical failure.
+**Fails or is fragile.** (i) Hard SQG as a current map fails on τ_uv (Stage E). (ii) Pre-P0 historical crop96/20ep runs ranked B2 above M3/M4, showing that short protocols and correctness bugs can reverse rankings. (iii) Raw heteroscedastic UV weighting previously starved SSH; scale normalization was required before M4 was interpretable. (iv) Larger compact R0 capacity did not automatically beat B2.
 
----
+Taken together, physics residuals are implementable and ablatable, but **regime- and hyperparameter-dependent**. Formal generalization to full-domain long training remains **待补充**.
 
-## 4.2 Why B2 > M3 is plausible
+## 4.3 Relation to VarDyn and Fablet et al.
 
-Rival explanations (not mutually exclusive):
+Fablet et al. (2024) demonstrate learned SST–SSH synergy for SSC with 4DVarNets; we do not re-quote their Table scores. Our contribution is the soft residual ablation and operator diagnostics under a transparent protocol. VarDyn (Le Guillou et al., 2025) jointly reconstructs SSH and SST with dynamical constraints; it is a natural dynamical counterpart for tracer mapping, whereas our solver targets SSC with optional soft SQG/advection residuals. Cross-code benchmarking against VarDyn is out of scope here.
 
-1. **Operator misspecification.** Our \(A_{\mathrm{SQG}}\) is eSQG-*style*, not full interior+surface QG. When SST poorly tracks surface density (mixed layer, unbalanced motions), or when interior PV contributes to surface velocity, the SQG residual may pull velocities toward a biased attractor (Miracca-Lage et al., 2022; Yassin & Griffies, 2023; isQG motivations in Wang et al., 2013).
-2. **Redundant information.** Multimodal \(G/H\) SST–SSH terms (B2) may already capture much of the transferable SST structure; adding λ_sqg / λ_adv with fixed weights can over-constrain the unrolled trajectory on short training.
-3. **Scale / crop artefacts.** Crop96 windows truncate mesoscale context that SQG/advection residuals assume; short 20-ep schedules may favor the simpler B2 loss landscape.
-4. **Hyperparameter regime.** Default `lam_sqg=lam_adv=0.1` was not re-tuned on NATL60 GPU96; under- or over-weighted physics can erase gains.
+## 4.4 Limitations
 
-Synthetic 8-ep ranking (M4 best) vs GPU96 ranking (B2 best) supports **regime dependence**: directional wiring success ≠ NATL60 cropped transfer.
-
----
-
-## 4.3 M4 SSH degradation (diagnosed) and post-fix retrain
-
-**Pre-fix GPU96** matched M3 on tau_uv but roughly **doubled** rmse_ssh (0.122 vs ~0.06). Best-val ~682 vs ~5 for B2/M3 was a **loss-scale bug**, not a deep dynamical failure:
-
-- Raw heteroscedastic NLL `||e||^2/sigma^2` with `sigma_0≈0.05` is `~1/sigma_0^2` larger than MSE.
-- UV gradients then dominate; SSH terms become relatively weak — SSH fit suffers while UV remains OK via the strain reweighting.
-
-**Mitigation + retrain (2026-08-16):** sigma-normalized UV term + `uncert_mse_mix: 0.5`; full M4-GPU96 **20ep retrain** on faceswap CUDA. Post-fix: best val **4.83**, rmse_ssh **0.063**, tau_uv **0.801**, rmse_uv **0.211**. SSH recovered near B2/M3; currents still trail B2 (ranking unchanged: B2 > M3 ≳ M4). Pre-fix metrics archived as `results/legacy_pre_review2/metrics_M4_GPU96_pre_nllfix.json`.
-
----
-
-## 4.4 Framing innovation without overclaim
-
-Defensible:
-
-- Explicit, ablatable physics residuals inside a Fablet-like 4DVarNet cost.
-- Engineering diagnosis of reweighting / NLL scale mismatch.
-- Evidence that multimodal SST synergy can outperform added SQG/adv on a constrained OSSE — a caution for “physics always helps” narratives.
-- Transparent contrast to dynamical joint SSH–SST mapping (VarDyn) without claiming SSC Table superiority.
-
-Not claimed:
-
-- Universal superiority of M3/M4 over B2.
-- Full 3D SQG inversion.
-- Paper-table NATL60 scores from crop96/20ep.
-- That B1 SSH-only was measured here (it was not).
-
----
-
-## 4.5 Next evidence gates
-
-1. **Full-grid / longer NATL60** (uncropped, ≥ paper epoch budget) for B2/M3/M4 with fixed seeds — **blocked on 4GB GPU** until hardware upgrades or off-machine compute.
-2. **B1 crop96/20ep** when GPU is free, for ablation completeness (SSH-only vs SST synergy).
-3. **λ_sqg / λ_adv / reweighting (M4) sweep** on a small grid before locking Table configs.
-4. ~~Re-train M4 with normalized NLL~~ **Done** (SSH 0.063); next: multi-seed short runs if memory allows.
-5. **OSE / drifters** (`scripts/evaluate_drifters.py`) once OSSE Table rows exist.
-6. Optional: M1/M2 single-term ablations to separate SQG vs advection on full protocol.
-
----
-
-## 4.6 Limitations checklist
-
-- Single GPU class (4GB) forced crop96; may interact with physics residuals; uncropped 200-ep Table runs not feasible here.
-- No formal significance / multi-seed intervals yet.
-- Strain α / dx calibration still under review for physical units.
-- B1 GPU96 missing from the measured matrix.
-- ChatGPT browser automation and Codex advisory quota were blocked this session (see `docs/chatgpt_collaboration/SESSION_5ROUNDS.md`); literature DOIs verified via Cursor WebSearch; pastes left for human ChatGPT re-review.
-- Public code+docs: https://github.com/Coucou2016/4DVarNets-sea-current
+Hardware (4GB GPU) precludes uncropped ~200×200 × ~200-epoch multi-seed tables. R0 is not byte-faithful to CIA-Oceanix. OSE/drifter evaluation hooks exist but formal scores are **待补充**. Stage H sensitivity (SST coarsening / sparsity) is reported when `results/post_p0/sensitivity/` is populated; otherwise marked incomplete in the audit package.

@@ -1,124 +1,104 @@
 # Paper outline — Physics-constrained 4DVarNet for SST–SSH current inversion
 
-**Axes (nature-writing):** `task=manuscript`, `paper_type=methods`, `journal=generic` (target venue: **JAMES / GMD-style** methods paper; Nature-family *style* for clarity, not flagship Nature format), `language=en`.
+**Axes (nature-writing):** `task=manuscript`, `paper_type=methods`, `journal=generic` (target: **JAMES / GMD-style** methods paper), `language=en`.
 
-**One-sentence argument (updated 2026-09-14 Round-2):**  
-We embed explicit eSQG-style SQG, SST-advection, and optional strain-aware UV
-**reweighting** (M4 — not uncertainty estimation) into a compact 4DVarNet-**inspired**
-cost (not a byte-faithful Fablet clone) and show, under a fair ablation, that on short
-cropped NATL60 OSSE **SST synergy (B2) can outperform physics extras (M3/M4)** while all
-beat geostrophy — framing physics residuals as useful but **regime-/hyperparameter-dependent**,
-with full Table claims gated on uncropped post-P0 long runs.
+**One-sentence argument:**  
+We embed soft, differentiable eSQG-style SQG and SST-advection residuals (plus optional strain-aware UV reweighting) inside a compact 4DVarNet-inspired unrolled cost, and show—with **our measured** post-P0 crop96 multi-seed NATL60 scores and Stage E operator diagnostics—when those soft physics terms help relative to SSH+SST synergy alone, when a standalone SQG map fails, and how this differs from VarDyn-style dynamical joint SSH–SST mapping.
 
-**Evidence strength today:** synthetic 8-ep directional ablation + historical B2/M3/M4-GPU96
-crop96/20ep (`results/legacy_pre_review2/`, tagged `pre_p0_fix` / `legacy_pre_review2`).
-Do **not** claim JAMES Table numbers from Fablet 2024 as our results. Crop96/20ep != paper table.
+**Evidence strength (this package):**
+| Protocol | Artefacts | Role in claims |
+|----------|-----------|----------------|
+| **post_p0** NATL60 crop96 / 15 ep / seeds {0,1,2} | `results/post_p0/ablation_summary.json`, `metrics_*-s*.json` | Primary directional ablation (B1–M4, R0) |
+| **Stage E** physics ops on NATL60 truth | `results/physics_ops/physics_ops_validation.json` | Operator skill / λ_sqg caution |
+| **legacy_pre_review2** crop96/20ep | `results/legacy_pre_review2/metrics_*_GPU96.json` | Quarantined pre-P0 historical context only |
+| Full-grid ~200 ep JAMES Table | — | **待补充** — do not invent |
 
-**Draft sections (this session):** `01_introduction.md`, `02_methods.md`, `03_experiments.md`, `04_discussion.md`.
-
----
-
-## 1. Target venue & style models to imitate
-
-| Role | Paper | Why imitate | DOI / URL |
-|------|-------|-------------|-----------|
-| Primary baseline (methods + OSSE) | Fablet et al. 2024 JAMES | IMRaD, Key Points, multimodal 4DVarNet UV | https://doi.org/10.1029/2023MS003609 |
-| Solver / SSH mapping style | Beauchamp et al. 2023 GMD | Clear methods, NATL60 OSSE, metrics, open code | https://doi.org/10.5194/gmd-16-2119-2023 |
-| Physics prior (SQG) | Lapeyre & Klein 2006 JPO | eSQG motivation for SST→ψ | https://doi.org/10.1175/JPO2840.1 |
-| SST advection / heat budget | Rio et al. 2016 JTECH | Heat-equation inversion for ageostrophy | https://doi.org/10.1175/JTECH-D-16-0017.1 |
-| Spectral SST–SSH transfer | González-Haro & Isern-Fontanet / related JC | Transfer-function language | https://doi.org/10.1029/2019JC015958 |
-| Multimodal SSH+SST DL | Martin et al. 2023 JAMES | Synergistic SST–SSH learning narrative | https://doi.org/10.1029/2022MS003589 |
-| Dynamical SST–SSH joint mapping | VarDyn / Ballarotta et al. 2024+ JAMES | Explicit advection–diffusion + variational SSH–SST (contrast to learned synergy) | https://doi.org/10.1029/2024MS004689 |
-
-Style cues from JAMES/GMD methods papers: Key Points (3 bullets); Plain Language Summary; explicit OSSE protocol; geostrophic baseline everywhere; open code/data; clear “what is *not* claimed.”
-
-**Advisor framing accepted (Cursor WebSearch–backed, 2026-08-16 dual-agent turn):** keep contribution as *ablatable physics residuals + honest regime-dependence* rather than “physics always wins”; Methods/Results skeleton stays IMRaD with geostrophy co-reported; cite VarDyn as dynamical counterpart.
+Never cite Fablet/JAMES table numbers as our results.
 
 ---
 
-## 2. Defensible innovation points (vs Fablet 2024)
+## 1. Target venue & verified literature (DOIs)
 
-**In scope (ours):**
-1. **Physics residuals inside the unrolled cost** — effective eSQG operator + SST advection residual + optional strain-aware UV **reweighting** — without claiming a byte-faithful Fablet solver.
-2. **Ablation matrix B1/B2/M1–M4** isolating SQG, advection, and reweighting contributions under identical training protocol.
-3. **M4 collapse / scale diagnosis & mitigation** — σ from truth strain + clamp + MSE mix + σ-normalized UV term (engineering contribution with physical motivation).
-4. **Honest partial result** — B2 > M3 ≳ M4 on GPU96 crop96/20ep (`legacy_pre_review2`); physics extras not universally additive.
-5. **Reproducible OSSE→OSE path** — NATL60 paper splits documented; OSE/drifter eval hooks reserved.
+| Role | Citation | DOI (WebSearch-verified 2026-09-15) |
+|------|----------|-------------------------------------|
+| Primary multimodal SSC baseline | Fablet et al. 2024 JAMES | https://doi.org/10.1029/2023MS003609 |
+| 4DVarNet-SSH methods / OSSE style | Beauchamp et al. 2023 GMD | https://doi.org/10.5194/gmd-16-2119-2023 |
+| Dynamical SSH–SST counterpart | Le Guillou, Chapron & Rio 2025 JAMES (VarDyn) | https://doi.org/10.1029/2024MS004689 |
+| eSQG motivation | Lapeyre & Klein 2006 JPO | https://doi.org/10.1175/JPO2840.1 |
+| SST heat-budget / advection inversion | Rio et al. 2016 JTECH | https://doi.org/10.1175/JTECH-D-16-0017.1 |
+| Multimodal SSH+SST DL narrative | Martin et al. 2023 JAMES | https://doi.org/10.1029/2022MS003589 |
+| Spectral SST–SSH transfer language | González-Haro / Isern-Fontanet related | https://doi.org/10.1029/2019JC015958 |
 
-**Out of scope / not claimed as novelty:**
-- Inventing 4DVarNet itself (Fablet et al.).
-- Claiming full 3D SQG inversion (we use *effective* eSQG-style mixing).
-- Quoting crop/max_samples/short-epoch GPU runs as Table 1 NATL60 scores.
-- Claiming M3/M4 beat B2 on NATL60 (evidence so far says otherwise on crop96/20ep).
+Style: JAMES IMRaD + **Key Points** (3) + Plain Language Summary; geostrophy co-reported; open code; explicit “what is not claimed.”
+
+---
+
+## 2. Innovation framing (vs Fablet / vs VarDyn)
+
+**In scope**
+1. Soft differentiable physics **inside** the learned unrolled 4DVarNet cost (SQG + advection + optional strain reweighting)—not a byte-faithful Fablet clone.
+2. Fair ablation matrix B1/B2/M1–M4 isolating SST synergy vs each physics knob under one protocol.
+3. Stage E honesty: standalone SQG τ_uv ≈ 0 on this crop → treat λ_sqg as a soft prior, not a hard current map.
+4. Contrast to VarDyn: VarDyn uses reduced dynamical models in a variational SSH–SST mapper; we learn SSC through an unrolled neural solver with optional soft physics residuals.
+
+**Out of scope**
+- Inventing 4DVarNet; quoting Fablet Table numbers as ours; claiming full 3D SQG; claiming full-grid JAMES Table scores without runs.
 
 ---
 
 ## 3. Section architecture (IMRaD + JAMES extras)
 
-| # | Section | Draft file | Status |
-|---|---------|------------|--------|
-| — | Title / Authors / Affiliations | — | TODO |
-| — | Key Points (3 bullets) | — | TODO (calibrate to B2>M3) |
-| — | Abstract / Plain Language Summary | — | TODO last |
-| 1 | Introduction | `01_introduction.md` | **Drafted** |
-| 2 | Related work | (merge into intro for now) | light |
-| 3 | Methods | `02_methods.md` | **Drafted** |
-| 4 | Experiments + Results | `03_experiments.md` | **Drafted** (prelim numbers) |
-| 5 | Discussion | `04_discussion.md` | **Drafted** |
-| 6 | Conclusions | in `PAPER.md` | Drafted (bounded) |
-| — | Open Research / References | in `PAPER.md` | Key DOIs listed |
-| — | Assembled MD / HTML | `PAPER.md`, `paper.html` | Built |
-| — | Chinese full report | `docs/report/report.{html,md,pdf}` | Built (Base64 HTML) |
+| Section | File | Notes |
+|---------|------|-------|
+| Key Points / PLS / Abstract | `assemble_paper.py` FRONT | Calibrated to post_p0 + Stage E |
+| 1 Introduction | `01_introduction.md` | Gap, contributions, boundary |
+| 2 Methods | `02_methods.md` | Compact solver + soft residuals in detail |
+| 3 Experiments + Results | `03_experiments.md` | Only our measured tables |
+| 4 Discussion | `04_discussion.md` | When physics helps/fails; VarDyn contrast |
+| 5 Conclusions + Open Research + Refs | assembled | Bounded claims |
+
+Outputs: `PAPER.md`, `paper.html`, `paper.pdf`.
 
 ---
 
-## 4. Experiment matrix (paper table criteria)
+## 4. Measured post_p0 ranking (crop96/15ep, mean of 3 seeds)
 
-See `docs/PAPER_EXPERIMENTS.md`. Paper row requires: NATL60 source, paper splits, finished ckpt + `results/metrics_<ID>.json`, test split, no invented numbers.
+From `results/post_p0/ablation_summary.json` (τ_uv mean):
 
-| ID | Flags | Status (2026-08-16 cont) |
-|----|-------|--------------------------|
-| B2 synthetic 8ep | SST only | Done — directional |
-| M3 synthetic 8ep | SQG+adv | Done — directional |
-| M4 synthetic 8ep | +uncert | Done — M4 best among trio (directional) |
-| B2-GPU96 | NATL60 crop96 20ep | Done — τ_uv 0.848, rmse_ssh 0.059 |
-| M3-GPU96 | NATL60 crop96 20ep | Done — τ_uv 0.811, rmse_ssh 0.064 |
-| M4-GPU96 | NATL60 crop96 20ep | **Retrained post-NLL-fix** — τ_uv 0.801, rmse_ssh 0.063 (best val 4.83); pre-fix archive `metrics_M4_GPU96_pre_nllfix.json` |
-| M4 fix (σ-norm NLL) | code+config+test+**20ep retrain** | **Done** — SSH recovered; UV still B2>M3≳M4 |
-| Full NATL60 200ep uncropped | — | **Not started** — only these qualify as Table rows |
+| ID | τ_uv | rmse_uv | rmse_ssh |
+|----|-----:|--------:|---------:|
+| B1 | 0.861 | 0.178 | 0.059 |
+| B2 | 0.878 | 0.166 | 0.059 |
+| M1 | 0.916 | 0.139 | 0.049 |
+| M2 | 0.880 | 0.165 | 0.056 |
+| M3 | 0.914 | 0.140 | 0.050 |
+| M4 | 0.917 | 0.137 | 0.051 |
+| R0 | 0.850 | 0.185 | 0.059 |
+| geo (OI-only, seed0 B2) | 0.846 | 0.188 | — |
+
+**Formal JAMES Table (full-grid long train): 待补充.**
 
 ---
 
 ## 5. Figure plan
 
-| Fig | Content | Status |
-|-----|---------|--------|
-| Fig 1 | Method schematic (cost terms + unrolled solver) | TODO schematic |
-| Fig 2 | Synthetic ablation τ_uv / RMSE | SciencePlots done |
-| Fig 3 | B2/M3/M4-GPU96 loss + GPU96 tau/rmse bars | SciencePlots done (crop96 != Table) |
-| Fig 4 | NATL60 maps (SSH/UV error) when metrics ready | Pending |
-| Fig 5 | Ablation table graphic / λ_x | Pending full runs |
+| Fig | Content | Path |
+|-----|---------|------|
+| Stage E | SQG skill / adv residual sanity | `results/physics_ops/fig_*` |
+| post_p0 | τ_uv / RMSE bars ±std | `results/figures/fig_post_p0_*` |
+| Quarantined | legacy GPU96 bars | `fig_GPU96_*` (labelled pre_p0) |
+| Synth | directional 8ep | `fig_synth_*` |
 
-Paths: `results/figures/` and mirrored `docs/paper/figures/`. Caption drafts in `03_experiments.md` and `FIGURE_NOTES.md`.
-
----
-
-## 6. Terminology ledger (canonical)
-
-- **4DVarNet** — unrolled variational DA neural solver
-- **SSC** — sea surface currents (u, v)
-- **eSQG** — effective surface quasi-geostrophy (our operator is eSQG-*style*, not full 3D)
-- **OSSE / OSE** — observing-system simulation / experiment
-- **τ_uv** — explained variance of UV
-- **λ_x** — resolved scale where error/signal PSD < 0.5
-- **B2 / M3 / M4** — ablation IDs (SSH+SST; +SQG+adv; +strain uncert)
+Mirrored to `docs/paper/figures/` and `docs/report/figures/`.
 
 ---
 
-## 7. Assumptions / missing inputs
+## 6. Terminology ledger
 
-- Full-domain NATL60 long training not yet available → Table 1 empty of our numbers.
-- ChatGPT browser: tabs creatable but navigate to chatgpt.com failed (2+ attempts) → Cursor WebSearch citations + pastes with public GitHub URL (`PASTE_ChatA_GH_LIT_2026-08-16.txt`, `PASTE_ChatB_REPORT_REVIEW_2026-08-16.txt`). No conversation URL this turn.
-- **Public GitHub:** https://github.com/Coucou2016/4DVarNets-sea-current (code+docs+metrics+figures; excludes `*.nc` / `*.pt` / wheels / secrets).
-- M4 GPU96 **post**-σ-normalization-fix retrain done (2026-08-16); SSH recovered (0.063). Still crop96/20ep ≠ paper table.
-- Strain–reweighting physical calibration (α, dx) still under review.
+- **4DVarNet** — unrolled variational DA neural solver  
+- **SSC** — sea surface currents (u, v)  
+- **eSQG** — effective surface quasi-geostrophy (*style* operator here)  
+- **τ_uv** — explained variance of UV  
+- **λ_x** — resolved scale (PSD error/signal threshold)  
+- **B1/B2/M1–M4/R0** — ablation IDs (see experiments)  
+- **post_p0 / legacy_pre_review2** — protocol quarantine tags  

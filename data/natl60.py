@@ -233,6 +233,8 @@ def _align_like(da: Any, ref: Any, *, strict: bool = True) -> Any:
     - Asserts time axes match when both exist (no silent time misalignment).
     - Prefers exact ``xarray.align``; otherwise interpolates onto ``ref`` and
       asserts the result shares ref's time length / values.
+    - Harmonizes numeric vs datetime64 time dtypes before ``interp`` (OI uses
+      datetime64; NATL60 refs often store seconds since 2012-10-01).
     - Never returns the original array after a failed align/interp.
     """
     import xarray as xr
@@ -248,6 +250,7 @@ def _align_like(da: Any, ref: Any, *, strict: bool = True) -> Any:
 
     t_src = _coord_name(da, _TIME_NAMES)
     t_dst = _coord_name(ref, _TIME_NAMES)
+    ts = tr = None
     if t_src and t_dst:
         ts = np.asarray(_time_values(da))
         tr = np.asarray(_time_values(ref))
@@ -270,6 +273,11 @@ def _align_like(da: Any, ref: Any, *, strict: bool = True) -> Any:
                     f"NATL60 time length mismatch: da={ts.shape} vs ref={tr.shape}; "
                     "refusing silent fallback."
                 )
+        # Same calendar after decode: stamp both with datetime64 so dtype-mismatched
+        # files (OI datetime vs ref float seconds) can share an index / interp target.
+        if ts.shape == tr.shape:
+            da = da.assign_coords({t_src: tr.astype("datetime64[ns]")})
+            ref = ref.assign_coords({t_dst: tr.astype("datetime64[ns]")})
 
     try:
         aligned, _ = xr.align(da, ref, join="exact")
@@ -282,7 +290,12 @@ def _align_like(da: Any, ref: Any, *, strict: bool = True) -> Any:
         src = _coord_name(da, names)
         dst = _coord_name(ref, names)
         if src and dst and src in da.coords and dst in ref.coords:
-            kwargs[src] = ref[dst]
+            # Prefer already-harmonized datetime time; never pass float seconds into
+            # a datetime-like interpolant.
+            if names == _TIME_NAMES and tr is not None:
+                kwargs[src] = xr.DataArray(tr.astype("datetime64[ns]"), dims=(src,))
+            else:
+                kwargs[src] = ref[dst]
     if not kwargs:
         if strict:
             raise RuntimeError("NATL60 align failed: no shared coords for regrid")

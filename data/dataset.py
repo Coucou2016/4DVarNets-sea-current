@@ -257,9 +257,9 @@ def make_natl60_datasets(
             "2012-10-20 to 2013-09-30 (paper §3.2)."
         )
     return (
-        SSTSSHCurrentDataset(data, dT, train_idx, f=f0),
-        SSTSSHCurrentDataset(data, dT, val_idx, f=f0),
-        SSTSSHCurrentDataset(data, dT, test_idx, f=f0),
+        SSTSSHCurrentDataset(data, dT, train_idx, f=None),
+        SSTSSHCurrentDataset(data, dT, val_idx, f=None),
+        SSTSSHCurrentDataset(data, dT, test_idx, f=None),
     )
 
 

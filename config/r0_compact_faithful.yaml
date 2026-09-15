@@ -1,0 +1,54 @@
+# R0: maximal faithful-compact SSH+SST toward Fablet JAMES capacity on 4GB VRAM.
+# Gaps vs official CIA-Oceanix/4dvarnet-james-uv-ssc:
+#   - Not a byte-faithful port of their Lightning/solver stack
+#   - No official pretrained checkpoint evaluated here
+#   - Crop96 / batch1 required on GTX 950M; full 200x200 paper grid not trained
+#   - hidden_lstm=96 / feat_dim=16 (between our compact 64/12 and paper-ish 150/20)
+#   - Same post-P0 physics/geometry stack as B2 (no SQG/adv in R0 by design)
+data:
+  source: natl60
+  dT: 7
+  allow_truth_background: false
+
+model:
+  dT_sst: 7
+  n_iter: 5
+  hidden_lstm: 96
+  feat_dim: 16
+  use_sst: true
+  use_sqg: false
+  use_adv: false
+  use_uncert: false
+  lam_obs: 1.0
+  lam_sst: 1.0
+  lam_prior: 0.1
+  lam_sqg: 0.0
+  lam_adv: 0.0
+  Ld_km: 30
+  kappa: 50.0
+  dt_seconds: 86400
+  uncert_sigma0: 0.05
+  uncert_alpha: 1.0e4
+  uncert_from_truth: true
+  uncert_max_mult: 10.0
+  uncert_mse_mix: 0.5
+
+physics:
+  f0: 7.0e-5
+  dx_deg: 0.05
+  g: 9.81
+
+train:
+  epochs: 15
+  batch_size: 1
+  lr: 0.001
+  device: auto
+  checkpoint_dir: checkpoints
+  seed: 0
+
+loss:
+  ssh: 50.0
+  grad_ssh: 100.0
+  uv: 50.0
+  div: 100.0
+  prior: 10.0

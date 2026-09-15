@@ -1,4 +1,4 @@
-# Default config — Fablet et al. JAMES 2024 + physics-augmented cost
+# Default config - Fablet et al. JAMES 2024 + physics-augmented cost
 data:
   source: synthetic
   cache: data/synthetic_osse.npz
@@ -9,7 +9,7 @@ data:
   # Paper/default NATL60 mode: require obs+oi; never fill y_ssh from SSH truth.
   allow_truth_background: false
   # Drop train windows whose SST history overlaps val targets (paper mode default = dT-1).
-  # Set to 0 to disable; omit / null → auto dT-1 when allow_truth_background is false.
+  # Set to 0 to disable; omit / null -> auto dT-1 when allow_truth_background is false.
   # purge_days: 6
   # NATL60 CPU smoke only (null = full paper grid / all windows):
   # crop_size: 48
@@ -33,11 +33,11 @@ model:
   kappa: 50.0
   dt_seconds: 86400
   uncert_sigma0: 0.05
-  # α·strain ~ O(0.1–1) for ~0.3 m/s fields on dx≈5.5 km; keep 1e4.
+  # alpha*strain ~ O(0.1-1) for ~0.3 m/s fields on dx~5.5 km; keep 1e4.
   uncert_alpha: 1.0e4
-  # M4 fix: σ from truth strain + MSE mix + σ clamp + σ-normalized NLL (see TrainingLoss).
-  # Raw err²/σ² is ~1/σ0² (~400×) MSE and SSH degrades (GPU96 M4 val~682, rmse_ssh~2×).
-  # Normalized form: E[err² (σ0/σ)²] + σ0² E[log(σ/σ0)²] ≈ MSE when σ≈σ0.
+  # M4 fix: sigma from truth strain + MSE mix + sigma clamp + sigma-normalized NLL (see TrainingLoss).
+  # Raw err^2/sigma^2 is ~1/sigma0^2 (~400x) MSE and SSH degrades (GPU96 M4 val~682, rmse_ssh~2x).
+  # Normalized form: E[err^2 (sigma0/sigma)^2] + sigma0^2 E[log(sigma/sigma0)^2] ~ MSE when sigma~sigma0.
   uncert_from_truth: true
   uncert_max_mult: 10.0
   # Keep a strong MSE floor so NLL cannot abandon UV/SSH balance early.
@@ -52,7 +52,8 @@ train:
   epochs: 8
   batch_size: 4
   lr: 0.001
-  # auto → CUDA when available, else CPU
+  seed: 0
+  # auto -> CUDA when available, else CPU
   device: auto
   checkpoint_dir: checkpoints
 

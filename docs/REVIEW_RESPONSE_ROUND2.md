@@ -5,9 +5,11 @@ Public repo: https://github.com/Coucou2016/4DVarNets-sea-current
 **Acceptance target:** `clean clone → pip install → pytest -q → 100% pass`, with
 physics / data / solver / tests / docs **internally consistent**.
 
-**Verdict (this pass):** Stage A release candidate for *consistency* only.
-GPU96 metrics remain `legacy_pre_review2` / `pre_p0_fix`. No post-P0 NATL60
-retrain. Do **not** invent JAMES table scores.
+**Verdict (this pass):** Stage A–D consistency is tagged `v0.2.0-review2-fixed`.
+Stages E–H post-P0 measured runs live under `results/physics_ops/` and
+`results/post_p0/` (crop96 multi-seed; **not** full-grid JAMES Table). Legacy
+GPU96 remains `legacy_pre_review2` / `pre_p0_fix`. Do **not** invent JAMES
+table scores.
 
 | ID | Issue | Status | Where |
 |----|-------|--------|--------|
@@ -24,15 +26,11 @@ retrain. Do **not** invent JAMES table scores.
 | A11 | Honest docs; GPU96 legacy | **Done** | README / PAPER / OUTLINE; `results/legacy_pre_review2/`; LICENSE + NOTICE |
 | A12 | Tests match implementation | **Done** | `tests/test_p0_correctness.py` (maps, density, early-iter grads, source guards, paper mode) |
 
-## Explicitly not done (Stage E–H / remaining)
+## Stage E–H status
 
-- Full multi-seed NATL60 retrain / paper Table rows
-- Faithful R0 official Fablet transplant
-- Learned uncertainty head (M5)
-- VarDyn comparator experiments
-- Optional Gaussian smooth on OI geo baseline
-- G(full state) / state-channel normalization
+See `docs/STAGE_EFGH_LEDGER.md` and `results/post_p0/`. Stage E measured; F–H running/completing on crop96 multi-seed post-P0 protocol. Full-grid JAMES Table and byte-faithful R0 remain hardware-/scope-blocked (listed in ledger).
 
 ## Tag
 
 **`v0.2.0-review2-fixed`** — Stage A–D consistency (geometry, solver graph, paper-mode NATL60, honest evaluate).
+

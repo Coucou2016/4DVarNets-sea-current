@@ -1,0 +1,2757 @@
+{
+  "stage": "F_G",
+  "git_commit": "89f61b6",
+  "protocol": {
+    "source": "natl60",
+    "crop_size": 96,
+    "epochs": 15,
+    "batch_size": 1,
+    "seeds": [
+      0,
+      1,
+      2
+    ],
+    "device": "cuda",
+    "note": "post_p0 directional evidence on GTX 950M 4GB (crop96). Not full-grid JAMES Table rows."
+  },
+  "runs": [
+    {
+      "name": "B1",
+      "exp_name": "B1-s0",
+      "seed": 0,
+      "train_ok": true,
+      "eval_ok": true,
+      "skipped_existing": true,
+      "ckpt": "E:\\Projects\\20260522-4DVarNets-sea-current\\checkpoints\\4dvarnet-B1-s0-best.pt",
+      "r0_note": null,
+      "metrics": {
+        "ckpt": "E:\\Projects\\20260522-4DVarNets-sea-current\\checkpoints\\4dvarnet-B1-s0-best.pt",
+        "source": "natl60",
+        "crop_size": 96,
+        "max_samples": null,
+        "flags": {
+          "use_sst": false,
+          "use_sqg": false,
+          "use_adv": false,
+          "use_uncert": false
+        },
+        "seed": 0,
+        "git_commit_ckpt": "89f61b6",
+        "git_commit_eval": "89f61b6",
+        "ckpt_epoch": 13,
+        "physics_scales": {
+          "dx": 4382.6318359375,
+          "dy": 5559.7470703125,
+          "f0": 7e-05
+        },
+        "geostrophic_baseline": "oi_only",
+        "geostrophic_tau_uv_sane": true,
+        "metrics_aggregation": "full_test_pooled",
+        "protocol_note": "crop/max_samples metrics are post_p0 directional evidence on limited VRAM; not full-grid JAMES Table rows.",
+        "model": {
+          "rmse_ssh": 0.05859917402267456,
+          "rmse_u": 0.17878736555576324,
+          "rmse_v": 0.17282634973526,
+          "rmse_uv": 0.1758321076631546,
+          "tau_uv": 0.8645929935688854,
+          "tau_div": -11.361893727032198,
+          "tau_vort": 0.21838543044943037,
+          "tau_curl": 0.21838543044943037,
+          "tau_strain": -0.6143703570619865,
+          "lambda_x_ssh_km": 93.49614583333332,
+          "lambda_x_ssh_min_ratio": 0.00037060313488065596,
+          "lambda_x_ssh_resolved": 1.0,
+          "lambda_x_uv_km": 76.49684659090907,
+          "lambda_x_uv_min_ratio": 0.003178349111515999,
+          "lambda_x_uv_resolved": 1.0,
+          "lambda_t_uv_s": 283885.71428571426,
+          "lambda_t_uv_days": 3.2857142857142856
+        },
+        "geostrophic": {
+          "rmse_ssh": 0.05963534116744995,
+          "rmse_u": 0.19356749951839447,
+          "rmse_v": 0.1815425604581833,
+          "rmse_uv": 0.1876513808965683,
+          "tau_uv": 0.8457773156600269,
+          "tau_div": -0.0005519296024563136,
+          "tau_vort": 0.15724359757870343,
+          "tau_curl": 0.15724359757870343,
+          "tau_strain": -0.18412571166030478,
+          "lambda_x_ssh_km": 93.49614583333332,
+          "lambda_x_ssh_min_ratio": 0.000351138928102398,
+          "lambda_x_ssh_resolved": 1.0,
+          "lambda_x_uv_km": 76.49684659090907,
+          "lambda_x_uv_min_ratio": 0.003492113577835548,
+          "lambda_x_uv_resolved": 1.0
+        },
+        "provisional_batch_mean": {
+          "model": {
+            "rmse_ssh": 0.05715672149444404,
+            "rmse_u": 0.1750495568241762,
+            "rmse_v": 0.1692827467037284,
+            "rmse_uv": 0.17298516695914062,
+            "tau_uv": 0.8642910860508544,
+            "tau_div": -11.747356795980812,
+            "tau_vort": 0.2030544131571908,
+            "tau_curl": 0.2030544131571908,
+            "tau_strain": -0.6759351541781246,
+            "lambda_x_ssh_km": 81.393634698475,
+            "lambda_x_ssh_min_ratio": 0.0003982152685917139,
+            "lambda_x_ssh_resolved": 1.0,
+            "lambda_x_uv_km": 70.77217936394644,
+            "lambda_x_uv_min_ratio": 0.0030895283792175023,
+            "lambda_x_uv_resolved": 1.0
+          },
+          "geostrophic": {
+            "rmse_ssh": 0.05821923142218072,
+            "rmse_u": 0.19048229896503946,
+            "rmse_v": 0.17819018402825232,
+            "rmse_uv": 0.1852621993292933,
+            "tau_uv": 0.8455821679057741,
+            "tau_div": -0.001337080151228192,
+            "tau_vort": 0.15248485202559633,
+            "tau_curl": 0.15248485202559633,
+            "tau_strain": -0.1986136760719821,
+            "lambda_x_ssh_km": 94.02163778793667,
+            "lambda_x_ssh_min_ratio": 0.00036785800137457443,
+            "lambda_x_ssh_resolved": 1.0,
+            "lambda_x_uv_km": 77.57869401522395,
+            "lambda_x_uv_min_ratio": 0.003272371884221905,
+            "lambda_x_uv_resolved": 1.0
+          },
+          "note": "Mean of per-batch batch_metrics; not the primary Table path."
+        },
+        "lambda_t_note": "resolved_timescale on domain-mean UV series"
+      }
+    },
+    {
+      "name": "B1",
+      "exp_name": "B1-s1",
+      "seed": 1,
+      "train_ok": true,
+      "eval_ok": true,
+      "skipped_existing": true,
+      "ckpt": "E:\\Projects\\20260522-4DVarNets-sea-current\\checkpoints\\4dvarnet-B1-s1-best.pt",
+      "r0_note": null,
+      "metrics": {
+        "ckpt": "E:\\Projects\\20260522-4DVarNets-sea-current\\checkpoints\\4dvarnet-B1-s1-best.pt",
+        "source": "natl60",
+        "crop_size": 96,
+        "max_samples": null,
+        "flags": {
+          "use_sst": false,
+          "use_sqg": false,
+          "use_adv": false,
+          "use_uncert": false
+        },
+        "seed": 1,
+        "git_commit_ckpt": "89f61b6",
+        "git_commit_eval": "89f61b6",
+        "ckpt_epoch": 8,
+        "physics_scales": {
+          "dx": 4382.6318359375,
+          "dy": 5559.7470703125,
+          "f0": 8.96254787221551e-05
+        },
+        "geostrophic_baseline": "oi_only",
+        "geostrophic_tau_uv_sane": true,
+        "metrics_aggregation": "full_test_pooled",
+        "protocol_note": "crop/max_samples metrics are post_p0 directional evidence on limited VRAM; not full-grid JAMES Table rows.",
+        "model": {
+          "rmse_ssh": 0.06002497673034668,
+          "rmse_u": 0.18490098416805267,
+          "rmse_v": 0.1779966801404953,
+          "rmse_uv": 0.18148167431354523,
+          "tau_uv": 0.8557518345011654,
+          "tau_div": -10.794330192609069,
+          "tau_vort": 0.17738655660629243,
+          "tau_curl": 0.17738655660629243,
+          "tau_strain": -0.7337903475911949,
+          "lambda_x_ssh_km": 93.49614583333332,
+          "lambda_x_ssh_min_ratio": 0.0004845266345419075,
+          "lambda_x_ssh_resolved": 1.0,
+          "lambda_x_uv_km": 76.49684659090907,
+          "lambda_x_uv_min_ratio": 0.004046620853608747,
+          "lambda_x_uv_resolved": 1.0,
+          "lambda_t_uv_s": 189257.1428571429,
+          "lambda_t_uv_days": 2.190476190476191
+        },
+        "geostrophic": {
+          "rmse_ssh": 0.05963534116744995,
+          "rmse_u": 0.19356749951839447,
+          "rmse_v": 0.1815425604581833,
+          "rmse_uv": 0.1876513808965683,
+          "tau_uv": 0.8457773156600269,
+          "tau_div": -0.0005519296024563136,
+          "tau_vort": 0.15724359757870343,
+          "tau_curl": 0.15724359757870343,
+          "tau_strain": -0.18412571166030478,
+          "lambda_x_ssh_km": 93.49614583333332,
+          "lambda_x_ssh_min_ratio": 0.000351138928102398,
+          "lambda_x_ssh_resolved": 1.0,
+          "lambda_x_uv_km": 76.49684659090907,
+          "lambda_x_uv_min_ratio": 0.003492113577835548,
+          "lambda_x_uv_resolved": 1.0
+        },
+        "provisional_batch_mean": {
+          "model": {
+            "rmse_ssh": 0.05860825919586679,
+            "rmse_u": 0.18095859496489816,
+            "rmse_v": 0.1742241173658682,
+            "rmse_uv": 0.178450345993042,
+            "tau_uv": 0.85556296791652,
+            "tau_div": -11.156869535269195,
+            "tau_vort": 0.1612439780658461,
+            "tau_curl": 0.1612439780658461,
+            "tau_strain": -0.7992403367031231,
+            "lambda_x_ssh_km": 87.1336751925078,
+            "lambda_x_ssh_min_ratio": 0.0005217512195015866,
+            "lambda_x_ssh_resolved": 1.0,
+            "lambda_x_uv_km": 73.24269502164505,
+            "lambda_x_uv_min_ratio": 0.004030370083362563,
+            "lambda_x_uv_resolved": 1.0
+          },
+          "geostrophic": {
+            "rmse_ssh": 0.05821923142218072,
+            "rmse_u": 0.19048229896503946,
+            "rmse_v": 0.17819018402825232,
+            "rmse_uv": 0.1852621993292933,
+            "tau_uv": 0.8455821679057741,
+            "tau_div": -0.001337080151228192,
+            "tau_vort": 0.15248485202559633,
+            "tau_curl": 0.15248485202559633,
+            "tau_strain": -0.1986136760719821,
+            "lambda_x_ssh_km": 94.02163778793667,
+            "lambda_x_ssh_min_ratio": 0.00036785800137457443,
+            "lambda_x_ssh_resolved": 1.0,
+            "lambda_x_uv_km": 77.57869401522395,
+            "lambda_x_uv_min_ratio": 0.003272371884221905,
+            "lambda_x_uv_resolved": 1.0
+          },
+          "note": "Mean of per-batch batch_metrics; not the primary Table path."
+        },
+        "lambda_t_note": "resolved_timescale on domain-mean UV series"
+      }
+    },
+    {
+      "name": "B1",
+      "exp_name": "B1-s2",
+      "seed": 2,
+      "train_ok": true,
+      "eval_ok": true,
+      "skipped_existing": true,
+      "ckpt": "E:\\Projects\\20260522-4DVarNets-sea-current\\checkpoints\\4dvarnet-B1-s2-best.pt",
+      "r0_note": null,
+      "metrics": {
+        "ckpt": "E:\\Projects\\20260522-4DVarNets-sea-current\\checkpoints\\4dvarnet-B1-s2-best.pt",
+        "source": "natl60",
+        "crop_size": 96,
+        "max_samples": null,
+        "flags": {
+          "use_sst": false,
+          "use_sqg": false,
+          "use_adv": false,
+          "use_uncert": false
+        },
+        "seed": 2,
+        "git_commit_ckpt": "89f61b6",
+        "git_commit_eval": "89f61b6",
+        "ckpt_epoch": 12,
+        "physics_scales": {
+          "dx": 4382.6318359375,
+          "dy": 5559.7470703125,
+          "f0": 8.96254787221551e-05
+        },
+        "geostrophic_baseline": "oi_only",
+        "geostrophic_tau_uv_sane": true,
+        "metrics_aggregation": "full_test_pooled",
+        "protocol_note": "crop/max_samples metrics are post_p0 directional evidence on limited VRAM; not full-grid JAMES Table rows.",
+        "model": {
+          "rmse_ssh": 0.057852085679769516,
+          "rmse_u": 0.18248367309570312,
+          "rmse_v": 0.17301829159259796,
+          "rmse_uv": 0.17781397700309753,
+          "tau_uv": 0.8615233554882712,
+          "tau_div": -9.35880929597606,
+          "tau_vort": 0.2873264632622474,
+          "tau_curl": 0.2873264632622474,
+          "tau_strain": -0.37037660187062404,
+          "lambda_x_ssh_km": 93.49614583333332,
+          "lambda_x_ssh_min_ratio": 0.00028447726684677086,
+          "lambda_x_ssh_resolved": 1.0,
+          "lambda_x_uv_km": 76.49684659090907,
+          "lambda_x_uv_min_ratio": 0.0031555366810688307,
+          "lambda_x_uv_resolved": 1.0,
+          "lambda_t_uv_s": 1987200.0000000002,
+          "lambda_t_uv_days": 23.000000000000004
+        },
+        "geostrophic": {
+          "rmse_ssh": 0.05963534116744995,
+          "rmse_u": 0.19356749951839447,
+          "rmse_v": 0.1815425604581833,
+          "rmse_uv": 0.1876513808965683,
+          "tau_uv": 0.8457773156600269,
+          "tau_div": -0.0005519296024563136,
+          "tau_vort": 0.15724359757870343,
+          "tau_curl": 0.15724359757870343,
+          "tau_strain": -0.18412571166030478,
+          "lambda_x_ssh_km": 93.49614583333332,
+          "lambda_x_ssh_min_ratio": 0.000351138928102398,
+          "lambda_x_ssh_resolved": 1.0,
+          "lambda_x_uv_km": 76.49684659090907,
+          "lambda_x_uv_min_ratio": 0.003492113577835548,
+          "lambda_x_uv_resolved": 1.0
+        },
+        "provisional_batch_mean": {
+          "model": {
+            "rmse_ssh": 0.056339113163235394,
+            "rmse_u": 0.17853485064014143,
+            "rmse_v": 0.16949843323749045,
+            "rmse_uv": 0.17491597358299338,
+            "tau_uv": 0.8614086634661543,
+            "tau_div": -9.662974366912863,
+            "tau_vort": 0.27588205734063226,
+            "tau_curl": 0.27588205734063226,
+            "tau_strain": -0.4143489899060797,
+            "lambda_x_ssh_km": 88.77317810586848,
+            "lambda_x_ssh_min_ratio": 0.0003025079870609958,
+            "lambda_x_ssh_resolved": 1.0,
+            "lambda_x_uv_km": 73.0886641041397,
+            "lambda_x_uv_min_ratio": 0.0031617597714926502,
+            "lambda_x_uv_resolved": 1.0
+          },
+          "geostrophic": {
+            "rmse_ssh": 0.05821923142218072,
+            "rmse_u": 0.19048229896503946,
+            "rmse_v": 0.17819018402825232,
+            "rmse_uv": 0.1852621993292933,
+            "tau_uv": 0.8455821679057741,
+            "tau_div": -0.001337080151228192,
+            "tau_vort": 0.15248485202559633,
+            "tau_curl": 0.15248485202559633,
+            "tau_strain": -0.1986136760719821,
+            "lambda_x_ssh_km": 94.02163778793667,
+            "lambda_x_ssh_min_ratio": 0.00036785800137457443,
+            "lambda_x_ssh_resolved": 1.0,
+            "lambda_x_uv_km": 77.57869401522395,
+            "lambda_x_uv_min_ratio": 0.003272371884221905,
+            "lambda_x_uv_resolved": 1.0
+          },
+          "note": "Mean of per-batch batch_metrics; not the primary Table path."
+        },
+        "lambda_t_note": "resolved_timescale on domain-mean UV series"
+      }
+    },
+    {
+      "name": "B2",
+      "exp_name": "B2-s0",
+      "seed": 0,
+      "train_ok": true,
+      "eval_ok": true,
+      "skipped_existing": true,
+      "ckpt": "E:\\Projects\\20260522-4DVarNets-sea-current\\checkpoints\\4dvarnet-B2-s0-best.pt",
+      "r0_note": null,
+      "metrics": {
+        "ckpt": "checkpoints\\4dvarnet-B2-s0-best.pt",
+        "source": "natl60",
+        "crop_size": 96,
+        "max_samples": null,
+        "flags": {
+          "use_sst": true,
+          "use_sqg": false,
+          "use_adv": false,
+          "use_uncert": false
+        },
+        "seed": 0,
+        "git_commit_ckpt": "89f61b6",
+        "git_commit_eval": "89f61b6",
+        "ckpt_epoch": 11,
+        "physics_scales": {
+          "dx": 4382.6318359375,
+          "dy": 5559.7470703125,
+          "f0": 8.96254787221551e-05
+        },
+        "geostrophic_baseline": "oi_only",
+        "geostrophic_tau_uv_sane": true,
+        "metrics_aggregation": "full_test_pooled",
+        "protocol_note": "crop/max_samples metrics are post_p0 directional evidence on limited VRAM; not full-grid JAMES Table rows.",
+        "model": {
+          "rmse_ssh": 0.06351916491985321,
+          "rmse_u": 0.17651283740997314,
+          "rmse_v": 0.16658872365951538,
+          "rmse_uv": 0.17162251472473145,
+          "tau_uv": 0.870998933020525,
+          "tau_div": -4.8808246541322,
+          "tau_vort": 0.29865490115570514,
+          "tau_curl": 0.29865490115570514,
+          "tau_strain": -0.45500115985639744,
+          "lambda_x_ssh_km": 93.49614583333332,
+          "lambda_x_ssh_min_ratio": 0.0003184935170286895,
+          "lambda_x_ssh_resolved": 1.0,
+          "lambda_x_uv_km": 76.49684659090907,
+          "lambda_x_uv_min_ratio": 0.002500918424604733,
+          "lambda_x_uv_resolved": 1.0,
+          "lambda_t_uv_s": 220800.0,
+          "lambda_t_uv_days": 2.5555555555555554
+        },
+        "geostrophic": {
+          "rmse_ssh": 0.05963534116744995,
+          "rmse_u": 0.19356749951839447,
+          "rmse_v": 0.1815425604581833,
+          "rmse_uv": 0.1876513808965683,
+          "tau_uv": 0.8457773156600269,
+          "tau_div": -0.0005519296024563136,
+          "tau_vort": 0.15724359757870343,
+          "tau_curl": 0.15724359757870343,
+          "tau_strain": -0.18412571166030478,
+          "lambda_x_ssh_km": 93.49614583333332,
+          "lambda_x_ssh_min_ratio": 0.000351138928102398,
+          "lambda_x_ssh_resolved": 1.0,
+          "lambda_x_uv_km": 76.49684659090907,
+          "lambda_x_uv_min_ratio": 0.003492113577835548,
+          "lambda_x_uv_resolved": 1.0
+        },
+        "provisional_batch_mean": {
+          "model": {
+            "rmse_ssh": 0.062246765374489456,
+            "rmse_u": 0.17418586851462073,
+            "rmse_v": 0.1643798855011878,
+            "rmse_uv": 0.1699924422023089,
+            "tau_uv": 0.8696913272550766,
+            "tau_div": -4.979585226084567,
+            "tau_vort": 0.29117451423667534,
+            "tau_curl": 0.29117451423667534,
+            "tau_strain": -0.493355216437237,
+            "lambda_x_ssh_km": 88.09934061812177,
+            "lambda_x_ssh_min_ratio": 0.0003420273408246348,
+            "lambda_x_ssh_resolved": 1.0,
+            "lambda_x_uv_km": 72.88159189488051,
+            "lambda_x_uv_min_ratio": 0.0025174664061882236,
+            "lambda_x_uv_resolved": 1.0
+          },
+          "geostrophic": {
+            "rmse_ssh": 0.05821923142218072,
+            "rmse_u": 0.19048229896503946,
+            "rmse_v": 0.17819018402825232,
+            "rmse_uv": 0.1852621993292933,
+            "tau_uv": 0.8455821679057741,
+            "tau_div": -0.001337080151228192,
+            "tau_vort": 0.15248485202559633,
+            "tau_curl": 0.15248485202559633,
+            "tau_strain": -0.1986136760719821,
+            "lambda_x_ssh_km": 94.02163778793667,
+            "lambda_x_ssh_min_ratio": 0.00036785800137457443,
+            "lambda_x_ssh_resolved": 1.0,
+            "lambda_x_uv_km": 77.57869401522395,
+            "lambda_x_uv_min_ratio": 0.003272371884221905,
+            "lambda_x_uv_resolved": 1.0
+          },
+          "note": "Mean of per-batch batch_metrics; not the primary Table path."
+        },
+        "lambda_t_note": "resolved_timescale on domain-mean UV series"
+      }
+    },
+    {
+      "name": "B2",
+      "exp_name": "B2-s1",
+      "seed": 1,
+      "train_ok": true,
+      "ckpt": "E:\\Projects\\20260522-4DVarNets-sea-current\\checkpoints\\4dvarnet-B2-s1-best.pt",
+      "r0_note": null,
+      "eval_ok": true,
+      "metrics": {
+        "ckpt": "E:\\Projects\\20260522-4DVarNets-sea-current\\checkpoints\\4dvarnet-B2-s1-best.pt",
+        "source": "natl60",
+        "crop_size": 96,
+        "max_samples": null,
+        "flags": {
+          "use_sst": true,
+          "use_sqg": false,
+          "use_adv": false,
+          "use_uncert": false
+        },
+        "seed": 1,
+        "git_commit_ckpt": "89f61b6",
+        "git_commit_eval": "89f61b6",
+        "ckpt_epoch": 8,
+        "physics_scales": {
+          "dx": 4382.6318359375,
+          "dy": 5559.7470703125,
+          "f0": 8.96254787221551e-05
+        },
+        "geostrophic_baseline": "oi_only",
+        "geostrophic_tau_uv_sane": true,
+        "metrics_aggregation": "full_test_pooled",
+        "protocol_note": "crop/max_samples metrics are post_p0 directional evidence on limited VRAM; not full-grid JAMES Table rows.",
+        "model": {
+          "rmse_ssh": 0.061603739857673645,
+          "rmse_u": 0.18540748953819275,
+          "rmse_v": 0.17690680921077728,
+          "rmse_uv": 0.18120700120925903,
+          "tau_uv": 0.8561881481154685,
+          "tau_div": -8.661265017357563,
+          "tau_vort": 0.28030435902213036,
+          "tau_curl": 0.28030435902213036,
+          "tau_strain": -0.34980845293658946,
+          "lambda_x_ssh_km": 93.49614583333332,
+          "lambda_x_ssh_min_ratio": 0.0007748932314571889,
+          "lambda_x_ssh_resolved": 1.0,
+          "lambda_x_uv_km": 76.49684659090907,
+          "lambda_x_uv_min_ratio": 0.008121332125824993,
+          "lambda_x_uv_resolved": 1.0,
+          "lambda_t_uv_s": 189257.1428571429,
+          "lambda_t_uv_days": 2.190476190476191
+        },
+        "geostrophic": {
+          "rmse_ssh": 0.05963534116744995,
+          "rmse_u": 0.19356749951839447,
+          "rmse_v": 0.1815425604581833,
+          "rmse_uv": 0.1876513808965683,
+          "tau_uv": 0.8457773156600269,
+          "tau_div": -0.0005519296024563136,
+          "tau_vort": 0.15724359757870343,
+          "tau_curl": 0.15724359757870343,
+          "tau_strain": -0.18412571166030478,
+          "lambda_x_ssh_km": 93.49614583333332,
+          "lambda_x_ssh_min_ratio": 0.000351138928102398,
+          "lambda_x_ssh_resolved": 1.0,
+          "lambda_x_uv_km": 76.49684659090907,
+          "lambda_x_uv_min_ratio": 0.003492113577835548,
+          "lambda_x_uv_resolved": 1.0
+        },
+        "provisional_batch_mean": {
+          "model": {
+            "rmse_ssh": 0.06032335891833772,
+            "rmse_u": 0.18186512638045393,
+            "rmse_v": 0.17295508718361025,
+            "rmse_uv": 0.1783861898533676,
+            "tau_uv": 0.8559545634320093,
+            "tau_div": -8.900874765196916,
+            "tau_vort": 0.26663979777398455,
+            "tau_curl": 0.26663979777398455,
+            "tau_strain": -0.40142945305787076,
+            "lambda_x_ssh_km": 91.16896035204135,
+            "lambda_x_ssh_min_ratio": 0.00086618835181201,
+            "lambda_x_ssh_resolved": 1.0,
+            "lambda_x_uv_km": 75.3768258715922,
+            "lambda_x_uv_min_ratio": 0.007472459872305174,
+            "lambda_x_uv_resolved": 1.0
+          },
+          "geostrophic": {
+            "rmse_ssh": 0.05821923142218072,
+            "rmse_u": 0.19048229896503946,
+            "rmse_v": 0.17819018402825232,
+            "rmse_uv": 0.1852621993292933,
+            "tau_uv": 0.8455821679057741,
+            "tau_div": -0.001337080151228192,
+            "tau_vort": 0.15248485202559633,
+            "tau_curl": 0.15248485202559633,
+            "tau_strain": -0.1986136760719821,
+            "lambda_x_ssh_km": 94.02163778793667,
+            "lambda_x_ssh_min_ratio": 0.00036785800137457443,
+            "lambda_x_ssh_resolved": 1.0,
+            "lambda_x_uv_km": 77.57869401522395,
+            "lambda_x_uv_min_ratio": 0.003272371884221905,
+            "lambda_x_uv_resolved": 1.0
+          },
+          "note": "Mean of per-batch batch_metrics; not the primary Table path."
+        },
+        "lambda_t_note": "resolved_timescale on domain-mean UV series"
+      }
+    },
+    {
+      "name": "B2",
+      "exp_name": "B2-s2",
+      "seed": 2,
+      "train_ok": true,
+      "ckpt": "E:\\Projects\\20260522-4DVarNets-sea-current\\checkpoints\\4dvarnet-B2-s2-best.pt",
+      "r0_note": null,
+      "eval_ok": true,
+      "metrics": {
+        "ckpt": "E:\\Projects\\20260522-4DVarNets-sea-current\\checkpoints\\4dvarnet-B2-s2-best.pt",
+        "source": "natl60",
+        "crop_size": 96,
+        "max_samples": null,
+        "flags": {
+          "use_sst": true,
+          "use_sqg": false,
+          "use_adv": false,
+          "use_uncert": false
+        },
+        "seed": 2,
+        "git_commit_ckpt": "89f61b6",
+        "git_commit_eval": "89f61b6",
+        "ckpt_epoch": 14,
+        "physics_scales": {
+          "dx": 4382.6318359375,
+          "dy": 5559.7470703125,
+          "f0": 8.96254787221551e-05
+        },
+        "geostrophic_baseline": "oi_only",
+        "geostrophic_tau_uv_sane": true,
+        "metrics_aggregation": "full_test_pooled",
+        "protocol_note": "crop/max_samples metrics are post_p0 directional evidence on limited VRAM; not full-grid JAMES Table rows.",
+        "model": {
+          "rmse_ssh": 0.051937442272901535,
+          "rmse_u": 0.155479297041893,
+          "rmse_v": 0.13370968401432037,
+          "rmse_uv": 0.14500360190868378,
+          "tau_uv": 0.9079121465194044,
+          "tau_div": -3.132573969243751,
+          "tau_vort": 0.5374787733078277,
+          "tau_curl": 0.5374787733078277,
+          "tau_strain": 0.15665782213120139,
+          "lambda_x_ssh_km": 56.09768749999999,
+          "lambda_x_ssh_min_ratio": 0.0005782853297031948,
+          "lambda_x_ssh_resolved": 1.0,
+          "lambda_x_uv_km": 76.49684659090907,
+          "lambda_x_uv_min_ratio": 0.0024890426427865682,
+          "lambda_x_uv_resolved": 1.0,
+          "lambda_t_uv_s": 1987200.0000000002,
+          "lambda_t_uv_days": 23.000000000000004
+        },
+        "geostrophic": {
+          "rmse_ssh": 0.05963534116744995,
+          "rmse_u": 0.19356749951839447,
+          "rmse_v": 0.1815425604581833,
+          "rmse_uv": 0.1876513808965683,
+          "tau_uv": 0.8457773156600269,
+          "tau_div": -0.0005519296024563136,
+          "tau_vort": 0.15724359757870343,
+          "tau_curl": 0.15724359757870343,
+          "tau_strain": -0.18412571166030478,
+          "lambda_x_ssh_km": 93.49614583333332,
+          "lambda_x_ssh_min_ratio": 0.000351138928102398,
+          "lambda_x_ssh_resolved": 1.0,
+          "lambda_x_uv_km": 76.49684659090907,
+          "lambda_x_uv_min_ratio": 0.003492113577835548,
+          "lambda_x_uv_resolved": 1.0
+        },
+        "provisional_batch_mean": {
+          "model": {
+            "rmse_ssh": 0.05110454324470914,
+            "rmse_u": 0.15337122409887935,
+            "rmse_v": 0.13254019763806593,
+            "rmse_uv": 0.1437142028108887,
+            "tau_uv": 0.9067788285593334,
+            "tau_div": -3.2235822908619123,
+            "tau_vort": 0.5298126099254383,
+            "tau_curl": 0.5298126099254383,
+            "tau_strain": 0.12868423121560993,
+            "lambda_x_ssh_km": 67.74923022573789,
+            "lambda_x_ssh_min_ratio": 0.0005700248656018555,
+            "lambda_x_ssh_resolved": 1.0,
+            "lambda_x_uv_km": 61.759382985482134,
+            "lambda_x_uv_min_ratio": 0.002523853363821898,
+            "lambda_x_uv_resolved": 1.0
+          },
+          "geostrophic": {
+            "rmse_ssh": 0.05821923142218072,
+            "rmse_u": 0.19048229896503946,
+            "rmse_v": 0.17819018402825232,
+            "rmse_uv": 0.1852621993292933,
+            "tau_uv": 0.8455821679057741,
+            "tau_div": -0.001337080151228192,
+            "tau_vort": 0.15248485202559633,
+            "tau_curl": 0.15248485202559633,
+            "tau_strain": -0.1986136760719821,
+            "lambda_x_ssh_km": 94.02163778793667,
+            "lambda_x_ssh_min_ratio": 0.00036785800137457443,
+            "lambda_x_ssh_resolved": 1.0,
+            "lambda_x_uv_km": 77.57869401522395,
+            "lambda_x_uv_min_ratio": 0.003272371884221905,
+            "lambda_x_uv_resolved": 1.0
+          },
+          "note": "Mean of per-batch batch_metrics; not the primary Table path."
+        },
+        "lambda_t_note": "resolved_timescale on domain-mean UV series"
+      }
+    },
+    {
+      "name": "M1",
+      "exp_name": "M1-s0",
+      "seed": 0,
+      "train_ok": true,
+      "ckpt": "E:\\Projects\\20260522-4DVarNets-sea-current\\checkpoints\\4dvarnet-M1-s0-best.pt",
+      "r0_note": null,
+      "eval_ok": true,
+      "metrics": {
+        "ckpt": "E:\\Projects\\20260522-4DVarNets-sea-current\\checkpoints\\4dvarnet-M1-s0-best.pt",
+        "source": "natl60",
+        "crop_size": 96,
+        "max_samples": null,
+        "flags": {
+          "use_sst": true,
+          "use_sqg": true,
+          "use_adv": false,
+          "use_uncert": false
+        },
+        "seed": 0,
+        "git_commit_ckpt": "89f61b6",
+        "git_commit_eval": "89f61b6",
+        "ckpt_epoch": 13,
+        "physics_scales": {
+          "dx": 4382.6318359375,
+          "dy": 5559.7470703125,
+          "f0": 8.96254787221551e-05
+        },
+        "geostrophic_baseline": "oi_only",
+        "geostrophic_tau_uv_sane": true,
+        "metrics_aggregation": "full_test_pooled",
+        "protocol_note": "crop/max_samples metrics are post_p0 directional evidence on limited VRAM; not full-grid JAMES Table rows.",
+        "model": {
+          "rmse_ssh": 0.05000583454966545,
+          "rmse_u": 0.14485199749469757,
+          "rmse_v": 0.14296726882457733,
+          "rmse_uv": 0.14391271770000458,
+          "tau_uv": 0.9092925173601979,
+          "tau_div": -8.245399605032071,
+          "tau_vort": 0.3000710226429917,
+          "tau_curl": 0.3000710226429917,
+          "tau_strain": -0.6423957385068952,
+          "lambda_x_ssh_km": 56.09768749999999,
+          "lambda_x_ssh_min_ratio": 0.0005532334193050969,
+          "lambda_x_ssh_resolved": 1.0,
+          "lambda_x_uv_km": 64.72810096153846,
+          "lambda_x_uv_min_ratio": 0.0025007311064285604,
+          "lambda_x_uv_resolved": 1.0,
+          "lambda_t_uv_s": 283885.71428571426,
+          "lambda_t_uv_days": 3.2857142857142856
+        },
+        "geostrophic": {
+          "rmse_ssh": 0.05963534116744995,
+          "rmse_u": 0.19356749951839447,
+          "rmse_v": 0.1815425604581833,
+          "rmse_uv": 0.1876513808965683,
+          "tau_uv": 0.8457773156600269,
+          "tau_div": -0.0005519296024563136,
+          "tau_vort": 0.15724359757870343,
+          "tau_curl": 0.15724359757870343,
+          "tau_strain": -0.18412571166030478,
+          "lambda_x_ssh_km": 93.49614583333332,
+          "lambda_x_ssh_min_ratio": 0.000351138928102398,
+          "lambda_x_ssh_resolved": 1.0,
+          "lambda_x_uv_km": 76.49684659090907,
+          "lambda_x_uv_min_ratio": 0.003492113577835548,
+          "lambda_x_uv_resolved": 1.0
+        },
+        "provisional_batch_mean": {
+          "model": {
+            "rmse_ssh": 0.04875179975415054,
+            "rmse_u": 0.14259763223969418,
+            "rmse_v": 0.14191783494923427,
+            "rmse_uv": 0.14277964895186218,
+            "tau_uv": 0.9084018947326833,
+            "tau_div": -8.467296670390288,
+            "tau_vort": 0.29941035331704696,
+            "tau_curl": 0.29941035331704696,
+            "tau_strain": -0.6767907641485968,
+            "lambda_x_ssh_km": 65.6816789733408,
+            "lambda_x_ssh_min_ratio": 0.0005743881486792928,
+            "lambda_x_ssh_resolved": 1.0,
+            "lambda_x_uv_km": 62.13446052972578,
+            "lambda_x_uv_min_ratio": 0.002476158606615145,
+            "lambda_x_uv_resolved": 1.0
+          },
+          "geostrophic": {
+            "rmse_ssh": 0.05821923142218072,
+            "rmse_u": 0.19048229896503946,
+            "rmse_v": 0.17819018402825232,
+            "rmse_uv": 0.1852621993292933,
+            "tau_uv": 0.8455821679057741,
+            "tau_div": -0.001337080151228192,
+            "tau_vort": 0.15248485202559633,
+            "tau_curl": 0.15248485202559633,
+            "tau_strain": -0.1986136760719821,
+            "lambda_x_ssh_km": 94.02163778793667,
+            "lambda_x_ssh_min_ratio": 0.00036785800137457443,
+            "lambda_x_ssh_resolved": 1.0,
+            "lambda_x_uv_km": 77.57869401522395,
+            "lambda_x_uv_min_ratio": 0.003272371884221905,
+            "lambda_x_uv_resolved": 1.0
+          },
+          "note": "Mean of per-batch batch_metrics; not the primary Table path."
+        },
+        "lambda_t_note": "resolved_timescale on domain-mean UV series"
+      }
+    },
+    {
+      "name": "M1",
+      "exp_name": "M1-s1",
+      "seed": 1,
+      "train_ok": true,
+      "ckpt": "E:\\Projects\\20260522-4DVarNets-sea-current\\checkpoints\\4dvarnet-M1-s1-best.pt",
+      "r0_note": null,
+      "eval_ok": true,
+      "metrics": {
+        "ckpt": "E:\\Projects\\20260522-4DVarNets-sea-current\\checkpoints\\4dvarnet-M1-s1-best.pt",
+        "source": "natl60",
+        "crop_size": 96,
+        "max_samples": null,
+        "flags": {
+          "use_sst": true,
+          "use_sqg": true,
+          "use_adv": false,
+          "use_uncert": false
+        },
+        "seed": 1,
+        "git_commit_ckpt": "89f61b6",
+        "git_commit_eval": "89f61b6",
+        "ckpt_epoch": 15,
+        "physics_scales": {
+          "dx": 4382.6318359375,
+          "dy": 5559.7470703125,
+          "f0": 8.96254787221551e-05
+        },
+        "geostrophic_baseline": "oi_only",
+        "geostrophic_tau_uv_sane": true,
+        "metrics_aggregation": "full_test_pooled",
+        "protocol_note": "crop/max_samples metrics are post_p0 directional evidence on limited VRAM; not full-grid JAMES Table rows.",
+        "model": {
+          "rmse_ssh": 0.05032048746943474,
+          "rmse_u": 0.13648194074630737,
+          "rmse_v": 0.13740774989128113,
+          "rmse_uv": 0.13694563508033752,
+          "tau_uv": 0.9178625671177666,
+          "tau_div": -6.179637337779342,
+          "tau_vort": 0.415984485379541,
+          "tau_curl": 0.415984485379541,
+          "tau_strain": -0.6320913027889208,
+          "lambda_x_ssh_km": 76.49684659090907,
+          "lambda_x_ssh_min_ratio": 0.0005348939806977203,
+          "lambda_x_ssh_resolved": 1.0,
+          "lambda_x_uv_km": 64.72810096153846,
+          "lambda_x_uv_min_ratio": 0.0033970626778431624,
+          "lambda_x_uv_resolved": 1.0,
+          "lambda_t_uv_s": 209178.9473684211,
+          "lambda_t_uv_days": 2.421052631578948
+        },
+        "geostrophic": {
+          "rmse_ssh": 0.05963534116744995,
+          "rmse_u": 0.19356749951839447,
+          "rmse_v": 0.1815425604581833,
+          "rmse_uv": 0.1876513808965683,
+          "tau_uv": 0.8457773156600269,
+          "tau_div": -0.0005519296024563136,
+          "tau_vort": 0.15724359757870343,
+          "tau_curl": 0.15724359757870343,
+          "tau_strain": -0.18412571166030478,
+          "lambda_x_ssh_km": 93.49614583333332,
+          "lambda_x_ssh_min_ratio": 0.000351138928102398,
+          "lambda_x_ssh_resolved": 1.0,
+          "lambda_x_uv_km": 76.49684659090907,
+          "lambda_x_uv_min_ratio": 0.003492113577835548,
+          "lambda_x_uv_resolved": 1.0
+        },
+        "provisional_batch_mean": {
+          "model": {
+            "rmse_ssh": 0.04888544660871443,
+            "rmse_u": 0.13445892460320308,
+            "rmse_v": 0.1359691436847915,
+            "rmse_uv": 0.13570509575631307,
+            "tau_uv": 0.9173816350680362,
+            "tau_div": -6.335451502093107,
+            "tau_vort": 0.4093941947223697,
+            "tau_curl": 0.4093941947223697,
+            "tau_strain": -0.6774565959602691,
+            "lambda_x_ssh_km": 71.20709809361566,
+            "lambda_x_ssh_min_ratio": 0.0005346476918654435,
+            "lambda_x_ssh_resolved": 1.0,
+            "lambda_x_uv_km": 52.32692348692134,
+            "lambda_x_uv_min_ratio": 0.003246651590181287,
+            "lambda_x_uv_resolved": 1.0
+          },
+          "geostrophic": {
+            "rmse_ssh": 0.05821923142218072,
+            "rmse_u": 0.19048229896503946,
+            "rmse_v": 0.17819018402825232,
+            "rmse_uv": 0.1852621993292933,
+            "tau_uv": 0.8455821679057741,
+            "tau_div": -0.001337080151228192,
+            "tau_vort": 0.15248485202559633,
+            "tau_curl": 0.15248485202559633,
+            "tau_strain": -0.1986136760719821,
+            "lambda_x_ssh_km": 94.02163778793667,
+            "lambda_x_ssh_min_ratio": 0.00036785800137457443,
+            "lambda_x_ssh_resolved": 1.0,
+            "lambda_x_uv_km": 77.57869401522395,
+            "lambda_x_uv_min_ratio": 0.003272371884221905,
+            "lambda_x_uv_resolved": 1.0
+          },
+          "note": "Mean of per-batch batch_metrics; not the primary Table path."
+        },
+        "lambda_t_note": "resolved_timescale on domain-mean UV series"
+      }
+    },
+    {
+      "name": "M1",
+      "exp_name": "M1-s2",
+      "seed": 2,
+      "train_ok": true,
+      "ckpt": "E:\\Projects\\20260522-4DVarNets-sea-current\\checkpoints\\4dvarnet-M1-s2-best.pt",
+      "r0_note": null,
+      "eval_ok": true,
+      "metrics": {
+        "ckpt": "E:\\Projects\\20260522-4DVarNets-sea-current\\checkpoints\\4dvarnet-M1-s2-best.pt",
+        "source": "natl60",
+        "crop_size": 96,
+        "max_samples": null,
+        "flags": {
+          "use_sst": true,
+          "use_sqg": true,
+          "use_adv": false,
+          "use_uncert": false
+        },
+        "seed": 2,
+        "git_commit_ckpt": "89f61b6",
+        "git_commit_eval": "89f61b6",
+        "ckpt_epoch": 14,
+        "physics_scales": {
+          "dx": 4382.6318359375,
+          "dy": 5559.7470703125,
+          "f0": 8.96254787221551e-05
+        },
+        "geostrophic_baseline": "oi_only",
+        "geostrophic_tau_uv_sane": true,
+        "metrics_aggregation": "full_test_pooled",
+        "protocol_note": "crop/max_samples metrics are post_p0 directional evidence on limited VRAM; not full-grid JAMES Table rows.",
+        "model": {
+          "rmse_ssh": 0.04665297642350197,
+          "rmse_u": 0.1365848034620285,
+          "rmse_v": 0.13474932312965393,
+          "rmse_uv": 0.13567017018795013,
+          "tau_uv": 0.9193854390096154,
+          "tau_div": -5.636055843786159,
+          "tau_vort": 0.45872255363485226,
+          "tau_curl": 0.45872255363485226,
+          "tau_strain": -0.3972274287751769,
+          "lambda_x_ssh_km": 56.09768749999999,
+          "lambda_x_ssh_min_ratio": 0.00039286814315776954,
+          "lambda_x_ssh_resolved": 1.0,
+          "lambda_x_uv_km": 64.72810096153846,
+          "lambda_x_uv_min_ratio": 0.0040644538278887055,
+          "lambda_x_uv_resolved": 1.0,
+          "lambda_t_uv_s": 1987200.0000000002,
+          "lambda_t_uv_days": 23.000000000000004
+        },
+        "geostrophic": {
+          "rmse_ssh": 0.05963534116744995,
+          "rmse_u": 0.19356749951839447,
+          "rmse_v": 0.1815425604581833,
+          "rmse_uv": 0.1876513808965683,
+          "tau_uv": 0.8457773156600269,
+          "tau_div": -0.0005519296024563136,
+          "tau_vort": 0.15724359757870343,
+          "tau_curl": 0.15724359757870343,
+          "tau_strain": -0.18412571166030478,
+          "lambda_x_ssh_km": 93.49614583333332,
+          "lambda_x_ssh_min_ratio": 0.000351138928102398,
+          "lambda_x_ssh_resolved": 1.0,
+          "lambda_x_uv_km": 76.49684659090907,
+          "lambda_x_uv_min_ratio": 0.003492113577835548,
+          "lambda_x_uv_resolved": 1.0
+        },
+        "provisional_batch_mean": {
+          "model": {
+            "rmse_ssh": 0.045592457703922104,
+            "rmse_u": 0.13462468220487886,
+            "rmse_v": 0.13376153406241667,
+            "rmse_uv": 0.1347742168151814,
+            "tau_uv": 0.9186064412640667,
+            "tau_div": -5.807726606838663,
+            "tau_vort": 0.45480437051643624,
+            "tau_curl": 0.45480437051643624,
+            "tau_strain": -0.4287142099806294,
+            "lambda_x_ssh_km": 60.50278164111372,
+            "lambda_x_ssh_min_ratio": 0.00038483380180640616,
+            "lambda_x_ssh_resolved": 1.0,
+            "lambda_x_uv_km": 52.76888239042592,
+            "lambda_x_uv_min_ratio": 0.003787072059187279,
+            "lambda_x_uv_resolved": 1.0
+          },
+          "geostrophic": {
+            "rmse_ssh": 0.05821923142218072,
+            "rmse_u": 0.19048229896503946,
+            "rmse_v": 0.17819018402825232,
+            "rmse_uv": 0.1852621993292933,
+            "tau_uv": 0.8455821679057741,
+            "tau_div": -0.001337080151228192,
+            "tau_vort": 0.15248485202559633,
+            "tau_curl": 0.15248485202559633,
+            "tau_strain": -0.1986136760719821,
+            "lambda_x_ssh_km": 94.02163778793667,
+            "lambda_x_ssh_min_ratio": 0.00036785800137457443,
+            "lambda_x_ssh_resolved": 1.0,
+            "lambda_x_uv_km": 77.57869401522395,
+            "lambda_x_uv_min_ratio": 0.003272371884221905,
+            "lambda_x_uv_resolved": 1.0
+          },
+          "note": "Mean of per-batch batch_metrics; not the primary Table path."
+        },
+        "lambda_t_note": "resolved_timescale on domain-mean UV series"
+      }
+    },
+    {
+      "name": "M2",
+      "exp_name": "M2-s0",
+      "seed": 0,
+      "train_ok": true,
+      "ckpt": "E:\\Projects\\20260522-4DVarNets-sea-current\\checkpoints\\4dvarnet-M2-s0-best.pt",
+      "r0_note": null,
+      "eval_ok": true,
+      "metrics": {
+        "ckpt": "E:\\Projects\\20260522-4DVarNets-sea-current\\checkpoints\\4dvarnet-M2-s0-best.pt",
+        "source": "natl60",
+        "crop_size": 96,
+        "max_samples": null,
+        "flags": {
+          "use_sst": true,
+          "use_sqg": false,
+          "use_adv": true,
+          "use_uncert": false
+        },
+        "seed": 0,
+        "git_commit_ckpt": "89f61b6",
+        "git_commit_eval": "89f61b6",
+        "ckpt_epoch": 13,
+        "physics_scales": {
+          "dx": 4382.6318359375,
+          "dy": 5559.7470703125,
+          "f0": 8.96254787221551e-05
+        },
+        "geostrophic_baseline": "oi_only",
+        "geostrophic_tau_uv_sane": true,
+        "metrics_aggregation": "full_test_pooled",
+        "protocol_note": "crop/max_samples metrics are post_p0 directional evidence on limited VRAM; not full-grid JAMES Table rows.",
+        "model": {
+          "rmse_ssh": 0.058558933436870575,
+          "rmse_u": 0.18016532063484192,
+          "rmse_v": 0.1699051409959793,
+          "rmse_uv": 0.17511039972305298,
+          "tau_uv": 0.8657022795730307,
+          "tau_div": -3.455139468049972,
+          "tau_vort": 0.37492200562722433,
+          "tau_curl": 0.37492200562722433,
+          "tau_strain": -0.0591745505632113,
+          "lambda_x_ssh_km": 93.49614583333332,
+          "lambda_x_ssh_min_ratio": 0.0003991704634707153,
+          "lambda_x_ssh_resolved": 1.0,
+          "lambda_x_uv_km": 76.49684659090907,
+          "lambda_x_uv_min_ratio": 0.0038671478401216004,
+          "lambda_x_uv_resolved": 1.0,
+          "lambda_t_uv_s": 209178.9473684211,
+          "lambda_t_uv_days": 2.421052631578948
+        },
+        "geostrophic": {
+          "rmse_ssh": 0.05963534116744995,
+          "rmse_u": 0.19356749951839447,
+          "rmse_v": 0.1815425604581833,
+          "rmse_uv": 0.1876513808965683,
+          "tau_uv": 0.8457773156600269,
+          "tau_div": -0.0005519296024563136,
+          "tau_vort": 0.15724359757870343,
+          "tau_curl": 0.15724359757870343,
+          "tau_strain": -0.18412571166030478,
+          "lambda_x_ssh_km": 93.49614583333332,
+          "lambda_x_ssh_min_ratio": 0.000351138928102398,
+          "lambda_x_ssh_resolved": 1.0,
+          "lambda_x_uv_km": 76.49684659090907,
+          "lambda_x_uv_min_ratio": 0.003492113577835548,
+          "lambda_x_uv_resolved": 1.0
+        },
+        "provisional_batch_mean": {
+          "model": {
+            "rmse_ssh": 0.05680380704934183,
+            "rmse_u": 0.17684823307006256,
+            "rmse_v": 0.1661187708377838,
+            "rmse_uv": 0.1723554796822693,
+            "tau_uv": 0.8657856927375159,
+            "tau_div": -3.5037818299189967,
+            "tau_vort": 0.3694383525998493,
+            "tau_curl": 0.3694383525998493,
+            "tau_strain": -0.07397825856958805,
+            "lambda_x_ssh_km": 88.32058278667193,
+            "lambda_x_ssh_min_ratio": 0.0004354810383451258,
+            "lambda_x_ssh_resolved": 1.0,
+            "lambda_x_uv_km": 74.48270815850195,
+            "lambda_x_uv_min_ratio": 0.003820433421331426,
+            "lambda_x_uv_resolved": 1.0
+          },
+          "geostrophic": {
+            "rmse_ssh": 0.05821923142218072,
+            "rmse_u": 0.19048229896503946,
+            "rmse_v": 0.17819018402825232,
+            "rmse_uv": 0.1852621993292933,
+            "tau_uv": 0.8455821679057741,
+            "tau_div": -0.001337080151228192,
+            "tau_vort": 0.15248485202559633,
+            "tau_curl": 0.15248485202559633,
+            "tau_strain": -0.1986136760719821,
+            "lambda_x_ssh_km": 94.02163778793667,
+            "lambda_x_ssh_min_ratio": 0.00036785800137457443,
+            "lambda_x_ssh_resolved": 1.0,
+            "lambda_x_uv_km": 77.57869401522395,
+            "lambda_x_uv_min_ratio": 0.003272371884221905,
+            "lambda_x_uv_resolved": 1.0
+          },
+          "note": "Mean of per-batch batch_metrics; not the primary Table path."
+        },
+        "lambda_t_note": "resolved_timescale on domain-mean UV series"
+      }
+    },
+    {
+      "name": "M2",
+      "exp_name": "M2-s1",
+      "seed": 1,
+      "train_ok": true,
+      "ckpt": "E:\\Projects\\20260522-4DVarNets-sea-current\\checkpoints\\4dvarnet-M2-s1-best.pt",
+      "r0_note": null,
+      "eval_ok": true,
+      "metrics": {
+        "ckpt": "E:\\Projects\\20260522-4DVarNets-sea-current\\checkpoints\\4dvarnet-M2-s1-best.pt",
+        "source": "natl60",
+        "crop_size": 96,
+        "max_samples": null,
+        "flags": {
+          "use_sst": true,
+          "use_sqg": false,
+          "use_adv": true,
+          "use_uncert": false
+        },
+        "seed": 1,
+        "git_commit_ckpt": "89f61b6",
+        "git_commit_eval": "89f61b6",
+        "ckpt_epoch": 15,
+        "physics_scales": {
+          "dx": 4382.6318359375,
+          "dy": 5559.7470703125,
+          "f0": 8.96254787221551e-05
+        },
+        "geostrophic_baseline": "oi_only",
+        "geostrophic_tau_uv_sane": true,
+        "metrics_aggregation": "full_test_pooled",
+        "protocol_note": "crop/max_samples metrics are post_p0 directional evidence on limited VRAM; not full-grid JAMES Table rows.",
+        "model": {
+          "rmse_ssh": 0.05813460052013397,
+          "rmse_u": 0.17913749814033508,
+          "rmse_v": 0.17293627560138702,
+          "rmse_uv": 0.17606419324874878,
+          "tau_uv": 0.8642353133202294,
+          "tau_div": -10.197858195666415,
+          "tau_vort": 0.26708785803540813,
+          "tau_curl": 0.26708785803540813,
+          "tau_strain": -0.4243669444990341,
+          "lambda_x_ssh_km": 93.49614583333332,
+          "lambda_x_ssh_min_ratio": 0.0005333358129143239,
+          "lambda_x_ssh_resolved": 1.0,
+          "lambda_x_uv_km": 76.49684659090907,
+          "lambda_x_uv_min_ratio": 0.003775789777411685,
+          "lambda_x_uv_resolved": 1.0,
+          "lambda_t_uv_s": 189257.1428571429,
+          "lambda_t_uv_days": 2.190476190476191
+        },
+        "geostrophic": {
+          "rmse_ssh": 0.05963534116744995,
+          "rmse_u": 0.19356749951839447,
+          "rmse_v": 0.1815425604581833,
+          "rmse_uv": 0.1876513808965683,
+          "tau_uv": 0.8457773156600269,
+          "tau_div": -0.0005519296024563136,
+          "tau_vort": 0.15724359757870343,
+          "tau_curl": 0.15724359757870343,
+          "tau_strain": -0.18412571166030478,
+          "lambda_x_ssh_km": 93.49614583333332,
+          "lambda_x_ssh_min_ratio": 0.000351138928102398,
+          "lambda_x_ssh_resolved": 1.0,
+          "lambda_x_uv_km": 76.49684659090907,
+          "lambda_x_uv_min_ratio": 0.003492113577835548,
+          "lambda_x_uv_resolved": 1.0
+        },
+        "provisional_batch_mean": {
+          "model": {
+            "rmse_ssh": 0.05674394867990328,
+            "rmse_u": 0.17562808614710104,
+            "rmse_v": 0.16945054025753684,
+            "rmse_uv": 0.17329466683061226,
+            "tau_uv": 0.863753385012973,
+            "tau_div": -10.488733890083196,
+            "tau_vort": 0.25369193826996045,
+            "tau_curl": 0.25369193826996045,
+            "tau_strain": -0.47676228575086144,
+            "lambda_x_ssh_km": 83.43297779440461,
+            "lambda_x_ssh_min_ratio": 0.0005717773237708958,
+            "lambda_x_ssh_resolved": 1.0,
+            "lambda_x_uv_km": 72.86502306045406,
+            "lambda_x_uv_min_ratio": 0.0036629177937271165,
+            "lambda_x_uv_resolved": 1.0
+          },
+          "geostrophic": {
+            "rmse_ssh": 0.05821923142218072,
+            "rmse_u": 0.19048229896503946,
+            "rmse_v": 0.17819018402825232,
+            "rmse_uv": 0.1852621993292933,
+            "tau_uv": 0.8455821679057741,
+            "tau_div": -0.001337080151228192,
+            "tau_vort": 0.15248485202559633,
+            "tau_curl": 0.15248485202559633,
+            "tau_strain": -0.1986136760719821,
+            "lambda_x_ssh_km": 94.02163778793667,
+            "lambda_x_ssh_min_ratio": 0.00036785800137457443,
+            "lambda_x_ssh_resolved": 1.0,
+            "lambda_x_uv_km": 77.57869401522395,
+            "lambda_x_uv_min_ratio": 0.003272371884221905,
+            "lambda_x_uv_resolved": 1.0
+          },
+          "note": "Mean of per-batch batch_metrics; not the primary Table path."
+        },
+        "lambda_t_note": "resolved_timescale on domain-mean UV series"
+      }
+    },
+    {
+      "name": "M2",
+      "exp_name": "M2-s2",
+      "seed": 2,
+      "train_ok": true,
+      "ckpt": "E:\\Projects\\20260522-4DVarNets-sea-current\\checkpoints\\4dvarnet-M2-s2-best.pt",
+      "r0_note": null,
+      "eval_ok": true,
+      "metrics": {
+        "ckpt": "E:\\Projects\\20260522-4DVarNets-sea-current\\checkpoints\\4dvarnet-M2-s2-best.pt",
+        "source": "natl60",
+        "crop_size": 96,
+        "max_samples": null,
+        "flags": {
+          "use_sst": true,
+          "use_sqg": false,
+          "use_adv": true,
+          "use_uncert": false
+        },
+        "seed": 2,
+        "git_commit_ckpt": "89f61b6",
+        "git_commit_eval": "89f61b6",
+        "ckpt_epoch": 12,
+        "physics_scales": {
+          "dx": 4382.6318359375,
+          "dy": 5559.7470703125,
+          "f0": 8.96254787221551e-05
+        },
+        "geostrophic_baseline": "oi_only",
+        "geostrophic_tau_uv_sane": true,
+        "metrics_aggregation": "full_test_pooled",
+        "protocol_note": "crop/max_samples metrics are post_p0 directional evidence on limited VRAM; not full-grid JAMES Table rows.",
+        "model": {
+          "rmse_ssh": 0.052590034902095795,
+          "rmse_u": 0.1527172476053238,
+          "rmse_v": 0.13546253740787506,
+          "rmse_uv": 0.1443479359149933,
+          "tau_uv": 0.9087430545829605,
+          "tau_div": -3.1881723413726792,
+          "tau_vort": 0.5645037196403417,
+          "tau_curl": 0.5645037196403417,
+          "tau_strain": 0.23073741361274558,
+          "lambda_x_ssh_km": 56.09768749999999,
+          "lambda_x_ssh_min_ratio": 0.0003568620659728285,
+          "lambda_x_ssh_resolved": 1.0,
+          "lambda_x_uv_km": 64.72810096153846,
+          "lambda_x_uv_min_ratio": 0.002394773994541898,
+          "lambda_x_uv_resolved": 1.0,
+          "lambda_t_uv_s": 220800.0,
+          "lambda_t_uv_days": 2.5555555555555554
+        },
+        "geostrophic": {
+          "rmse_ssh": 0.05963534116744995,
+          "rmse_u": 0.19356749951839447,
+          "rmse_v": 0.1815425604581833,
+          "rmse_uv": 0.1876513808965683,
+          "tau_uv": 0.8457773156600269,
+          "tau_div": -0.0005519296024563136,
+          "tau_vort": 0.15724359757870343,
+          "tau_curl": 0.15724359757870343,
+          "tau_strain": -0.18412571166030478,
+          "lambda_x_ssh_km": 93.49614583333332,
+          "lambda_x_ssh_min_ratio": 0.000351138928102398,
+          "lambda_x_ssh_resolved": 1.0,
+          "lambda_x_uv_km": 76.49684659090907,
+          "lambda_x_uv_min_ratio": 0.003492113577835548,
+          "lambda_x_uv_resolved": 1.0
+        },
+        "provisional_batch_mean": {
+          "model": {
+            "rmse_ssh": 0.051430832837586815,
+            "rmse_u": 0.15008284216341766,
+            "rmse_v": 0.13360183232504388,
+            "rmse_uv": 0.14252236728434978,
+            "tau_uv": 0.9080780698894627,
+            "tau_div": -3.306424502547543,
+            "tau_vort": 0.5584866604585976,
+            "tau_curl": 0.5584866604585976,
+            "tau_strain": 0.2091126949692546,
+            "lambda_x_ssh_km": 62.59776274389465,
+            "lambda_x_ssh_min_ratio": 0.00034878186080566746,
+            "lambda_x_ssh_resolved": 1.0,
+            "lambda_x_uv_km": 56.20527452928753,
+            "lambda_x_uv_min_ratio": 0.002412752224528016,
+            "lambda_x_uv_resolved": 1.0
+          },
+          "geostrophic": {
+            "rmse_ssh": 0.05821923142218072,
+            "rmse_u": 0.19048229896503946,
+            "rmse_v": 0.17819018402825232,
+            "rmse_uv": 0.1852621993292933,
+            "tau_uv": 0.8455821679057741,
+            "tau_div": -0.001337080151228192,
+            "tau_vort": 0.15248485202559633,
+            "tau_curl": 0.15248485202559633,
+            "tau_strain": -0.1986136760719821,
+            "lambda_x_ssh_km": 94.02163778793667,
+            "lambda_x_ssh_min_ratio": 0.00036785800137457443,
+            "lambda_x_ssh_resolved": 1.0,
+            "lambda_x_uv_km": 77.57869401522395,
+            "lambda_x_uv_min_ratio": 0.003272371884221905,
+            "lambda_x_uv_resolved": 1.0
+          },
+          "note": "Mean of per-batch batch_metrics; not the primary Table path."
+        },
+        "lambda_t_note": "resolved_timescale on domain-mean UV series"
+      }
+    },
+    {
+      "name": "M3",
+      "exp_name": "M3-s0",
+      "seed": 0,
+      "train_ok": true,
+      "ckpt": "E:\\Projects\\20260522-4DVarNets-sea-current\\checkpoints\\4dvarnet-M3-s0-best.pt",
+      "r0_note": null,
+      "eval_ok": true,
+      "metrics": {
+        "ckpt": "E:\\Projects\\20260522-4DVarNets-sea-current\\checkpoints\\4dvarnet-M3-s0-best.pt",
+        "source": "natl60",
+        "crop_size": 96,
+        "max_samples": null,
+        "flags": {
+          "use_sst": true,
+          "use_sqg": true,
+          "use_adv": true,
+          "use_uncert": false
+        },
+        "seed": 0,
+        "git_commit_ckpt": "89f61b6",
+        "git_commit_eval": "89f61b6",
+        "ckpt_epoch": 13,
+        "physics_scales": {
+          "dx": 4382.6318359375,
+          "dy": 5559.7470703125,
+          "f0": 8.96254787221551e-05
+        },
+        "geostrophic_baseline": "oi_only",
+        "geostrophic_tau_uv_sane": true,
+        "metrics_aggregation": "full_test_pooled",
+        "protocol_note": "crop/max_samples metrics are post_p0 directional evidence on limited VRAM; not full-grid JAMES Table rows.",
+        "model": {
+          "rmse_ssh": 0.050002433359622955,
+          "rmse_u": 0.14475975930690765,
+          "rmse_v": 0.14393769204616547,
+          "rmse_uv": 0.14434930682182312,
+          "tau_uv": 0.9087413169642362,
+          "tau_div": -8.677917896282715,
+          "tau_vort": 0.27925776888033427,
+          "tau_curl": 0.27925776888033427,
+          "tau_strain": -0.6886599590682656,
+          "lambda_x_ssh_km": 93.49614583333332,
+          "lambda_x_ssh_min_ratio": 0.0005765259937214682,
+          "lambda_x_ssh_resolved": 1.0,
+          "lambda_x_uv_km": 64.72810096153846,
+          "lambda_x_uv_min_ratio": 0.00276807224856521,
+          "lambda_x_uv_resolved": 1.0,
+          "lambda_t_uv_s": 1987200.0000000002,
+          "lambda_t_uv_days": 23.000000000000004
+        },
+        "geostrophic": {
+          "rmse_ssh": 0.05963534116744995,
+          "rmse_u": 0.19356749951839447,
+          "rmse_v": 0.1815425604581833,
+          "rmse_uv": 0.1876513808965683,
+          "tau_uv": 0.8457773156600269,
+          "tau_div": -0.0005519296024563136,
+          "tau_vort": 0.15724359757870343,
+          "tau_curl": 0.15724359757870343,
+          "tau_strain": -0.18412571166030478,
+          "lambda_x_ssh_km": 93.49614583333332,
+          "lambda_x_ssh_min_ratio": 0.000351138928102398,
+          "lambda_x_ssh_resolved": 1.0,
+          "lambda_x_uv_km": 76.49684659090907,
+          "lambda_x_uv_min_ratio": 0.003492113577835548,
+          "lambda_x_uv_resolved": 1.0
+        },
+        "provisional_batch_mean": {
+          "model": {
+            "rmse_ssh": 0.04870719794669877,
+            "rmse_u": 0.1425895543526048,
+            "rmse_v": 0.14297557265862174,
+            "rmse_uv": 0.14328043843093125,
+            "tau_uv": 0.907806429671792,
+            "tau_div": -8.911896761360794,
+            "tau_vort": 0.28013204544037423,
+            "tau_curl": 0.28013204544037423,
+            "tau_strain": -0.720218846449506,
+            "lambda_x_ssh_km": 68.6717511025313,
+            "lambda_x_ssh_min_ratio": 0.0005938259071928733,
+            "lambda_x_ssh_resolved": 1.0,
+            "lambda_x_uv_km": 63.56338713271216,
+            "lambda_x_uv_min_ratio": 0.002691322772021285,
+            "lambda_x_uv_resolved": 1.0
+          },
+          "geostrophic": {
+            "rmse_ssh": 0.05821923142218072,
+            "rmse_u": 0.19048229896503946,
+            "rmse_v": 0.17819018402825232,
+            "rmse_uv": 0.1852621993292933,
+            "tau_uv": 0.8455821679057741,
+            "tau_div": -0.001337080151228192,
+            "tau_vort": 0.15248485202559633,
+            "tau_curl": 0.15248485202559633,
+            "tau_strain": -0.1986136760719821,
+            "lambda_x_ssh_km": 94.02163778793667,
+            "lambda_x_ssh_min_ratio": 0.00036785800137457443,
+            "lambda_x_ssh_resolved": 1.0,
+            "lambda_x_uv_km": 77.57869401522395,
+            "lambda_x_uv_min_ratio": 0.003272371884221905,
+            "lambda_x_uv_resolved": 1.0
+          },
+          "note": "Mean of per-batch batch_metrics; not the primary Table path."
+        },
+        "lambda_t_note": "resolved_timescale on domain-mean UV series"
+      }
+    },
+    {
+      "name": "M3",
+      "exp_name": "M3-s1",
+      "seed": 1,
+      "train_ok": true,
+      "ckpt": "E:\\Projects\\20260522-4DVarNets-sea-current\\checkpoints\\4dvarnet-M3-s1-best.pt",
+      "r0_note": null,
+      "eval_ok": true,
+      "metrics": {
+        "ckpt": "E:\\Projects\\20260522-4DVarNets-sea-current\\checkpoints\\4dvarnet-M3-s1-best.pt",
+        "source": "natl60",
+        "crop_size": 96,
+        "max_samples": null,
+        "flags": {
+          "use_sst": true,
+          "use_sqg": true,
+          "use_adv": true,
+          "use_uncert": false
+        },
+        "seed": 1,
+        "git_commit_ckpt": "89f61b6",
+        "git_commit_eval": "89f61b6",
+        "ckpt_epoch": 15,
+        "physics_scales": {
+          "dx": 4382.6318359375,
+          "dy": 5559.7470703125,
+          "f0": 8.96254787221551e-05
+        },
+        "geostrophic_baseline": "oi_only",
+        "geostrophic_tau_uv_sane": true,
+        "metrics_aggregation": "full_test_pooled",
+        "protocol_note": "crop/max_samples metrics are post_p0 directional evidence on limited VRAM; not full-grid JAMES Table rows.",
+        "model": {
+          "rmse_ssh": 0.05113920941948891,
+          "rmse_u": 0.13766264915466309,
+          "rmse_v": 0.13662941753864288,
+          "rmse_uv": 0.13714699447155,
+          "tau_uv": 0.9176208423270739,
+          "tau_div": -6.191557807759808,
+          "tau_vort": 0.41099207418157824,
+          "tau_curl": 0.41099207418157824,
+          "tau_strain": -0.638550531394066,
+          "lambda_x_ssh_km": 76.49684659090907,
+          "lambda_x_ssh_min_ratio": 0.0005345655751275705,
+          "lambda_x_ssh_resolved": 1.0,
+          "lambda_x_uv_km": 64.72810096153846,
+          "lambda_x_uv_min_ratio": 0.003386988274915898,
+          "lambda_x_uv_resolved": 1.0,
+          "lambda_t_uv_s": 220800.0,
+          "lambda_t_uv_days": 2.5555555555555554
+        },
+        "geostrophic": {
+          "rmse_ssh": 0.05963534116744995,
+          "rmse_u": 0.19356749951839447,
+          "rmse_v": 0.1815425604581833,
+          "rmse_uv": 0.1876513808965683,
+          "tau_uv": 0.8457773156600269,
+          "tau_div": -0.0005519296024563136,
+          "tau_vort": 0.15724359757870343,
+          "tau_curl": 0.15724359757870343,
+          "tau_strain": -0.18412571166030478,
+          "lambda_x_ssh_km": 93.49614583333332,
+          "lambda_x_ssh_min_ratio": 0.000351138928102398,
+          "lambda_x_ssh_resolved": 1.0,
+          "lambda_x_uv_km": 76.49684659090907,
+          "lambda_x_uv_min_ratio": 0.003492113577835548,
+          "lambda_x_uv_resolved": 1.0
+        },
+        "provisional_batch_mean": {
+          "model": {
+            "rmse_ssh": 0.0496418425489379,
+            "rmse_u": 0.13557259738445282,
+            "rmse_v": 0.13518804975825807,
+            "rmse_uv": 0.13586404952018158,
+            "tau_uv": 0.9171623638438843,
+            "tau_div": -6.34754324509328,
+            "tau_vort": 0.40407355207674334,
+            "tau_curl": 0.40407355207674334,
+            "tau_strain": -0.684031778376108,
+            "lambda_x_ssh_km": 71.9759627199846,
+            "lambda_x_ssh_min_ratio": 0.000535892844786514,
+            "lambda_x_ssh_resolved": 1.0,
+            "lambda_x_uv_km": 52.18434883264172,
+            "lambda_x_uv_min_ratio": 0.003249784061939939,
+            "lambda_x_uv_resolved": 1.0
+          },
+          "geostrophic": {
+            "rmse_ssh": 0.05821923142218072,
+            "rmse_u": 0.19048229896503946,
+            "rmse_v": 0.17819018402825232,
+            "rmse_uv": 0.1852621993292933,
+            "tau_uv": 0.8455821679057741,
+            "tau_div": -0.001337080151228192,
+            "tau_vort": 0.15248485202559633,
+            "tau_curl": 0.15248485202559633,
+            "tau_strain": -0.1986136760719821,
+            "lambda_x_ssh_km": 94.02163778793667,
+            "lambda_x_ssh_min_ratio": 0.00036785800137457443,
+            "lambda_x_ssh_resolved": 1.0,
+            "lambda_x_uv_km": 77.57869401522395,
+            "lambda_x_uv_min_ratio": 0.003272371884221905,
+            "lambda_x_uv_resolved": 1.0
+          },
+          "note": "Mean of per-batch batch_metrics; not the primary Table path."
+        },
+        "lambda_t_note": "resolved_timescale on domain-mean UV series"
+      }
+    },
+    {
+      "name": "M3",
+      "exp_name": "M3-s2",
+      "seed": 2,
+      "train_ok": true,
+      "ckpt": "E:\\Projects\\20260522-4DVarNets-sea-current\\checkpoints\\4dvarnet-M3-s2-best.pt",
+      "r0_note": null,
+      "eval_ok": true,
+      "metrics": {
+        "ckpt": "E:\\Projects\\20260522-4DVarNets-sea-current\\checkpoints\\4dvarnet-M3-s2-best.pt",
+        "source": "natl60",
+        "crop_size": 96,
+        "max_samples": null,
+        "flags": {
+          "use_sst": true,
+          "use_sqg": true,
+          "use_adv": true,
+          "use_uncert": false
+        },
+        "seed": 2,
+        "git_commit_ckpt": "89f61b6",
+        "git_commit_eval": "89f61b6",
+        "ckpt_epoch": 15,
+        "physics_scales": {
+          "dx": 4382.6318359375,
+          "dy": 5559.7470703125,
+          "f0": 8.96254787221551e-05
+        },
+        "geostrophic_baseline": "oi_only",
+        "geostrophic_tau_uv_sane": true,
+        "metrics_aggregation": "full_test_pooled",
+        "protocol_note": "crop/max_samples metrics are post_p0 directional evidence on limited VRAM; not full-grid JAMES Table rows.",
+        "model": {
+          "rmse_ssh": 0.048908818513154984,
+          "rmse_u": 0.1459767371416092,
+          "rmse_v": 0.1313944309949875,
+          "rmse_uv": 0.13887712359428406,
+          "tau_uv": 0.9155292796423397,
+          "tau_div": -5.442099139079268,
+          "tau_vort": 0.45648750606688826,
+          "tau_curl": 0.45648750606688826,
+          "tau_strain": -0.3741860146824072,
+          "lambda_x_ssh_km": 76.49684659090907,
+          "lambda_x_ssh_min_ratio": 0.0007932732453675769,
+          "lambda_x_ssh_resolved": 1.0,
+          "lambda_x_uv_km": 64.72810096153846,
+          "lambda_x_uv_min_ratio": 0.0031412679154223834,
+          "lambda_x_uv_resolved": 1.0,
+          "lambda_t_uv_s": 1987200.0000000002,
+          "lambda_t_uv_days": 23.000000000000004
+        },
+        "geostrophic": {
+          "rmse_ssh": 0.05963534116744995,
+          "rmse_u": 0.19356749951839447,
+          "rmse_v": 0.1815425604581833,
+          "rmse_uv": 0.1876513808965683,
+          "tau_uv": 0.8457773156600269,
+          "tau_div": -0.0005519296024563136,
+          "tau_vort": 0.15724359757870343,
+          "tau_curl": 0.15724359757870343,
+          "tau_strain": -0.18412571166030478,
+          "lambda_x_ssh_km": 93.49614583333332,
+          "lambda_x_ssh_min_ratio": 0.000351138928102398,
+          "lambda_x_ssh_resolved": 1.0,
+          "lambda_x_uv_km": 76.49684659090907,
+          "lambda_x_uv_min_ratio": 0.003492113577835548,
+          "lambda_x_uv_resolved": 1.0
+        },
+        "provisional_batch_mean": {
+          "model": {
+            "rmse_ssh": 0.04784305705486432,
+            "rmse_u": 0.14357350475114325,
+            "rmse_v": 0.13001590643240057,
+            "rmse_uv": 0.13751919211252875,
+            "tau_uv": 0.9148369833626914,
+            "tau_div": -5.620008203930291,
+            "tau_vort": 0.45136359033714024,
+            "tau_curl": 0.45136359033714024,
+            "tau_strain": -0.4070254351112982,
+            "lambda_x_ssh_km": 68.55681128864909,
+            "lambda_x_ssh_min_ratio": 0.0008487783275798465,
+            "lambda_x_ssh_resolved": 1.0,
+            "lambda_x_uv_km": 53.20307823530884,
+            "lambda_x_uv_min_ratio": 0.0030818071283530628,
+            "lambda_x_uv_resolved": 1.0
+          },
+          "geostrophic": {
+            "rmse_ssh": 0.05821923142218072,
+            "rmse_u": 0.19048229896503946,
+            "rmse_v": 0.17819018402825232,
+            "rmse_uv": 0.1852621993292933,
+            "tau_uv": 0.8455821679057741,
+            "tau_div": -0.001337080151228192,
+            "tau_vort": 0.15248485202559633,
+            "tau_curl": 0.15248485202559633,
+            "tau_strain": -0.1986136760719821,
+            "lambda_x_ssh_km": 94.02163778793667,
+            "lambda_x_ssh_min_ratio": 0.00036785800137457443,
+            "lambda_x_ssh_resolved": 1.0,
+            "lambda_x_uv_km": 77.57869401522395,
+            "lambda_x_uv_min_ratio": 0.003272371884221905,
+            "lambda_x_uv_resolved": 1.0
+          },
+          "note": "Mean of per-batch batch_metrics; not the primary Table path."
+        },
+        "lambda_t_note": "resolved_timescale on domain-mean UV series"
+      }
+    },
+    {
+      "name": "M4",
+      "exp_name": "M4-s0",
+      "seed": 0,
+      "train_ok": true,
+      "ckpt": "E:\\Projects\\20260522-4DVarNets-sea-current\\checkpoints\\4dvarnet-M4-s0-best.pt",
+      "r0_note": null,
+      "eval_ok": true,
+      "metrics": {
+        "ckpt": "E:\\Projects\\20260522-4DVarNets-sea-current\\checkpoints\\4dvarnet-M4-s0-best.pt",
+        "source": "natl60",
+        "crop_size": 96,
+        "max_samples": null,
+        "flags": {
+          "use_sst": true,
+          "use_sqg": true,
+          "use_adv": true,
+          "use_uncert": true
+        },
+        "seed": 0,
+        "git_commit_ckpt": "89f61b6",
+        "git_commit_eval": "89f61b6",
+        "ckpt_epoch": 13,
+        "physics_scales": {
+          "dx": 4382.6318359375,
+          "dy": 5559.7470703125,
+          "f0": 8.96254787221551e-05
+        },
+        "geostrophic_baseline": "oi_only",
+        "geostrophic_tau_uv_sane": true,
+        "metrics_aggregation": "full_test_pooled",
+        "protocol_note": "crop/max_samples metrics are post_p0 directional evidence on limited VRAM; not full-grid JAMES Table rows.",
+        "model": {
+          "rmse_ssh": 0.04833604022860527,
+          "rmse_u": 0.13708928227424622,
+          "rmse_v": 0.1313144564628601,
+          "rmse_uv": 0.13423293828964233,
+          "tau_uv": 0.9210843814410181,
+          "tau_div": -6.2563884339693585,
+          "tau_vort": 0.44096635888210245,
+          "tau_curl": 0.44096635888210245,
+          "tau_strain": -0.5582836269517946,
+          "lambda_x_ssh_km": 56.09768749999999,
+          "lambda_x_ssh_min_ratio": 0.000641599983128438,
+          "lambda_x_ssh_resolved": 1.0,
+          "lambda_x_uv_km": 64.72810096153846,
+          "lambda_x_uv_min_ratio": 0.002679717341336741,
+          "lambda_x_uv_resolved": 1.0,
+          "lambda_t_uv_s": 1987200.0000000002,
+          "lambda_t_uv_days": 23.000000000000004
+        },
+        "geostrophic": {
+          "rmse_ssh": 0.05963534116744995,
+          "rmse_u": 0.19356749951839447,
+          "rmse_v": 0.1815425604581833,
+          "rmse_uv": 0.1876513808965683,
+          "tau_uv": 0.8457773156600269,
+          "tau_div": -0.0005519296024563136,
+          "tau_vort": 0.15724359757870343,
+          "tau_curl": 0.15724359757870343,
+          "tau_strain": -0.18412571166030478,
+          "lambda_x_ssh_km": 93.49614583333332,
+          "lambda_x_ssh_min_ratio": 0.000351138928102398,
+          "lambda_x_ssh_resolved": 1.0,
+          "lambda_x_uv_km": 76.49684659090907,
+          "lambda_x_uv_min_ratio": 0.003492113577835548,
+          "lambda_x_uv_resolved": 1.0
+        },
+        "provisional_batch_mean": {
+          "model": {
+            "rmse_ssh": 0.04690372870992059,
+            "rmse_u": 0.13480061519405115,
+            "rmse_v": 0.12983595401696538,
+            "rmse_uv": 0.13288018658109332,
+            "tau_uv": 0.9205895128618862,
+            "tau_div": -6.425495921990653,
+            "tau_vort": 0.43476748445349533,
+            "tau_curl": 0.43476748445349533,
+            "tau_strain": -0.5939839735731031,
+            "lambda_x_ssh_km": 62.43097685576526,
+            "lambda_x_ssh_min_ratio": 0.0006759167866019225,
+            "lambda_x_ssh_resolved": 1.0,
+            "lambda_x_uv_km": 50.03371555037099,
+            "lambda_x_uv_min_ratio": 0.00261803211704912,
+            "lambda_x_uv_resolved": 1.0
+          },
+          "geostrophic": {
+            "rmse_ssh": 0.05821923142218072,
+            "rmse_u": 0.19048229896503946,
+            "rmse_v": 0.17819018402825232,
+            "rmse_uv": 0.1852621993292933,
+            "tau_uv": 0.8455821679057741,
+            "tau_div": -0.001337080151228192,
+            "tau_vort": 0.15248485202559633,
+            "tau_curl": 0.15248485202559633,
+            "tau_strain": -0.1986136760719821,
+            "lambda_x_ssh_km": 94.02163778793667,
+            "lambda_x_ssh_min_ratio": 0.00036785800137457443,
+            "lambda_x_ssh_resolved": 1.0,
+            "lambda_x_uv_km": 77.57869401522395,
+            "lambda_x_uv_min_ratio": 0.003272371884221905,
+            "lambda_x_uv_resolved": 1.0
+          },
+          "note": "Mean of per-batch batch_metrics; not the primary Table path."
+        },
+        "lambda_t_note": "resolved_timescale on domain-mean UV series"
+      }
+    },
+    {
+      "name": "M4",
+      "exp_name": "M4-s1",
+      "seed": 1,
+      "train_ok": true,
+      "ckpt": "E:\\Projects\\20260522-4DVarNets-sea-current\\checkpoints\\4dvarnet-M4-s1-best.pt",
+      "r0_note": null,
+      "eval_ok": true,
+      "metrics": {
+        "ckpt": "E:\\Projects\\20260522-4DVarNets-sea-current\\checkpoints\\4dvarnet-M4-s1-best.pt",
+        "source": "natl60",
+        "crop_size": 96,
+        "max_samples": null,
+        "flags": {
+          "use_sst": true,
+          "use_sqg": true,
+          "use_adv": true,
+          "use_uncert": true
+        },
+        "seed": 1,
+        "git_commit_ckpt": "89f61b6",
+        "git_commit_eval": "89f61b6",
+        "ckpt_epoch": 15,
+        "physics_scales": {
+          "dx": 4382.6318359375,
+          "dy": 5559.7470703125,
+          "f0": 8.96254787221551e-05
+        },
+        "geostrophic_baseline": "oi_only",
+        "geostrophic_tau_uv_sane": true,
+        "metrics_aggregation": "full_test_pooled",
+        "protocol_note": "crop/max_samples metrics are post_p0 directional evidence on limited VRAM; not full-grid JAMES Table rows.",
+        "model": {
+          "rmse_ssh": 0.052972663193941116,
+          "rmse_u": 0.13974754512310028,
+          "rmse_v": 0.13891130685806274,
+          "rmse_uv": 0.13933005928993225,
+          "tau_uv": 0.9149773939882895,
+          "tau_div": -6.5240157092695386,
+          "tau_vort": 0.4070720040252098,
+          "tau_curl": 0.4070720040252098,
+          "tau_strain": -0.6513024672907959,
+          "lambda_x_ssh_km": 76.49684659090907,
+          "lambda_x_ssh_min_ratio": 0.0005509464532182792,
+          "lambda_x_ssh_resolved": 1.0,
+          "lambda_x_uv_km": 64.72810096153846,
+          "lambda_x_uv_min_ratio": 0.004007129312397769,
+          "lambda_x_uv_resolved": 1.0,
+          "lambda_t_uv_s": 209178.9473684211,
+          "lambda_t_uv_days": 2.421052631578948
+        },
+        "geostrophic": {
+          "rmse_ssh": 0.05963534116744995,
+          "rmse_u": 0.19356749951839447,
+          "rmse_v": 0.1815425604581833,
+          "rmse_uv": 0.1876513808965683,
+          "tau_uv": 0.8457773156600269,
+          "tau_div": -0.0005519296024563136,
+          "tau_vort": 0.15724359757870343,
+          "tau_curl": 0.15724359757870343,
+          "tau_strain": -0.18412571166030478,
+          "lambda_x_ssh_km": 93.49614583333332,
+          "lambda_x_ssh_min_ratio": 0.000351138928102398,
+          "lambda_x_ssh_resolved": 1.0,
+          "lambda_x_uv_km": 76.49684659090907,
+          "lambda_x_uv_min_ratio": 0.003492113577835548,
+          "lambda_x_uv_resolved": 1.0
+        },
+        "provisional_batch_mean": {
+          "model": {
+            "rmse_ssh": 0.0511592080735642,
+            "rmse_u": 0.137931859039742,
+            "rmse_v": 0.13738612765851227,
+            "rmse_uv": 0.13809832881974138,
+            "tau_uv": 0.9145303943412754,
+            "tau_div": -6.648004108945304,
+            "tau_vort": 0.3994536958269023,
+            "tau_curl": 0.3994536958269023,
+            "tau_strain": -0.6970136135504221,
+            "lambda_x_ssh_km": 66.8323620442324,
+            "lambda_x_ssh_min_ratio": 0.0005534240223694789,
+            "lambda_x_ssh_resolved": 1.0,
+            "lambda_x_uv_km": 51.434939838166954,
+            "lambda_x_uv_min_ratio": 0.0038437933203286736,
+            "lambda_x_uv_resolved": 1.0
+          },
+          "geostrophic": {
+            "rmse_ssh": 0.05821923142218072,
+            "rmse_u": 0.19048229896503946,
+            "rmse_v": 0.17819018402825232,
+            "rmse_uv": 0.1852621993292933,
+            "tau_uv": 0.8455821679057741,
+            "tau_div": -0.001337080151228192,
+            "tau_vort": 0.15248485202559633,
+            "tau_curl": 0.15248485202559633,
+            "tau_strain": -0.1986136760719821,
+            "lambda_x_ssh_km": 94.02163778793667,
+            "lambda_x_ssh_min_ratio": 0.00036785800137457443,
+            "lambda_x_ssh_resolved": 1.0,
+            "lambda_x_uv_km": 77.57869401522395,
+            "lambda_x_uv_min_ratio": 0.003272371884221905,
+            "lambda_x_uv_resolved": 1.0
+          },
+          "note": "Mean of per-batch batch_metrics; not the primary Table path."
+        },
+        "lambda_t_note": "resolved_timescale on domain-mean UV series"
+      }
+    },
+    {
+      "name": "M4",
+      "exp_name": "M4-s2",
+      "seed": 2,
+      "train_ok": true,
+      "ckpt": "E:\\Projects\\20260522-4DVarNets-sea-current\\checkpoints\\4dvarnet-M4-s2-best.pt",
+      "r0_note": null,
+      "eval_ok": true,
+      "metrics": {
+        "ckpt": "E:\\Projects\\20260522-4DVarNets-sea-current\\checkpoints\\4dvarnet-M4-s2-best.pt",
+        "source": "natl60",
+        "crop_size": 96,
+        "max_samples": null,
+        "flags": {
+          "use_sst": true,
+          "use_sqg": true,
+          "use_adv": true,
+          "use_uncert": true
+        },
+        "seed": 2,
+        "git_commit_ckpt": "89f61b6",
+        "git_commit_eval": "89f61b6",
+        "ckpt_epoch": 14,
+        "physics_scales": {
+          "dx": 4382.6318359375,
+          "dy": 5559.7470703125,
+          "f0": 8.96254787221551e-05
+        },
+        "geostrophic_baseline": "oi_only",
+        "geostrophic_tau_uv_sane": true,
+        "metrics_aggregation": "full_test_pooled",
+        "protocol_note": "crop/max_samples metrics are post_p0 directional evidence on limited VRAM; not full-grid JAMES Table rows.",
+        "model": {
+          "rmse_ssh": 0.05104707181453705,
+          "rmse_u": 0.14202505350112915,
+          "rmse_v": 0.13553671538829803,
+          "rmse_uv": 0.13881878554821014,
+          "tau_uv": 0.915600228327995,
+          "tau_div": -8.332017151517904,
+          "tau_vort": 0.36067416330342505,
+          "tau_curl": 0.36067416330342505,
+          "tau_strain": -0.6098251725064838,
+          "lambda_x_ssh_km": 93.49614583333332,
+          "lambda_x_ssh_min_ratio": 0.0005220963425082273,
+          "lambda_x_ssh_resolved": 1.0,
+          "lambda_x_uv_km": 64.72810096153846,
+          "lambda_x_uv_min_ratio": 0.00530589780486061,
+          "lambda_x_uv_resolved": 1.0,
+          "lambda_t_uv_s": 198720.00000000003,
+          "lambda_t_uv_days": 2.3000000000000003
+        },
+        "geostrophic": {
+          "rmse_ssh": 0.05963534116744995,
+          "rmse_u": 0.19356749951839447,
+          "rmse_v": 0.1815425604581833,
+          "rmse_uv": 0.1876513808965683,
+          "tau_uv": 0.8457773156600269,
+          "tau_div": -0.0005519296024563136,
+          "tau_vort": 0.15724359757870343,
+          "tau_curl": 0.15724359757870343,
+          "tau_strain": -0.18412571166030478,
+          "lambda_x_ssh_km": 93.49614583333332,
+          "lambda_x_ssh_min_ratio": 0.000351138928102398,
+          "lambda_x_ssh_resolved": 1.0,
+          "lambda_x_uv_km": 76.49684659090907,
+          "lambda_x_uv_min_ratio": 0.003492113577835548,
+          "lambda_x_uv_resolved": 1.0
+        },
+        "provisional_batch_mean": {
+          "model": {
+            "rmse_ssh": 0.04951210834247911,
+            "rmse_u": 0.14023006513066913,
+            "rmse_v": 0.13451044569196907,
+            "rmse_uv": 0.13782629014357275,
+            "tau_uv": 0.9148248397871592,
+            "tau_div": -8.51950749328655,
+            "tau_vort": 0.351820271207509,
+            "tau_curl": 0.351820271207509,
+            "tau_strain": -0.6547576282121232,
+            "lambda_x_ssh_km": 72.19894495309843,
+            "lambda_x_ssh_min_ratio": 0.0005103931939429052,
+            "lambda_x_ssh_resolved": 1.0,
+            "lambda_x_uv_km": 55.38377746414469,
+            "lambda_x_uv_min_ratio": 0.004912071336462533,
+            "lambda_x_uv_resolved": 1.0
+          },
+          "geostrophic": {
+            "rmse_ssh": 0.05821923142218072,
+            "rmse_u": 0.19048229896503946,
+            "rmse_v": 0.17819018402825232,
+            "rmse_uv": 0.1852621993292933,
+            "tau_uv": 0.8455821679057741,
+            "tau_div": -0.001337080151228192,
+            "tau_vort": 0.15248485202559633,
+            "tau_curl": 0.15248485202559633,
+            "tau_strain": -0.1986136760719821,
+            "lambda_x_ssh_km": 94.02163778793667,
+            "lambda_x_ssh_min_ratio": 0.00036785800137457443,
+            "lambda_x_ssh_resolved": 1.0,
+            "lambda_x_uv_km": 77.57869401522395,
+            "lambda_x_uv_min_ratio": 0.003272371884221905,
+            "lambda_x_uv_resolved": 1.0
+          },
+          "note": "Mean of per-batch batch_metrics; not the primary Table path."
+        },
+        "lambda_t_note": "resolved_timescale on domain-mean UV series"
+      }
+    },
+    {
+      "name": "R0",
+      "exp_name": "R0-s0",
+      "seed": 0,
+      "train_ok": true,
+      "ckpt": "E:\\Projects\\20260522-4DVarNets-sea-current\\checkpoints\\4dvarnet-R0-s0-best.pt",
+      "r0_note": "R0 = compact larger-capacity SSH+SST (hidden_lstm/feat closer to Fablet). Not a byte-faithful CIA-Oceanix transplant; no official ckpt eval on this machine.",
+      "eval_ok": true,
+      "metrics": {
+        "ckpt": "E:\\Projects\\20260522-4DVarNets-sea-current\\checkpoints\\4dvarnet-R0-s0-best.pt",
+        "source": "natl60",
+        "crop_size": 96,
+        "max_samples": null,
+        "flags": {
+          "use_sst": true,
+          "use_sqg": false,
+          "use_adv": false,
+          "use_uncert": false
+        },
+        "seed": 0,
+        "git_commit_ckpt": "89f61b6",
+        "git_commit_eval": "89f61b6",
+        "ckpt_epoch": 8,
+        "physics_scales": {
+          "dx": 4382.6318359375,
+          "dy": 5559.7470703125,
+          "f0": 8.96254787221551e-05
+        },
+        "geostrophic_baseline": "oi_only",
+        "geostrophic_tau_uv_sane": true,
+        "metrics_aggregation": "full_test_pooled",
+        "protocol_note": "crop/max_samples metrics are post_p0 directional evidence on limited VRAM; not full-grid JAMES Table rows.",
+        "model": {
+          "rmse_ssh": 0.058040402829647064,
+          "rmse_u": 0.18595576286315918,
+          "rmse_v": 0.1789999157190323,
+          "rmse_uv": 0.18251097202301025,
+          "tau_uv": 0.8541109513770881,
+          "tau_div": -8.015107513833042,
+          "tau_vort": 0.33599447720333364,
+          "tau_curl": 0.33599447720333364,
+          "tau_strain": -0.21996868949714798,
+          "lambda_x_ssh_km": 93.49614583333332,
+          "lambda_x_ssh_min_ratio": 0.00034481491522516945,
+          "lambda_x_ssh_resolved": 1.0,
+          "lambda_x_uv_km": 76.49684659090907,
+          "lambda_x_uv_min_ratio": 0.005990178964142194,
+          "lambda_x_uv_resolved": 1.0,
+          "lambda_t_uv_s": 220800.0,
+          "lambda_t_uv_days": 2.5555555555555554
+        },
+        "geostrophic": {
+          "rmse_ssh": 0.05963534116744995,
+          "rmse_u": 0.19356749951839447,
+          "rmse_v": 0.1815425604581833,
+          "rmse_uv": 0.1876513808965683,
+          "tau_uv": 0.8457773156600269,
+          "tau_div": -0.0005519296024563136,
+          "tau_vort": 0.15724359757870343,
+          "tau_curl": 0.15724359757870343,
+          "tau_strain": -0.18412571166030478,
+          "lambda_x_ssh_km": 93.49614583333332,
+          "lambda_x_ssh_min_ratio": 0.000351138928102398,
+          "lambda_x_ssh_resolved": 1.0,
+          "lambda_x_uv_km": 76.49684659090907,
+          "lambda_x_uv_min_ratio": 0.003492113577835548,
+          "lambda_x_uv_resolved": 1.0
+        },
+        "provisional_batch_mean": {
+          "model": {
+            "rmse_ssh": 0.05668863508364429,
+            "rmse_u": 0.18261881043081699,
+            "rmse_v": 0.17533716559410095,
+            "rmse_uv": 0.17973121887315874,
+            "tau_uv": 0.85374239463255,
+            "tau_div": -8.229764300460031,
+            "tau_vort": 0.32597492561932545,
+            "tau_curl": 0.32597492561932545,
+            "tau_strain": -0.253413591517906,
+            "lambda_x_ssh_km": 85.43188199103749,
+            "lambda_x_ssh_min_ratio": 0.00037361353632546854,
+            "lambda_x_ssh_resolved": 1.0,
+            "lambda_x_uv_km": 71.4133007735019,
+            "lambda_x_uv_min_ratio": 0.005922084846773182,
+            "lambda_x_uv_resolved": 1.0
+          },
+          "geostrophic": {
+            "rmse_ssh": 0.05821923142218072,
+            "rmse_u": 0.19048229896503946,
+            "rmse_v": 0.17819018402825232,
+            "rmse_uv": 0.1852621993292933,
+            "tau_uv": 0.8455821679057741,
+            "tau_div": -0.001337080151228192,
+            "tau_vort": 0.15248485202559633,
+            "tau_curl": 0.15248485202559633,
+            "tau_strain": -0.1986136760719821,
+            "lambda_x_ssh_km": 94.02163778793667,
+            "lambda_x_ssh_min_ratio": 0.00036785800137457443,
+            "lambda_x_ssh_resolved": 1.0,
+            "lambda_x_uv_km": 77.57869401522395,
+            "lambda_x_uv_min_ratio": 0.003272371884221905,
+            "lambda_x_uv_resolved": 1.0
+          },
+          "note": "Mean of per-batch batch_metrics; not the primary Table path."
+        },
+        "lambda_t_note": "resolved_timescale on domain-mean UV series"
+      }
+    },
+    {
+      "name": "R0",
+      "exp_name": "R0-s1",
+      "seed": 1,
+      "train_ok": true,
+      "ckpt": "E:\\Projects\\20260522-4DVarNets-sea-current\\checkpoints\\4dvarnet-R0-s1-best.pt",
+      "r0_note": "R0 = compact larger-capacity SSH+SST (hidden_lstm/feat closer to Fablet). Not a byte-faithful CIA-Oceanix transplant; no official ckpt eval on this machine.",
+      "eval_ok": true,
+      "metrics": {
+        "ckpt": "E:\\Projects\\20260522-4DVarNets-sea-current\\checkpoints\\4dvarnet-R0-s1-best.pt",
+        "source": "natl60",
+        "crop_size": 96,
+        "max_samples": null,
+        "flags": {
+          "use_sst": true,
+          "use_sqg": false,
+          "use_adv": false,
+          "use_uncert": false
+        },
+        "seed": 1,
+        "git_commit_ckpt": "89f61b6",
+        "git_commit_eval": "89f61b6",
+        "ckpt_epoch": 6,
+        "physics_scales": {
+          "dx": 4382.6318359375,
+          "dy": 5559.7470703125,
+          "f0": 8.96254787221551e-05
+        },
+        "geostrophic_baseline": "oi_only",
+        "geostrophic_tau_uv_sane": true,
+        "metrics_aggregation": "full_test_pooled",
+        "protocol_note": "crop/max_samples metrics are post_p0 directional evidence on limited VRAM; not full-grid JAMES Table rows.",
+        "model": {
+          "rmse_ssh": 0.05865234136581421,
+          "rmse_u": 0.18420365452766418,
+          "rmse_v": 0.1738339215517044,
+          "rmse_uv": 0.1790938526391983,
+          "tau_uv": 0.8595227118677695,
+          "tau_div": -6.65997608976963,
+          "tau_vort": 0.3570650026284905,
+          "tau_curl": 0.3570650026284905,
+          "tau_strain": -0.1822866281396638,
+          "lambda_x_ssh_km": 93.49614583333332,
+          "lambda_x_ssh_min_ratio": 0.00037574022916941983,
+          "lambda_x_ssh_resolved": 1.0,
+          "lambda_x_uv_km": 76.49684659090907,
+          "lambda_x_uv_min_ratio": 0.006021489491034809,
+          "lambda_x_uv_resolved": 1.0,
+          "lambda_t_uv_s": 283885.71428571426,
+          "lambda_t_uv_days": 3.2857142857142856
+        },
+        "geostrophic": {
+          "rmse_ssh": 0.05963534116744995,
+          "rmse_u": 0.19356749951839447,
+          "rmse_v": 0.1815425604581833,
+          "rmse_uv": 0.1876513808965683,
+          "tau_uv": 0.8457773156600269,
+          "tau_div": -0.0005519296024563136,
+          "tau_vort": 0.15724359757870343,
+          "tau_curl": 0.15724359757870343,
+          "tau_strain": -0.18412571166030478,
+          "lambda_x_ssh_km": 93.49614583333332,
+          "lambda_x_ssh_min_ratio": 0.000351138928102398,
+          "lambda_x_ssh_resolved": 1.0,
+          "lambda_x_uv_km": 76.49684659090907,
+          "lambda_x_uv_min_ratio": 0.003492113577835548,
+          "lambda_x_uv_resolved": 1.0
+        },
+        "provisional_batch_mean": {
+          "model": {
+            "rmse_ssh": 0.05724278873885456,
+            "rmse_u": 0.18062724934323973,
+            "rmse_v": 0.16993888807685478,
+            "rmse_uv": 0.1760376523370328,
+            "tau_uv": 0.8592754667346764,
+            "tau_div": -6.850599172142008,
+            "tau_vort": 0.34516490617573026,
+            "tau_curl": 0.34516490617573026,
+            "tau_strain": -0.22806391566899584,
+            "lambda_x_ssh_km": 78.9681732874968,
+            "lambda_x_ssh_min_ratio": 0.00041198299121537017,
+            "lambda_x_ssh_resolved": 1.0,
+            "lambda_x_uv_km": 72.21607704541837,
+            "lambda_x_uv_min_ratio": 0.006046808863857987,
+            "lambda_x_uv_resolved": 1.0
+          },
+          "geostrophic": {
+            "rmse_ssh": 0.05821923142218072,
+            "rmse_u": 0.19048229896503946,
+            "rmse_v": 0.17819018402825232,
+            "rmse_uv": 0.1852621993292933,
+            "tau_uv": 0.8455821679057741,
+            "tau_div": -0.001337080151228192,
+            "tau_vort": 0.15248485202559633,
+            "tau_curl": 0.15248485202559633,
+            "tau_strain": -0.1986136760719821,
+            "lambda_x_ssh_km": 94.02163778793667,
+            "lambda_x_ssh_min_ratio": 0.00036785800137457443,
+            "lambda_x_ssh_resolved": 1.0,
+            "lambda_x_uv_km": 77.57869401522395,
+            "lambda_x_uv_min_ratio": 0.003272371884221905,
+            "lambda_x_uv_resolved": 1.0
+          },
+          "note": "Mean of per-batch batch_metrics; not the primary Table path."
+        },
+        "lambda_t_note": "resolved_timescale on domain-mean UV series"
+      }
+    },
+    {
+      "name": "R0",
+      "exp_name": "R0-s2",
+      "seed": 2,
+      "train_ok": true,
+      "ckpt": "E:\\Projects\\20260522-4DVarNets-sea-current\\checkpoints\\4dvarnet-R0-s2-best.pt",
+      "r0_note": "R0 = compact larger-capacity SSH+SST (hidden_lstm/feat closer to Fablet). Not a byte-faithful CIA-Oceanix transplant; no official ckpt eval on this machine.",
+      "eval_ok": true,
+      "metrics": {
+        "ckpt": "E:\\Projects\\20260522-4DVarNets-sea-current\\checkpoints\\4dvarnet-R0-s2-best.pt",
+        "source": "natl60",
+        "crop_size": 96,
+        "max_samples": null,
+        "flags": {
+          "use_sst": true,
+          "use_sqg": false,
+          "use_adv": false,
+          "use_uncert": false
+        },
+        "seed": 2,
+        "git_commit_ckpt": "89f61b6",
+        "git_commit_eval": "89f61b6",
+        "ckpt_epoch": 15,
+        "physics_scales": {
+          "dx": 4382.6318359375,
+          "dy": 5559.7470703125,
+          "f0": 8.96254787221551e-05
+        },
+        "geostrophic_baseline": "oi_only",
+        "geostrophic_tau_uv_sane": true,
+        "metrics_aggregation": "full_test_pooled",
+        "protocol_note": "crop/max_samples metrics are post_p0 directional evidence on limited VRAM; not full-grid JAMES Table rows.",
+        "model": {
+          "rmse_ssh": 0.058846231549978256,
+          "rmse_u": 0.1966601461172104,
+          "rmse_v": 0.19105373322963715,
+          "rmse_uv": 0.1938772201538086,
+          "tau_uv": 0.8353740373592268,
+          "tau_div": -1.0925397347424566,
+          "tau_vort": -0.567560986318796,
+          "tau_curl": -0.567560986318796,
+          "tau_strain": -2.237160847916845,
+          "lambda_x_ssh_km": 93.49614583333332,
+          "lambda_x_ssh_min_ratio": 0.00023095851882154,
+          "lambda_x_ssh_resolved": 1.0,
+          "lambda_x_uv_km": 76.49684659090907,
+          "lambda_x_uv_min_ratio": 0.0047895984963361865,
+          "lambda_x_uv_resolved": 1.0,
+          "lambda_t_uv_s": 1987200.0000000002,
+          "lambda_t_uv_days": 23.000000000000004
+        },
+        "geostrophic": {
+          "rmse_ssh": 0.05963534116744995,
+          "rmse_u": 0.19356749951839447,
+          "rmse_v": 0.1815425604581833,
+          "rmse_uv": 0.1876513808965683,
+          "tau_uv": 0.8457773156600269,
+          "tau_div": -0.0005519296024563136,
+          "tau_vort": 0.15724359757870343,
+          "tau_curl": 0.15724359757870343,
+          "tau_strain": -0.18412571166030478,
+          "lambda_x_ssh_km": 93.49614583333332,
+          "lambda_x_ssh_min_ratio": 0.000351138928102398,
+          "lambda_x_ssh_resolved": 1.0,
+          "lambda_x_uv_km": 76.49684659090907,
+          "lambda_x_uv_min_ratio": 0.003492113577835548,
+          "lambda_x_uv_resolved": 1.0
+        },
+        "provisional_batch_mean": {
+          "model": {
+            "rmse_ssh": 0.057226298133964126,
+            "rmse_u": 0.1934890241726585,
+            "rmse_v": 0.18771096480929333,
+            "rmse_uv": 0.19143178654105766,
+            "tau_uv": 0.835349120755616,
+            "tau_div": -1.1049952791114162,
+            "tau_vort": -0.577941598553494,
+            "tau_curl": -0.577941598553494,
+            "tau_strain": -2.307334103233946,
+            "lambda_x_ssh_km": 92.82474493888459,
+            "lambda_x_ssh_min_ratio": 0.00023150129739265247,
+            "lambda_x_ssh_resolved": 1.0,
+            "lambda_x_uv_km": 76.7632474581578,
+            "lambda_x_uv_min_ratio": 0.004542518123867682,
+            "lambda_x_uv_resolved": 1.0
+          },
+          "geostrophic": {
+            "rmse_ssh": 0.05821923142218072,
+            "rmse_u": 0.19048229896503946,
+            "rmse_v": 0.17819018402825232,
+            "rmse_uv": 0.1852621993292933,
+            "tau_uv": 0.8455821679057741,
+            "tau_div": -0.001337080151228192,
+            "tau_vort": 0.15248485202559633,
+            "tau_curl": 0.15248485202559633,
+            "tau_strain": -0.1986136760719821,
+            "lambda_x_ssh_km": 94.02163778793667,
+            "lambda_x_ssh_min_ratio": 0.00036785800137457443,
+            "lambda_x_ssh_resolved": 1.0,
+            "lambda_x_uv_km": 77.57869401522395,
+            "lambda_x_uv_min_ratio": 0.003272371884221905,
+            "lambda_x_uv_resolved": 1.0
+          },
+          "note": "Mean of per-batch batch_metrics; not the primary Table path."
+        },
+        "lambda_t_note": "resolved_timescale on domain-mean UV series"
+      }
+    }
+  ],
+  "summary": {
+    "B1": {
+      "n_seeds": 3,
+      "metrics": {
+        "tau_uv": {
+          "mean": 0.860622727852774,
+          "std": 0.004488860770679767,
+          "n": 3,
+          "values": [
+            0.8645929935688854,
+            0.8557518345011654,
+            0.8615233554882712
+          ]
+        },
+        "rmse_uv": {
+          "mean": 0.17837591965993246,
+          "std": 0.0028663976514921134,
+          "n": 3,
+          "values": [
+            0.1758321076631546,
+            0.18148167431354523,
+            0.17781397700309753
+          ]
+        },
+        "rmse_ssh": {
+          "mean": 0.05882541214426359,
+          "std": 0.0011039708534036033,
+          "n": 3,
+          "values": [
+            0.05859917402267456,
+            0.06002497673034668,
+            0.057852085679769516
+          ]
+        },
+        "tau_div": {
+          "mean": -10.505011071872442,
+          "std": 1.0324078528869942,
+          "n": 3,
+          "values": [
+            -11.361893727032198,
+            -10.794330192609069,
+            -9.35880929597606
+          ]
+        },
+        "tau_vort": {
+          "mean": 0.22769948343932342,
+          "std": 0.055558612799492445,
+          "n": 3,
+          "values": [
+            0.21838543044943037,
+            0.17738655660629243,
+            0.2873264632622474
+          ]
+        }
+      },
+      "geostrophic_tau_uv": {
+        "mean": 0.8457773156600269,
+        "std": 0.0,
+        "n": 3,
+        "values": [
+          0.8457773156600269,
+          0.8457773156600269,
+          0.8457773156600269
+        ]
+      }
+    },
+    "B2": {
+      "n_seeds": 3,
+      "metrics": {
+        "tau_uv": {
+          "mean": 0.878366409218466,
+          "std": 0.026637431968341316,
+          "n": 3,
+          "values": [
+            0.870998933020525,
+            0.8561881481154685,
+            0.9079121465194044
+          ]
+        },
+        "rmse_uv": {
+          "mean": 0.16594437261422476,
+          "std": 0.018757731835154143,
+          "n": 3,
+          "values": [
+            0.17162251472473145,
+            0.18120700120925903,
+            0.14500360190868378
+          ]
+        },
+        "rmse_ssh": {
+          "mean": 0.05902011568347613,
+          "std": 0.006208092321547069,
+          "n": 3,
+          "values": [
+            0.06351916491985321,
+            0.061603739857673645,
+            0.051937442272901535
+          ]
+        },
+        "tau_div": {
+          "mean": -5.558221213577838,
+          "std": 2.825907951514883,
+          "n": 3,
+          "values": [
+            -4.8808246541322,
+            -8.661265017357563,
+            -3.132573969243751
+          ]
+        },
+        "tau_vort": {
+          "mean": 0.3721460111618877,
+          "std": 0.14347605123592402,
+          "n": 3,
+          "values": [
+            0.29865490115570514,
+            0.28030435902213036,
+            0.5374787733078277
+          ]
+        }
+      },
+      "geostrophic_tau_uv": {
+        "mean": 0.8457773156600269,
+        "std": 0.0,
+        "n": 3,
+        "values": [
+          0.8457773156600269,
+          0.8457773156600269,
+          0.8457773156600269
+        ]
+      }
+    },
+    "M1": {
+      "n_seeds": 3,
+      "metrics": {
+        "tau_uv": {
+          "mean": 0.9155135078291933,
+          "std": 0.005441077697593068,
+          "n": 3,
+          "values": [
+            0.9092925173601979,
+            0.9178625671177666,
+            0.9193854390096154
+          ]
+        },
+        "rmse_uv": {
+          "mean": 0.13884284098943075,
+          "std": 0.004436715008679552,
+          "n": 3,
+          "values": [
+            0.14391271770000458,
+            0.13694563508033752,
+            0.13567017018795013
+          ]
+        },
+        "rmse_ssh": {
+          "mean": 0.048993099480867386,
+          "std": 0.0020327035095384144,
+          "n": 3,
+          "values": [
+            0.05000583454966545,
+            0.05032048746943474,
+            0.04665297642350197
+          ]
+        },
+        "tau_div": {
+          "mean": -6.687030928865857,
+          "std": 1.3766825735422796,
+          "n": 3,
+          "values": [
+            -8.245399605032071,
+            -6.179637337779342,
+            -5.636055843786159
+          ]
+        },
+        "tau_vort": {
+          "mean": 0.3915926872191283,
+          "std": 0.08209017562801933,
+          "n": 3,
+          "values": [
+            0.3000710226429917,
+            0.415984485379541,
+            0.45872255363485226
+          ]
+        }
+      },
+      "geostrophic_tau_uv": {
+        "mean": 0.8457773156600269,
+        "std": 0.0,
+        "n": 3,
+        "values": [
+          0.8457773156600269,
+          0.8457773156600269,
+          0.8457773156600269
+        ]
+      }
+    },
+    "M2": {
+      "n_seeds": 3,
+      "metrics": {
+        "tau_uv": {
+          "mean": 0.8795602158254069,
+          "std": 0.025283721165183418,
+          "n": 3,
+          "values": [
+            0.8657022795730307,
+            0.8642353133202294,
+            0.9087430545829605
+          ]
+        },
+        "rmse_uv": {
+          "mean": 0.16517417629559836,
+          "std": 0.018042357019399474,
+          "n": 3,
+          "values": [
+            0.17511039972305298,
+            0.17606419324874878,
+            0.1443479359149933
+          ]
+        },
+        "rmse_ssh": {
+          "mean": 0.05642785628636678,
+          "std": 0.0033304157907432966,
+          "n": 3,
+          "values": [
+            0.058558933436870575,
+            0.05813460052013397,
+            0.052590034902095795
+          ]
+        },
+        "tau_div": {
+          "mean": -5.613723335029689,
+          "std": 3.972220685845671,
+          "n": 3,
+          "values": [
+            -3.455139468049972,
+            -10.197858195666415,
+            -3.1881723413726792
+          ]
+        },
+        "tau_vort": {
+          "mean": 0.40217119443432475,
+          "std": 0.1505687132226845,
+          "n": 3,
+          "values": [
+            0.37492200562722433,
+            0.26708785803540813,
+            0.5645037196403417
+          ]
+        }
+      },
+      "geostrophic_tau_uv": {
+        "mean": 0.8457773156600269,
+        "std": 0.0,
+        "n": 3,
+        "values": [
+          0.8457773156600269,
+          0.8457773156600269,
+          0.8457773156600269
+        ]
+      }
+    },
+    "M3": {
+      "n_seeds": 3,
+      "metrics": {
+        "tau_uv": {
+          "mean": 0.9139638129778832,
+          "std": 0.00464214466334931,
+          "n": 3,
+          "values": [
+            0.9087413169642362,
+            0.9176208423270739,
+            0.9155292796423397
+          ]
+        },
+        "rmse_uv": {
+          "mean": 0.1401244749625524,
+          "std": 0.003759686140446418,
+          "n": 3,
+          "values": [
+            0.14434930682182312,
+            0.13714699447155,
+            0.13887712359428406
+          ]
+        },
+        "rmse_ssh": {
+          "mean": 0.050016820430755615,
+          "std": 0.0011152650535303692,
+          "n": 3,
+          "values": [
+            0.050002433359622955,
+            0.05113920941948891,
+            0.048908818513154984
+          ]
+        },
+        "tau_div": {
+          "mean": -6.770524947707264,
+          "std": 1.6938220004538898,
+          "n": 3,
+          "values": [
+            -8.677917896282715,
+            -6.191557807759808,
+            -5.442099139079268
+          ]
+        },
+        "tau_vort": {
+          "mean": 0.3822457830429336,
+          "std": 0.09204540660171229,
+          "n": 3,
+          "values": [
+            0.27925776888033427,
+            0.41099207418157824,
+            0.45648750606688826
+          ]
+        }
+      },
+      "geostrophic_tau_uv": {
+        "mean": 0.8457773156600269,
+        "std": 0.0,
+        "n": 3,
+        "values": [
+          0.8457773156600269,
+          0.8457773156600269,
+          0.8457773156600269
+        ]
+      }
+    },
+    "M4": {
+      "n_seeds": 3,
+      "metrics": {
+        "tau_uv": {
+          "mean": 0.9172206679191008,
+          "std": 0.003360534524188632,
+          "n": 3,
+          "values": [
+            0.9210843814410181,
+            0.9149773939882895,
+            0.915600228327995
+          ]
+        },
+        "rmse_uv": {
+          "mean": 0.13746059437592825,
+          "std": 0.002806897409640667,
+          "n": 3,
+          "values": [
+            0.13423293828964233,
+            0.13933005928993225,
+            0.13881878554821014
+          ]
+        },
+        "rmse_ssh": {
+          "mean": 0.050785258412361145,
+          "std": 0.0023293728391648974,
+          "n": 3,
+          "values": [
+            0.04833604022860527,
+            0.052972663193941116,
+            0.05104707181453705
+          ]
+        },
+        "tau_div": {
+          "mean": -7.037473764918934,
+          "std": 1.1290651108158016,
+          "n": 3,
+          "values": [
+            -6.2563884339693585,
+            -6.5240157092695386,
+            -8.332017151517904
+          ]
+        },
+        "tau_vort": {
+          "mean": 0.4029041754035791,
+          "std": 0.040308029774172895,
+          "n": 3,
+          "values": [
+            0.44096635888210245,
+            0.4070720040252098,
+            0.36067416330342505
+          ]
+        }
+      },
+      "geostrophic_tau_uv": {
+        "mean": 0.8457773156600269,
+        "std": 0.0,
+        "n": 3,
+        "values": [
+          0.8457773156600269,
+          0.8457773156600269,
+          0.8457773156600269
+        ]
+      }
+    },
+    "R0": {
+      "n_seeds": 3,
+      "metrics": {
+        "tau_uv": {
+          "mean": 0.8496692335346948,
+          "std": 0.012672263537879173,
+          "n": 3,
+          "values": [
+            0.8541109513770881,
+            0.8595227118677695,
+            0.8353740373592268
+          ]
+        },
+        "rmse_uv": {
+          "mean": 0.18516068160533905,
+          "std": 0.007739684064677478,
+          "n": 3,
+          "values": [
+            0.18251097202301025,
+            0.1790938526391983,
+            0.1938772201538086
+          ]
+        },
+        "rmse_ssh": {
+          "mean": 0.05851299191514651,
+          "std": 0.00042059919600338487,
+          "n": 3,
+          "values": [
+            0.058040402829647064,
+            0.05865234136581421,
+            0.058846231549978256
+          ]
+        },
+        "tau_div": {
+          "mean": -5.255874446115043,
+          "std": 3.6686662744532823,
+          "n": 3,
+          "values": [
+            -8.015107513833042,
+            -6.65997608976963,
+            -1.0925397347424566
+          ]
+        },
+        "tau_vort": {
+          "mean": 0.04183283117100937,
+          "std": 0.5278556718995465,
+          "n": 3,
+          "values": [
+            0.33599447720333364,
+            0.3570650026284905,
+            -0.567560986318796
+          ]
+        }
+      },
+      "geostrophic_tau_uv": {
+        "mean": 0.8457773156600269,
+        "std": 0.0,
+        "n": 3,
+        "values": [
+          0.8457773156600269,
+          0.8457773156600269,
+          0.8457773156600269
+        ]
+      },
+      "faithfulness": "not_byte_faithful_compact_larger_capacity",
+      "note": "R0 = compact larger-capacity SSH+SST (hidden_lstm/feat closer to Fablet). Not a byte-faithful CIA-Oceanix transplant; no official ckpt eval on this machine."
+    }
+  },
+  "acceptance": {
+    "geo_tau_uv": 0.8457773156600269,
+    "geo_sane": true,
+    "b2_beats_b1_tau_uv": true,
+    "b2_tau_uv": 0.878366409218466,
+    "b1_tau_uv": 0.860622727852774
+  }
+}

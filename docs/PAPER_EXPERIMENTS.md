@@ -137,3 +137,40 @@ python scripts/evaluate.py --source natl60 --ckpt checkpoints/4dvarnet-NATL60smo
 `evaluate.py` reports **full-test pooled** metrics (concat windows, score once). JSON also stores `provisional_batch_mean` for diagnostics — do not use batch-mean as the Table path. Temporal `lambda_t` is filled when ≥8 test windows exist; otherwise marked **待补充**.
 
 Historical GPU96 NATL60 crop96/20ep scores: `results/legacy_pre_review2/` only (`pre_p0_fix`). Synthetic `results/metrics_B2.json` etc. are directional, not NATL60 Table rows.
+
+## Post-P0 Stages E–H (this workstation)
+
+Canonical measured artifacts live under `results/post_p0/` and `results/physics_ops/`.
+Legacy GPU96 remains quarantined in `results/legacy_pre_review2/`.
+
+### Stage E — physics operators (no training)
+
+`ash
+python scripts/validate_physics_operators.py --crop-size 96 --n-samples 24 --stride 2 --device cpu
+`
+
+Writes `results/physics_ops/physics_ops_validation.json` + SciencePlots figures.
+If SQG `tau_uv` is near zero, treat `lam_sqg` with caution (flagged in JSON).
+
+### Stages F–G — multi-seed crop96 matrix
+
+`ash
+# faceswap CUDA; seeds 0 1 2; 15 epochs; crop96 batch1
+python -u scripts/run_post_p0_pipeline.py --epochs 15 --crop-size 96 --batch-size 1 --device cuda --seeds 0 1 2
+`
+
+Outputs: `results/post_p0/metrics_<ID>-s<seed>.json`, `results/post_p0/ablation_summary.json` (mean±std).
+R0 uses `config/r0_compact_faithful.yaml` (larger capacity, **not** byte-faithful).
+
+### Stage H — sensitivity
+
+`ash
+python scripts/finalize_post_p0.py   # or scripts/run_sensitivity.py after F/G
+`
+
+SST coarsening factors 1/4/8 (~native / ~0.2° / ~0.4°), altimetry thin-mask, optional strain bins → `results/post_p0/sensitivity/`.
+
+### Reproducibility flags
+
+`train.py`: `--seed`, `--lam-sqg`, `--lam-adv`; checkpoints store `optimizer`, `epoch`, `seed`, `git_commit`.
+`environment.yml` documents the faceswap / torch 1.12.1+cu113 workstation path.

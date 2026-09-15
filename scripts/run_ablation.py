@@ -3,7 +3,7 @@
 
 B1 SSH-only, B2 SSH-SST, M1 +sqg, M2 +adv, M3 both, M4 +uncert.
 Use --quick for 2 epochs (wiring check). Prefer --epochs N for paper-prep
-directional runs on CPU. Metrics JSON lands under results/ when eval succeeds.
+directional runs. Metrics JSON lands under --results-dir when eval succeeds.
 """
 
 from __future__ import annotations
@@ -51,6 +51,12 @@ def main() -> None:
     p.add_argument("--source", default=None, help="synthetic | natl60 (passed to train/eval)")
     p.add_argument("--skip-eval", action="store_true")
     p.add_argument("--results-dir", default="results", help="directory for metrics JSON")
+    p.add_argument("--crop-size", type=int, default=None)
+    p.add_argument("--max-samples", type=int, default=None)
+    p.add_argument("--batch-size", type=int, default=None)
+    p.add_argument("--device", default=None)
+    p.add_argument("--seed", type=int, default=None)
+    p.add_argument("--name-suffix", default="", help="appended to exp-name / metrics stem")
     args = p.parse_args()
 
     names = args.only or list(EXPERIMENTS)
@@ -62,13 +68,14 @@ def main() -> None:
         if name not in EXPERIMENTS:
             raise SystemExit(f"unknown experiment {name}; choose from {list(EXPERIMENTS)}")
         flags = EXPERIMENTS[name]
+        exp_name = f"{name}{args.name_suffix}"
         cmd = [
             py,
             str(ROOT / "scripts" / "train.py"),
             "--config",
             args.config,
             "--exp-name",
-            name,
+            exp_name,
             "--use-sst",
             str(flags["use_sst"]),
             "--use-sqg",
@@ -84,14 +91,24 @@ def main() -> None:
             cmd += ["--epochs", "2"]
         elif args.epochs is not None:
             cmd += ["--epochs", str(args.epochs)]
+        if args.crop_size is not None:
+            cmd += ["--crop-size", str(args.crop_size)]
+        if args.max_samples is not None:
+            cmd += ["--max-samples", str(args.max_samples)]
+        if args.batch_size is not None:
+            cmd += ["--batch-size", str(args.batch_size)]
+        if args.device:
+            cmd += ["--device", args.device]
+        if args.seed is not None:
+            cmd += ["--seed", str(args.seed)]
         print(">>", " ".join(cmd), flush=True)
         r = subprocess.run(cmd, cwd=ROOT)
         if r.returncode != 0:
             raise SystemExit(r.returncode)
-        ckpt = ROOT / "checkpoints" / f"4dvarnet-{name}-best.pt"
-        row: dict = {"name": name, **flags, "ckpt": str(ckpt)}
+        ckpt = ROOT / "checkpoints" / f"4dvarnet-{exp_name}-best.pt"
+        row: dict = {"name": name, "exp_name": exp_name, **flags, "ckpt": str(ckpt), "seed": args.seed}
         if not args.skip_eval and ckpt.exists():
-            metrics_path = results_dir / f"metrics_{name}.json"
+            metrics_path = results_dir / f"metrics_{exp_name}.json"
             ev_cmd = [
                 py,
                 str(ROOT / "scripts" / "evaluate.py"),
@@ -101,9 +118,17 @@ def main() -> None:
                 str(ckpt),
                 "--out",
                 str(metrics_path),
+                "--batch-size",
+                "1",
             ]
             if args.source:
                 ev_cmd += ["--source", args.source]
+            if args.crop_size is not None:
+                ev_cmd += ["--crop-size", str(args.crop_size)]
+            if args.max_samples is not None:
+                ev_cmd += ["--max-samples", str(args.max_samples)]
+            if args.device:
+                ev_cmd += ["--device", args.device]
             ev = subprocess.run(ev_cmd, cwd=ROOT, capture_output=True, text=True, encoding="utf-8", errors="replace")
             print(ev.stdout, end="" if ev.stdout.endswith("\n") or not ev.stdout else "\n")
             if ev.stderr:

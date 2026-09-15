@@ -18,6 +18,7 @@ sys.path.insert(0, str(ROOT))
 from data.dataset import make_datasets, scales_from_dataset
 from fourdvarnet.metrics import batch_metrics, resolved_timescale
 from fourdvarnet.model import build_fourdvarnet
+from fourdvarnet.repro import git_commit
 
 
 def _fmt(v: float) -> str:
@@ -65,6 +66,8 @@ def main() -> None:
     p.add_argument("--source", default=None, help="synthetic | natl60")
     p.add_argument("--crop-size", type=int, default=None, help="NATL60 center crop (CPU smoke)")
     p.add_argument("--max-samples", type=int, default=None, help="cap test windows (CPU smoke)")
+    p.add_argument("--batch-size", type=int, default=None, help="eval loader batch (default min(4,n))")
+    p.add_argument("--device", default=None, help="cpu | cuda | auto")
     p.add_argument("--out", default=None, help="optional JSON path for metrics")
     args = p.parse_args()
 
@@ -86,7 +89,8 @@ def main() -> None:
         raise SystemExit(f"Data load failed:\n{exc}") from exc
     except RuntimeError as exc:
         raise SystemExit(f"Dataset split error:\n{exc}") from exc
-    loader = DataLoader(test_ds, batch_size=min(4, max(len(test_ds), 1)))
+    bs = args.batch_size if args.batch_size is not None else min(4, max(len(test_ds), 1))
+    loader = DataLoader(test_ds, batch_size=bs)
 
     # torch>=2 supports weights_only=; faceswap env is 1.12.1 — omit for compat
     ckpt = torch.load(ROOT / args.ckpt, map_location="cpu")
@@ -109,6 +113,12 @@ def main() -> None:
         f0=scales["f0"],
     )
     model.load_state_dict(ckpt["model"])
+    want = str(args.device or "auto").lower()
+    if want in ("auto", ""):
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    else:
+        device = torch.device(want)
+    model = model.to(device)
     model.eval()
 
     dx_km = float(scales["dx"]) / 1000.0
@@ -126,6 +136,7 @@ def main() -> None:
     dx_acc, dy_acc, n_scale = 0.0, 0.0, 0
     # Inner 4DVar loop needs autograd even at inference - do not wrap in no_grad.
     for batch in loader:
+        batch = {k: (v.to(device) if isinstance(v, torch.Tensor) else v) for k, v in batch.items()}
         dx_b, dy_b = _batch_scales(batch, scales)
         dx_acc += dx_b
         dy_acc += dy_b
@@ -151,8 +162,8 @@ def main() -> None:
         truth_chunks.append(truth.detach().cpu())
         geo_chunks.append(geo_state.detach().cpu())
         kw = dict(dx=dx_b, dy=dy_b, dx_km=dx_km)
-        model_ms.append(batch_metrics(pred_d, truth, **kw))
-        geo_ms.append(batch_metrics(geo_state, truth, **kw))
+        model_ms.append(batch_metrics(pred_d.cpu(), truth.detach().cpu(), **kw))
+        geo_ms.append(batch_metrics(geo_state.cpu(), truth.detach().cpu(), **kw))
 
         # Per-sample domain-mean UV proxies for temporal resolved scale.
         for i in range(pred_d.shape[0]):
@@ -210,19 +221,38 @@ def main() -> None:
     else:
         print("WARN: model did not beat geostrophic baseline (needs more training or NATL60)")
 
+    # Sanity flag for pathological geo baseline (pre-P0 bug was tau_uv ≈ -3.7).
+    geo_tau = float(mean_geo.get("tau_uv", float("nan")))
+    geo_sane = (geo_tau == geo_tau) and (-0.5 <= geo_tau <= 1.0)
+    if not geo_sane:
+        print(f"WARN: geostrophic tau_uv={geo_tau} outside sane band [-0.5, 1.0]")
+
     if args.out:
         payload = {
             "ckpt": str(Path(args.ckpt)),
             "source": str((cfg.get("data") or {}).get("source", "synthetic")),
+            "crop_size": (cfg.get("data") or {}).get("crop_size"),
+            "max_samples": (cfg.get("data") or {}).get("max_samples"),
             "flags": {
                 "use_sst": bool(use_sst),
                 "use_sqg": bool(use_sqg),
                 "use_adv": bool(use_adv),
                 "use_uncert": bool(use_uncert),
             },
+            "seed": ckpt.get("seed"),
+            "git_commit_ckpt": ckpt.get("git_commit"),
+            "git_commit_eval": git_commit(ROOT),
+            "ckpt_epoch": ckpt.get("epoch"),
             "physics_scales": {"dx": scales["dx"], "dy": scales["dy"], "f0": scales["f0"]},
             "geostrophic_baseline": "oi_only",
+            "geostrophic_tau_uv_sane": geo_sane,
             "metrics_aggregation": "full_test_pooled",
+            "protocol_note": (
+                "crop/max_samples metrics are post_p0 directional evidence on limited VRAM; "
+                "not full-grid JAMES Table rows."
+                if (cfg.get("data") or {}).get("crop_size") is not None
+                else "full-grid evaluation"
+            ),
             "model": mean_m,
             "geostrophic": mean_geo,
             "provisional_batch_mean": {

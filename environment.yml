@@ -1,0 +1,26 @@
+# Conda environment lock note for Coucou2016/4DVarNets-sea-current
+# Primary measured runs on this workstation used:
+#   env name: faceswap
+#   python: 3.8 / 3.9 (faceswap)
+#   torch: 1.12.1+cu113  (GTX 950M, driver CUDA 11.2)
+# Fresh clones may prefer a newer torch; keep torch CUDA matching the driver.
+name: 4dvarnets-sea-current
+channels:
+  - pytorch
+  - conda-forge
+  - defaults
+dependencies:
+  - python>=3.8,<3.12
+  - numpy>=1.24
+  - scipy>=1.10
+  - pyyaml>=6.0
+  - xarray>=2023.1
+  - netcdf4>=1.6
+  - pytest>=7.0
+  - matplotlib>=3.7
+  - pip
+  - pip:
+      - SciencePlots>=2.1
+      # Install torch separately for your CUDA:
+      #   pip install torch==1.12.1+cu113 -f https://download.pytorch.org/whl/torch_stable.html
+      # or: pip install 'torch>=2.0'  (CUDA build matching your driver)

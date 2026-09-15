@@ -1,0 +1,204 @@
+<!DOCTYPE html><html><head><meta charset=utf-8><title>AUDIT</title><style>body{font-family:Times New Roman,SimSun,serif;max-width:900px;margin:24px auto;padding:0 16px;line-height:1.45}table{border-collapse:collapse;width:100%}th,td{border:1px solid #ccc;padding:6px}th{background:#f4f4f4}</style></head><body><h1>Audit evidence — data / code / results provenance</h1>
+<p><strong>Public repo:</strong> https://github.com/Coucou2016/4DVarNets-sea-current<br />
+<strong>Purpose:</strong> Demonstrate that reported numbers are computed in <em>this</em> repository, quarantine legacy protocols, and list what was <strong>not</strong> run. This document is <em>not</em> a manuscript section.</p>
+<p><strong>Audit date:</strong> 2026-09-15  </p>
+<hr />
+<h2>1. Scientific honesty rules (enforced)</h2>
+<ol>
+<li>Use <strong>only</strong> metrics JSON under <code>results/</code> (including <code>results/legacy_pre_review2/</code> when labelled as quarantine).</li>
+<li><strong>Never</strong> copy Fablet/JAMES (or any external) table numbers as “our results.”</li>
+<li>Label protocol tags: <code>post_p0</code>, <code>legacy_pre_review2</code> / <code>pre_p0_fix</code>, synthetic short-train.</li>
+<li>Full-grid ~200-epoch JAMES Table claims: <strong>待补充</strong> (not invented).</li>
+</ol>
+<hr />
+<h2>2. Primary measured artefacts (post_p0)</h2>
+<table>
+<thead>
+<tr>
+<th>Artefact</th>
+<th>Role</th>
+<th>SHA256 (first 16 hex)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>results/post_p0/ablation_summary.json</code></td>
+<td>Multi-seed mean±std for B1–M4, R0</td>
+<td><code>c2ddc875a018a1ae</code></td>
+</tr>
+<tr>
+<td><code>results/post_p0/metrics_{ID}-s{0,1,2}.json</code></td>
+<td>Per-seed evaluation</td>
+<td>(see §2.1)</td>
+</tr>
+<tr>
+<td><code>results/physics_ops/physics_ops_validation.json</code></td>
+<td>Stage E SQG / advection</td>
+<td><code>c01f1054d6627029</code></td>
+</tr>
+<tr>
+<td><code>results/legacy_pre_review2/metrics_B2_GPU96.json</code></td>
+<td>Quarantined historical</td>
+<td><code>4c9344624604903e</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Protocol (ablation_summary):</strong> NATL60, <code>crop_size=96</code>, <code>epochs=15</code>, <code>batch_size=1</code>, <code>seeds=[0,1,2]</code>, CUDA. Note in JSON: <em>not</em> full-grid JAMES Table rows. Git commit recorded in summary: <code>89f61b6</code>.</p>
+<h3>2.1 Per-seed metric files</h3>
+<p>Present under <code>results/post_p0/</code>:</p>
+<ul>
+<li>B1-s0/s1/s2, B2-s0/s1/s2, M1-s0/s1/s2, M2-s0/s1/s2, M3-s0/s1/s2, M4-s0/s1/s2, R0-s0/s1/s2</li>
+</ul>
+<p>Each JSON includes <code>ckpt</code>, <code>crop_size</code>, <code>seed</code>, <code>git_commit_ckpt</code>, <code>git_commit_eval</code>, <code>model.*</code>, <code>geostrophic.*</code>, and <code>protocol_note</code>.</p>
+<h3>2.2 Checkpoints (local only; not pushed)</h3>
+<p>Corresponding best weights: <code>checkpoints/4dvarnet-{ID}-s{seed}-best.pt</code> (excluded from git as <code>*.pt</code>). Training histories: <code>checkpoints/history-{ID}-s{seed}.json</code> (+ <code>-meta.json</code>).</p>
+<hr />
+<h2>3. How numbers were computed</h2>
+<table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>Script</th>
+<th>Inputs</th>
+<th>Outputs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>E</td>
+<td><code>scripts/validate_physics_operators.py</code></td>
+<td>NATL60 truth crop96</td>
+<td><code>results/physics_ops/*</code></td>
+</tr>
+<tr>
+<td>F–G train/eval</td>
+<td><code>scripts/run_post_p0_pipeline.py</code> → <code>scripts/train.py</code>, <code>scripts/evaluate.py</code></td>
+<td><code>config/default.yaml</code>, <code>config/r0_compact_faithful.yaml</code></td>
+<td>ckpts + <code>results/post_p0/metrics_*.json</code></td>
+</tr>
+<tr>
+<td>F–G summarize</td>
+<td>pipeline / <code>finalize_post_p0.py</code></td>
+<td>metrics JSONs</td>
+<td><code>ablation_summary.json</code></td>
+</tr>
+<tr>
+<td>H</td>
+<td><code>scripts/run_sensitivity.py</code></td>
+<td>B2-s0 / M3-s0 ckpts</td>
+<td><code>results/post_p0/sensitivity/</code> (if completed)</td>
+</tr>
+<tr>
+<td>Figures</td>
+<td><code>scripts/plot_science.py</code> + <code>fourdvarnet/plotting.py</code></td>
+<td>metrics JSON</td>
+<td><code>results/figures/</code>, mirrored to <code>docs/paper/figures/</code>, <code>docs/report/figures/</code></td>
+</tr>
+<tr>
+<td>Paper</td>
+<td><code>scripts/assemble_paper.py</code></td>
+<td><code>docs/paper/0*.md</code></td>
+<td><code>PAPER.md</code>, <code>paper.html</code>, <code>paper.pdf</code></td>
+</tr>
+<tr>
+<td>Report</td>
+<td><code>scripts/build_report.py</code></td>
+<td>metrics + PNGs</td>
+<td><code>docs/report/report.{html,md,pdf}</code>, root <code>report.html</code></td>
+</tr>
+</tbody>
+</table>
+<p>Core libraries: <code>fourdvarnet/model.py</code>, <code>solver.py</code>, <code>physics.py</code>, <code>losses.py</code>, <code>metrics.py</code>; data <code>data/natl60.py</code>, <code>data/dataset.py</code>.</p>
+<hr />
+<h2>4. Quarantine: legacy vs current</h2>
+<table>
+<thead>
+<tr>
+<th>Tag</th>
+<th>Path</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>post_p0</strong></td>
+<td><code>results/post_p0/</code></td>
+<td>Primary scientific ranking for this package</td>
+</tr>
+<tr>
+<td><strong>legacy_pre_review2</strong> / <strong>pre_p0_fix</strong></td>
+<td><code>results/legacy_pre_review2/</code></td>
+<td>Historical crop96/20ep only; do not cite as current claims</td>
+</tr>
+<tr>
+<td>Synthetic short</td>
+<td><code>results/metrics_B2.json</code> etc.</td>
+<td>Directional code-path only</td>
+</tr>
+</tbody>
+</table>
+<p>Known historical issue (documented): pre-P0 geostrophic τ_uv could be pathological (~−3.7); post_p0 OI-only geo τ_uv ≈ <strong>0.846</strong> (sane).</p>
+<hr />
+<h2>5. What was NOT run / 待补充</h2>
+<ol>
+<li>Full-grid uncropped NATL60 (~200×200) × ~200 epochs × multi-seed JAMES Table (4GB VRAM / wall-time).</li>
+<li>Byte-faithful CIA-Oceanix R0 + official pretrained checkpoint evaluation.</li>
+<li>VarDyn comparator experiments (separate codebase).</li>
+<li>Formal OSE / drifter score tables (hooks may exist; scores 待补充).</li>
+<li>
+<p>Copying any external paper table as ours — <strong>not done</strong>.</p>
+</li>
+<li>
+<p>Stage H sensitivity: <strong>Done</strong> — <code>results/post_p0/sensitivity/sensitivity_summary.json</code> (SST factors 1/4/8; altimetry keep_every=3; strain bins). M3 τ_uv drops under strong SST coarsening (factor 8: ~0.876 vs ~0.909 at factor 1); sparsity impact mild.</p>
+</li>
+</ol>
+<hr />
+<h2>6. Pytest / tooling gate</h2>
+<p>Command (faceswap env, 2026-09-15 package build):</p>
+<pre><code class="language-text">python -m pytest -q --tb=line
+..........................................................               [100%]
+</code></pre>
+<p>Status: <strong>green</strong> (58 tests).</p>
+<hr />
+<h2>7. Plagiarism / table hygiene</h2>
+<ul>
+<li>Manuscript and report tables are built from <strong>local</strong> JSON only.</li>
+<li>Literature DOIs were verified via WebSearch (2026-09-15): Fablet 2024 <code>10.1029/2023MS003609</code>; Beauchamp 2023 <code>10.5194/gmd-16-2119-2023</code>; VarDyn 2025 <code>10.1029/2024MS004689</code>; Lapeyre &amp; Klein 2006 <code>10.1175/JPO2840.1</code>.</li>
+<li>Paper body avoids local absolute paths and git SHAs (audit/report may include them).</li>
+</ul>
+<hr />
+<h2>8. Deliverable map</h2>
+<table>
+<thead>
+<tr>
+<th>Deliverable</th>
+<th>Paths</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Outline</td>
+<td><code>docs/paper/OUTLINE.md</code></td>
+</tr>
+<tr>
+<td>Paper</td>
+<td><code>docs/paper/PAPER.md</code>, <code>paper.html</code>, <code>paper.pdf</code></td>
+</tr>
+<tr>
+<td>Report</td>
+<td><code>docs/report/report.md</code>, <code>report.html</code>, <code>report.pdf</code> (+ root <code>report.html</code>)</td>
+</tr>
+<tr>
+<td>Audit</td>
+<td><code>docs/AUDIT_EVIDENCE.md</code> (+ optional html/pdf)</td>
+</tr>
+<tr>
+<td>Figures</td>
+<td><code>results/figures/</code>, <code>docs/paper/figures/</code>, <code>docs/report/figures/</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>9. Recompute hashes (maintainer)</h2>
+<pre><code class="language-bash">python -c &quot;import hashlib,pathlib; p=pathlib.Path('results/post_p0/ablation_summary.json'); print(hashlib.sha256(p.read_bytes()).hexdigest())&quot;
+</code></pre></body></html>

@@ -114,16 +114,28 @@ def bar_compare(
     ylabel: str,
     title: str | None = None,
     ylim: tuple[float, float] | None = None,
+    yerr: dict[str, Sequence[float]] | None = None,
 ) -> mpl.figure.Figure:
     """Grouped bar chart for ablation / baseline comparison."""
     apply_science_style()
     x = np.arange(len(labels))
     n = max(len(series), 1)
     width = min(0.8 / n, 0.35)
-    fig, ax = plt.subplots(figsize=(6.2, 3.6))
+    fig, ax = plt.subplots(figsize=(6.8, 3.8))
     for i, (name, vals) in enumerate(series.items()):
         offset = (i - (n - 1) / 2.0) * width
-        ax.bar(x + offset, list(vals), width=width, label=name)
+        err = None
+        if yerr and name in yerr:
+            err = list(yerr[name])
+        ax.bar(
+            x + offset,
+            list(vals),
+            width=width,
+            label=name,
+            yerr=err,
+            capsize=2.5 if err is not None else 0,
+            error_kw={"elinewidth": 0.9, "capthick": 0.9},
+        )
     ax.set_xticks(x)
     ax.set_xticklabels(list(labels))
     ax.set_ylabel(ylabel)

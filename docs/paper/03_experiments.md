@@ -1,109 +1,63 @@
-# 3. Experiments (setup + preliminary results)
+# 3. Experiments and results
 
-**Status:** matured draft. All numeric values below are **local measured** results.  
-**Hard caveat:** GPU96 = NATL60 **crop_size=96**, **20 epochs** — **not** JAMES Table / full-domain 200-ep protocol.
+**Protocol caveat.** Primary NATL60 numbers are **crop_size=96**, **15 epochs**, **seeds {0,1,2}** (tag `post_p0`). They are directional evidence on limited VRAM and are **not** JAMES full-domain ~200-epoch Table rows. Full-grid Table claims: **待补充**.
 
-> **P0 (2026-09):** GPU96 / synthetic metrics JSON are tagged `pre_p0_fix` and are
-> **obsolete for formal claims** after Phase-1 correctness fixes. See
-> `docs/REVIEW_RESPONSE_P0.md`. Numbers below are **historical pre-fix** context only.
+Canonical paths: `results/physics_ops/` (Stage E), `results/post_p0/` (Stages F–G). Legacy crop96/20ep JSON under `results/legacy_pre_review2/` is quarantined (`pre_p0_fix`) and is not used for scientific ranking claims.
 
-Figures: SciencePlots + Times New Roman via `scripts/plot_science.py` → `results/figures/` (mirrored in `docs/paper/figures/`). Expanded summary JSON: `results/legacy_pre_review2/metrics_GPU96_expanded_summary.json` (`legacy_pre_review2` / `pre_p0_fix`).
+## 3.1 Stage E — physics operators on NATL60 truth
 
----
+Operators are evaluated against truth SST/SSH/UV on paper-mode NATL60 (obs+oi), crop96, 23 test days (`scripts/validate_physics_operators.py` → `results/physics_ops/physics_ops_validation.json`).
 
-## 3.1 OSSE protocols
+| Quantity | Measured |
+|----------|---------:|
+| SQG τ_uv mean | −0.011 |
+| SQG corr_u / corr_v | 0.876 / 0.915 |
+| SQG rmse_uv | 0.478 |
+| Adv RMS truth / scrambled / zero | 6.06×10⁻⁶ / 2.22×10⁻⁵ / 4.97×10⁻⁶ |
 
-### Synthetic (directional)
+Standalone SQG recovers correlated structure but near-zero explained variance of UV on this crop (`lam_sqg_caution`). Truth advection residuals beat scrambled fields; zero-flow residuals can be ≤ truth when \(\partial_t - \kappa\nabla^2\) dominates. Soft λ_sqg inside a learned solver must therefore not be equated with hard SQG current recovery.
 
-- Source: `synthetic` cache (`data/synthetic_osse.npz`).
-- Short training (8 epochs in directional ablation) for wiring / ranking checks only.
-- See `results/SYNTHETIC_ABLATION_NOTES.md` and `results/metrics_{B2,M3,M4}.json`.
+## 3.2 Stages F–G — learned ablations (post_p0)
 
-### NATL60 Gulf Stream OSSE (paper protocol vs this draft)
+- Source: NATL60 paper mode; Gulf Stream box; paper date splits; OI-only geostrophic baseline.
+- Train: crop96, batch size 1, 15 epochs, seeds {0,1,2}, CUDA (GTX 950M 4GB).
+- Summary: `results/post_p0/ablation_summary.json` (mean ± std over seeds).
 
-Paper-ready rows require (`docs/PAPER_EXPERIMENTS.md`):
+### Table 1. Measured post_p0 scores (mean of three seeds)
 
-- Full Gulf Stream box **33–43°N, 65–55°W**
-- Splits: train 2013-02-04→2013-09-30; val 2013-01-01→2013-02-04; test 2012-10-20→2012-12-04
-- Finished ckpt + `results/metrics_<ID>.json` on **test**
-- **Uncropped**, long epoch schedule (target ~200) for Table claims
+| ID | τ_uv ↑ | rmse_uv ↓ | rmse_ssh ↓ |
+|----|-------:|----------:|-----------:|
+| B1 | 0.861 ± 0.004 | 0.178 ± 0.003 | 0.059 ± 0.001 |
+| B2 | 0.878 ± 0.027 | 0.166 ± 0.019 | 0.059 ± 0.006 |
+| M1 | 0.916 ± 0.005 | 0.139 ± 0.004 | 0.049 ± 0.002 |
+| M2 | 0.880 ± 0.025 | 0.165 ± 0.018 | 0.056 ± 0.003 |
+| M3 | 0.914 ± 0.005 | 0.140 ± 0.004 | 0.050 ± 0.001 |
+| M4 | 0.917 ± 0.003 | 0.137 ± 0.003 | 0.051 ± 0.002 |
+| R0 | 0.850 ± 0.013 | 0.185 ± 0.008 | 0.059 ± 0.000 |
+| geo (OI-only, B2-s0) | 0.846 | 0.188 | — |
 
-**This draft reports only GPU96 crop96/20ep** for B2/M3/M4 — preliminary ranking evidence.
+Acceptance checks in the same JSON: geostrophic τ_uv is sane (~0.85; the pre-P0 pathological geo τ_uv ≈ −3.7 is fixed); B2 mean τ_uv exceeds B1.
 
-**Hardware honesty.** GTX 950M 4GB (`faceswap` env, torch 1.12.1+cu113) cannot host uncropped ~200×200 / ~200-ep Table training in this environment. We therefore (i) label crop96/20ep as preliminary, (ii) expand measured diagnostics (τ_div, λ_x, loss curves), and (iii) do **not** invent JAMES Table scores. B1 SSH-only crop96/20ep remains a desirable completeness run when GPU memory is free.
+**Interpretation (bounded).** Under this post_p0 protocol, soft SQG-containing configurations (M1, M3, M4) outperform multimodal B2 on mean τ_uv, while B2 still beats B1 and geostrophy. Advection alone (M2) is close to B2. Compact larger-capacity R0 does not beat B2 here and is not a byte-faithful official R0. These ranks reverse the quarantined pre-P0 crop96/20ep historical order (B2 > M3 ≳ M4), underscoring protocol dependence and the need for full-grid long-train confirmation (**待补充**).
 
----
+Figures: `fig_post_p0_tau_uv`, `fig_post_p0_rmse_uv`, `fig_post_p0_rmse_ssh` (SciencePlots, 300 dpi); Stage E `fig_sqg_skill`, `fig_adv_residual_sanity`.
 
-## 3.2 Ablation matrix
+## 3.3 Quarantined historical context (not for Table claims)
 
-| ID | SST | SQG | Adv | Uncert | Role | Status (this draft) |
-|----|-----|-----|-----|--------|------|---------------------|
-| B1 | | | | | SSH-only baseline | **Not measured** this session |
-| B2 | ✓ | | | | Multimodal synergy (Fablet-like) | Measured GPU96 |
-| M3 | ✓ | ✓ | ✓ | | Physics residuals in cost | Measured GPU96 |
-| M4 | ✓ | ✓ | ✓ | ✓ | + strain-aware spatial reweighting | Measured GPU96 (post-NLL-fix; **pre_p0_fix**) |
-| geo | — | — | — | — | Geostrophic baseline | Always co-reported |
+Legacy NATL60 crop96/20ep (`results/legacy_pre_review2/`): B2 τ_uv 0.848, M3 0.811, M4 0.801 (post-NLL-fix), all above a then-broken geo diagnostic. Those files remain for engineering history only.
 
----
+Synthetic 8-epoch OSSE metrics (`results/metrics_B2.json`, `M3`, `M4`) are directional code-path checks only.
 
-## 3.3 Preliminary results — GPU96 crop96 / 20ep
+## 3.4 Stage H — sensitivity (eval-time, frozen ckpts)
 
-Source JSON: `results/legacy_pre_review2/metrics_{B2,M3,M4}_GPU96.json` (+ pre-fix archive).
+Source: `results/post_p0/sensitivity/sensitivity_summary.json` (B2-s0 vs M3-s0; crop96).
 
-### Table A — primary UV / SSH skill
+SST coarsening (average-pool then upsample) and altimetry thinning change scores only mildly on this crop; high-strain bins show larger UV RMSE than low-strain bins for both models. These are diagnostic, not full-grid Table rows.
 
-| ID | τ_uv ↑ | rmse_uv ↓ | rmse_ssh ↓ | Notes |
-|----|--------|-----------|------------|-------|
-| **B2** | **0.848** | **0.184** | **0.059** | Best UV & SSH among learned models |
-| M3 | 0.811 | 0.206 | 0.064 | SQG+adv slightly below B2 |
-| M4 | 0.801 | 0.211 | 0.063 | **Post-NLL-fix retrain**; SSH recovered; UV ≈ M3 |
-| M4 (pre-fix) | 0.806 | 0.209 | **0.122** | Archived — SSH starved by raw NLL |
-| geo | −3.74 | 1.029 | 0.059 | All learned models beat geo on τ_uv / rmse_uv |
+## 3.5 What is not claimed
 
-Ranking (this protocol, **post-fix**): **B2 > M3 ≳ M4** on currents; M4 SSH no longer degraded.
-
-Training diagnostics (val loss at best ckpt): B2 ≈ 4.53; M3 ≈ 5.19; M4 **post-fix** ≈ **4.83** @ep15 (was ≈682 pre-fix).
-
-### Table B — expanded diagnostics (same JSON; still crop96/20ep)
-
-| ID | τ_div | τ_vort | τ_strain | λ_x,ssh (km) | λ_x,uv (km) |
-|----|-------|--------|----------|--------------|-------------|
-| B2 | **0.354** | **0.535** | **0.571** | 102.4 | 90.3 |
-| M3 | −1.317 | −0.635 | −0.908 | 97.6 | 79.6 |
-| M4 | −1.480 | −0.858 | −1.316 | 83.3 | 86.1 |
-| geo | ≈0 | −56.1 | −80.5 | 122.2 | 101.6 |
-
-**Reading Table B.** On this preliminary protocol, B2 alone shows positive explained variance for divergence/vorticity/strain; M3/M4 are negative on these diagnostics despite competitive τ_uv. This strengthens the partial-result narrative: physics residuals do not automatically improve dynamical structure scores under crop96/20ep. λ_x values are reported for completeness; they are **not** promoted to paper-Table resolved-scale claims.
-
-### Figures (captions)
-
-**Figure 2 (synthetic).** `fig_synth_ablation_tau_uv`, `fig_synth_ablation_rmse_uv`  
-*Caption:* Synthetic OSSE ablation (8 epochs). Directional only; not NATL60 Table metrics. On this short synthetic run, M4 ranked best among B2/M3/M4 after the truth-σ reweight fix.
-
-**Figure 3 (GPU96 primary).** `fig_GPU96_tau_uv`, `fig_GPU96_rmse_uv`, `fig_{B2,M3,M4}_GPU96_loss`  
-*Caption:* NATL60 OSSE, **cropped 96×96, 20 epochs**. Explained variance and RMSE of surface currents for B2/M3/M4 vs geostrophy; loss curves for each run. **Preliminary / not paper Table.** B2 leads; M3 and M4 remain far above geostrophy but do not improve on B2.
-
-**Figure 3b (GPU96 diagnostics).** `fig_GPU96_tau_div`, `fig_GPU96_lambda_x_uv`  
-*Caption:* Same protocol. Divergence explained variance and λ_x,uv from measured JSON. Diagnostic only; still ≠ JAMES Table.
-
----
-
-## 3.4 Contrast with synthetic 8-ep ranking
-
-| Setting | Ranking (τ_uv) |
-|---------|----------------|
-| Synthetic 8ep (directional) | M4 best among B2/M3/M4 |
-| NATL60 GPU96 crop96/20ep | B2 > M3 ≳ M4 |
-
-This discrepancy is treated as a **scientific result**, not a bug to hide: physics extras can help under some regimes/scales/training lengths and hurt or be neutral under others (see Discussion).
-
----
-
-## 3.5 What is *not* claimed yet
-
-- No full-grid NATL60 200-ep Table.
-- No B1 GPU96 row in this draft.
-- No OSE / drifter scores in this draft.
+- No full-grid NATL60 ~200-epoch JAMES Table from this workstation.
 - No copying of Fablet 2024 JAMES table numbers as ours.
-- GPU96 metrics must not be promoted to “demonstrates improvement of SQG+adv over SST synergy.”
-- No fabricated multi-seed confidence intervals.
+- No claim that SQG alone recovers currents (Stage E τ_uv ≈ 0).
+- No claim that M4 estimates uncertainty (strain reweighting only).
+- No byte-faithful Fablet R0 comparison.

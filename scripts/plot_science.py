@@ -174,7 +174,9 @@ def main() -> None:
                 "",
                 "- Style: SciencePlots (`science`+`ieee`) + Times New Roman; CJK fallback SimSun/Microsoft YaHei (`fourdvarnet/plotting.py`). DPI 300.",
                 "- Synthetic ablation figures are **directional** only (8-epoch synthetic OSSE).",
-                "- GPU96 figures are **cropped / short-epoch** NATL60 — **not** JAMES Table rows.",
+                "- GPU96 / legacy figures under `results/legacy_pre_review2/` are **pre_p0_fix** - do not cite as Table rows.",
+                "- **post_p0** figures (`fig_post_p0_*`) are crop96 / 15ep / multi-seed directional evidence after P0 fixes - still **not** full-grid JAMES Table rows.",
+                "- Stage E physics-operator figures live under `results/physics_ops/` and are mirrored here.",
                 "- Do not invent or paste JAMES paper table numbers into these plots.",
                 "",
             ]
@@ -182,7 +184,109 @@ def main() -> None:
         encoding="utf-8",
     )
 
+    # --- Mirror Stage E physics figures into results/figures ---
+    phys_dir = results / "physics_ops"
+    for stem in ("fig_sqg_skill", "fig_adv_residual_sanity"):
+        for ext in (".png", ".pdf"):
+            src = phys_dir / f"{stem}{ext}"
+            if src.is_file():
+                dst = fig_dir / f"{stem}{ext}"
+                dst.write_bytes(src.read_bytes())
+                written.append(dst)
+
+    # --- post_p0 ablation summary (mean±std) ---
+    post = results / "post_p0" / "ablation_summary.json"
+    if post.is_file():
+        ledger = _load(post)
+        summary = ledger.get("summary") or {}
+        # OI-only geo from any seed-0 metrics file (same protocol).
+        geo_ref = float("nan")
+        for seed_name in ("B2-s0", "B1-s0", "M3-s0"):
+            mp = results / "post_p0" / f"metrics_{seed_name}.json"
+            if mp.is_file():
+                geo_ref = float((_load(mp).get("geostrophic") or {}).get("tau_uv", float("nan")))
+                break
+
+        ids_p: list[str] = []
+        tau_m: list[float] = []
+        tau_s: list[float] = []
+        rmse_m: list[float] = []
+        rmse_s: list[float] = []
+        ssh_m: list[float] = []
+        ssh_s: list[float] = []
+        geo_m: list[float] = []
+        for name in ("B1", "B2", "M1", "M2", "M3", "M4", "R0"):
+            block = summary.get(name)
+            if not block:
+                continue
+            mets = block.get("metrics") or {}
+            m_tau = mets.get("tau_uv") or {}
+            if m_tau.get("mean") is None:
+                continue
+            ids_p.append(name)
+            tau_m.append(float(m_tau["mean"]))
+            tau_s.append(float(m_tau.get("std") or 0.0))
+            m_rmse = mets.get("rmse_uv") or {}
+            rmse_m.append(float(m_rmse.get("mean") or float("nan")))
+            rmse_s.append(float(m_rmse.get("std") or 0.0))
+            m_ssh = mets.get("rmse_ssh") or {}
+            ssh_m.append(float(m_ssh.get("mean") or float("nan")))
+            ssh_s.append(float(m_ssh.get("std") or 0.0))
+            g = (block.get("geostrophic_tau_uv") or {}).get("mean")
+            geo_m.append(float(g) if g is not None else geo_ref)
+
+        if ids_p:
+            fig = bar_compare(
+                ids_p,
+                {"Model $\\tau_{uv}$ (mean)": tau_m, "Geostrophic $\\tau_{uv}$": geo_m},
+                ylabel=r"$\tau_{uv}$",
+                title="post_p0 NATL60 crop96/15ep (3 seeds) — not JAMES Table",
+                yerr={"Model $\\tau_{uv}$ (mean)": tau_s},
+            )
+            written += save_figure(fig, fig_dir / "fig_post_p0_tau_uv")
+            fig.clf()
+
+            fig = bar_compare(
+                ids_p,
+                {"Model RMSE$_{uv}$ (mean)": rmse_m},
+                ylabel=r"RMSE$_{uv}$",
+                title="post_p0 NATL60 crop96/15ep (3 seeds) — not JAMES Table",
+                yerr={"Model RMSE$_{uv}$ (mean)": rmse_s},
+            )
+            written += save_figure(fig, fig_dir / "fig_post_p0_rmse_uv")
+            fig.clf()
+
+            fig = bar_compare(
+                ids_p,
+                {"Model RMSE$_{ssh}$ (mean)": ssh_m},
+                ylabel=r"RMSE$_{ssh}$",
+                title="post_p0 NATL60 crop96/15ep (3 seeds) — not JAMES Table",
+                yerr={"Model RMSE$_{ssh}$ (mean)": ssh_s},
+            )
+            written += save_figure(fig, fig_dir / "fig_post_p0_rmse_ssh")
+            fig.clf()
+
+            (results / "post_p0" / "figure_tau_uv_means.json").write_text(
+                json.dumps(
+                    {
+                        "ids": ids_p,
+                        "tau_uv_mean": tau_m,
+                        "tau_uv_std": tau_s,
+                        "rmse_uv_mean": rmse_m,
+                        "rmse_uv_std": rmse_s,
+                        "rmse_ssh_mean": ssh_m,
+                        "rmse_ssh_std": ssh_s,
+                        "geo_tau_uv": geo_m,
+                        "protocol": ledger.get("protocol"),
+                    },
+                    indent=2,
+                ),
+                encoding="utf-8",
+            )
+
+    report_fig = ROOT / "docs" / "report" / "figures"
     mirrored = mirror_to(written, paper_fig)
+    mirrored += mirror_to(written, report_fig)
     print("Wrote:")
     for p in written + mirrored:
         print(f"  {p}")

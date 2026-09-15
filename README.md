@@ -6,11 +6,11 @@
 
 Reference code (full IMT stack): [CIA-Oceanix/4dvarnet-james-uv-ssc](https://github.com/CIA-Oceanix/4dvarnet-james-uv-ssc). This repo is **not** a byte-faithful Fablet reproduction (R0); a faithful R0 port is a later phase.
 
-> **P0 / review2 (2026-09):** Consistency Stage A–D: non-periodic `geometry.grad_*` in physics; faithful solver (no per-iter detach; tensor norm scale only); paper-mode NATL60 (`obs`+`oi`, no truth→`y_ssh`); full SST mask window; OI-only geo baseline; full-test pooled evaluate. See [`docs/REVIEW_RESPONSE_ROUND2.md`](docs/REVIEW_RESPONSE_ROUND2.md).
+> **P0 / review2 + Stages E–H (2026-09):** Consistency Stage A–D tagged `v0.2.0-review2-fixed`. Post-P0 measured runs: Stage E `results/physics_ops/`; Stages F–H `results/post_p0/` (crop96 / 15ep / seeds 0–2). See [`docs/STAGE_EFGH_LEDGER.md`](docs/STAGE_EFGH_LEDGER.md).
 >
-> **GPU96 B2/M3/M4 scores live under `results/legacy_pre_review2/` and are tagged `legacy_pre_review2` / `pre_p0_fix` — obsolete for formal claims.** Do not cite them as paper Table rows until a post-P0 retrain. Historical directional note only: under crop96/20ep, B2 beat M3 ≳ M4 and geostrophy; physics extras did **not** beat B2.
+> **GPU96 B2/M3/M4 scores live under `results/legacy_pre_review2/` (`pre_p0_fix`) — obsolete for formal claims.**
 >
-> Release tag: **`v0.2.0-review2-fixed`**.
+> Target release tag after E–H: **`v0.3.0-post-p0-complete`**.
 
 ## Innovation vs Fablet 2024 (honest)
 

@@ -18,6 +18,7 @@ sys.path.insert(0, str(ROOT))
 from data.dataset import make_datasets, scales_from_dataset
 from fourdvarnet.losses import LossWeights, TrainingLoss
 from fourdvarnet.model import build_fourdvarnet
+from fourdvarnet.repro import git_commit, seed_all
 
 
 def load_config(path: Path) -> dict:
@@ -127,6 +128,10 @@ def main() -> None:
     p.add_argument("--crop-size", type=int, default=None, help="NATL60 center crop (CPU smoke)")
     p.add_argument("--max-samples", type=int, default=None, help="cap windows per split (CPU smoke)")
     p.add_argument("--batch-size", type=int, default=None)
+    p.add_argument("--seed", type=int, default=None, help="RNG seed (default: train.seed or 0)")
+    p.add_argument("--lam-sqg", type=float, default=None, help="override model.lam_sqg")
+    p.add_argument("--lam-adv", type=float, default=None, help="override model.lam_adv")
+    p.add_argument("--lr", type=float, default=None, help="override train.lr")
     p.add_argument(
         "--device",
         default=None,
@@ -147,6 +152,17 @@ def main() -> None:
         tcfg["batch_size"] = args.batch_size
     if args.device:
         tcfg["device"] = args.device
+    if args.lam_sqg is not None:
+        mcfg["lam_sqg"] = float(args.lam_sqg)
+    if args.lam_adv is not None:
+        mcfg["lam_adv"] = float(args.lam_adv)
+    if args.lr is not None:
+        tcfg["lr"] = float(args.lr)
+
+    seed = args.seed if args.seed is not None else int(tcfg.get("seed", 0))
+    seed_all(seed)
+    commit = git_commit(ROOT)
+
     use_sst = _flag(args.use_sst, mcfg.get("use_sst", True))
     use_sqg = _flag(args.use_sqg, mcfg.get("use_sqg", False))
     use_adv = _flag(args.use_adv, mcfg.get("use_adv", False))
@@ -164,7 +180,7 @@ def main() -> None:
     print(
         f"device={device}  epochs={epochs}  source={dcfg.get('source', 'synthetic')}"
         f"  crop_size={dcfg.get('crop_size')}  max_samples={dcfg.get('max_samples')}"
-        f"  batch_size={tcfg['batch_size']}"
+        f"  batch_size={tcfg['batch_size']}  seed={seed}  commit={commit}"
     )
 
     paths_all = load_paths(ROOT)
@@ -175,7 +191,9 @@ def main() -> None:
         raise SystemExit(f"Data load failed:\n{exc}") from exc
     except RuntimeError as exc:
         raise SystemExit(f"Dataset split error:\n{exc}") from exc
-    train_loader = DataLoader(train_ds, batch_size=tcfg["batch_size"], shuffle=True)
+    g = torch.Generator()
+    g.manual_seed(seed)
+    train_loader = DataLoader(train_ds, batch_size=tcfg["batch_size"], shuffle=True, generator=g)
     val_loader = DataLoader(val_ds, batch_size=tcfg["batch_size"])
 
     # Prefer NATL60/synthetic dataset meter spacings over isotropic config fallback.
@@ -218,6 +236,8 @@ def main() -> None:
         "use_adv": use_adv,
         "use_uncert": use_uncert,
         "exp_name": tag,
+        "seed": seed,
+        "git_commit": commit,
     }
 
     for ep in range(1, epochs + 1):
@@ -228,14 +248,25 @@ def main() -> None:
         if va < best:
             best = va
             torch.save(
-                {"model": model.state_dict(), "config": cfg, **flags},
+                {
+                    "model": model.state_dict(),
+                    "optimizer": opt.state_dict(),
+                    "epoch": ep,
+                    "best_val": best,
+                    "config": cfg,
+                    **flags,
+                },
                 ckpt_dir / f"4dvarnet-{tag}-best.pt",
             )
 
     hist_name = f"history-{tag}.json" if args.exp_name else "history.json"
     with open(ckpt_dir / hist_name, "w", encoding="utf-8") as f:
+        # Flat list kept for plot_science / legacy; meta nested alongside when readers support it.
         json.dump(history, f, indent=2)
-    print(f"Best val loss: {best:.4f}  ckpt=4dvarnet-{tag}-best.pt")
+    meta_path = ckpt_dir / (f"history-{tag}-meta.json" if args.exp_name else "history-meta.json")
+    with open(meta_path, "w", encoding="utf-8") as f:
+        json.dump({"seed": seed, "git_commit": commit, "epochs": epochs, "best_val": best}, f, indent=2)
+    print(f"Best val loss: {best:.4f}  ckpt=4dvarnet-{tag}-best.pt  seed={seed}")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,267 @@
+{
+  "stage": "H",
+  "git_commit": "89f61b6",
+  "crop_size": 96,
+  "sst_coarsening": [
+    {
+      "model": {
+        "rmse_ssh": 0.06351916491985321,
+        "rmse_u": 0.17651283740997314,
+        "rmse_v": 0.16658872365951538,
+        "rmse_uv": 0.17162251472473145,
+        "tau_uv": 0.870998933020525,
+        "tau_div": -4.880824150201954,
+        "tau_vort": 0.29865490115570514,
+        "tau_curl": 0.29865490115570514,
+        "tau_strain": -0.45500115985639744,
+        "lambda_x_ssh_km": 93.49614583333332,
+        "lambda_x_ssh_min_ratio": 0.0003184935317646621,
+        "lambda_x_ssh_resolved": 1.0,
+        "lambda_x_uv_km": 76.49684659090907,
+        "lambda_x_uv_min_ratio": 0.0025009185494076817,
+        "lambda_x_uv_resolved": 1.0
+      },
+      "ckpt": "checkpoints/4dvarnet-B2-s0-best.pt",
+      "flags": {
+        "use_sst": true,
+        "use_sqg": false,
+        "use_adv": false,
+        "use_uncert": false
+      },
+      "sst_factor": 1,
+      "mask_keep_every": 1
+    },
+    {
+      "model": {
+        "rmse_ssh": 0.06297735124826431,
+        "rmse_u": 0.17337754368782043,
+        "rmse_v": 0.16273868083953857,
+        "rmse_uv": 0.16814227402210236,
+        "tau_uv": 0.8761777791816504,
+        "tau_div": -4.628804098565481,
+        "tau_vort": 0.3281489375083809,
+        "tau_curl": 0.3281489375083809,
+        "tau_strain": -0.4055482204136973,
+        "lambda_x_ssh_km": 93.49614583333332,
+        "lambda_x_ssh_min_ratio": 0.00029318827116749097,
+        "lambda_x_ssh_resolved": 1.0,
+        "lambda_x_uv_km": 76.49684659090907,
+        "lambda_x_uv_min_ratio": 0.0028343043936233697,
+        "lambda_x_uv_resolved": 1.0
+      },
+      "ckpt": "checkpoints/4dvarnet-B2-s0-best.pt",
+      "flags": {
+        "use_sst": true,
+        "use_sqg": false,
+        "use_adv": false,
+        "use_uncert": false
+      },
+      "sst_factor": 4,
+      "mask_keep_every": 1
+    },
+    {
+      "model": {
+        "rmse_ssh": 0.06305531412363052,
+        "rmse_u": 0.17450745403766632,
+        "rmse_v": 0.16195553541183472,
+        "rmse_uv": 0.1683485209941864,
+        "tau_uv": 0.8758738345880953,
+        "tau_div": -4.335121109871093,
+        "tau_vort": 0.323386563726357,
+        "tau_curl": 0.323386563726357,
+        "tau_strain": -0.3994624975585952,
+        "lambda_x_ssh_km": 93.49614583333332,
+        "lambda_x_ssh_min_ratio": 0.00027922984425866003,
+        "lambda_x_ssh_resolved": 1.0,
+        "lambda_x_uv_km": 64.72810096153846,
+        "lambda_x_uv_min_ratio": 0.003449007313104403,
+        "lambda_x_uv_resolved": 1.0
+      },
+      "ckpt": "checkpoints/4dvarnet-B2-s0-best.pt",
+      "flags": {
+        "use_sst": true,
+        "use_sqg": false,
+        "use_adv": false,
+        "use_uncert": false
+      },
+      "sst_factor": 8,
+      "mask_keep_every": 1
+    },
+    {
+      "model": {
+        "rmse_ssh": 0.050002433359622955,
+        "rmse_u": 0.14475975930690765,
+        "rmse_v": 0.14393769204616547,
+        "rmse_uv": 0.14434930682182312,
+        "tau_uv": 0.9087413169642362,
+        "tau_div": -8.677917896282715,
+        "tau_vort": 0.27925776888033427,
+        "tau_curl": 0.27925776888033427,
+        "tau_strain": -0.6886601319875945,
+        "lambda_x_ssh_km": 93.49614583333332,
+        "lambda_x_ssh_min_ratio": 0.0005765260219374401,
+        "lambda_x_ssh_resolved": 1.0,
+        "lambda_x_uv_km": 64.72810096153846,
+        "lambda_x_uv_min_ratio": 0.0027680723874929734,
+        "lambda_x_uv_resolved": 1.0
+      },
+      "ckpt": "checkpoints/4dvarnet-M3-s0-best.pt",
+      "flags": {
+        "use_sst": true,
+        "use_sqg": true,
+        "use_adv": true,
+        "use_uncert": false
+      },
+      "sst_factor": 1,
+      "mask_keep_every": 1
+    },
+    {
+      "model": {
+        "rmse_ssh": 0.04941105842590332,
+        "rmse_u": 0.14886780083179474,
+        "rmse_v": 0.14496639370918274,
+        "rmse_uv": 0.1469300538301468,
+        "tau_uv": 0.9054490189518892,
+        "tau_div": -8.439222264293399,
+        "tau_vort": 0.26549587095595173,
+        "tau_curl": 0.26549587095595173,
+        "tau_strain": -0.6476936409003322,
+        "lambda_x_ssh_km": 56.09768749999999,
+        "lambda_x_ssh_min_ratio": 0.0005753322619452191,
+        "lambda_x_ssh_resolved": 1.0,
+        "lambda_x_uv_km": 64.72810096153846,
+        "lambda_x_uv_min_ratio": 0.0027714897148917103,
+        "lambda_x_uv_resolved": 1.0
+      },
+      "ckpt": "checkpoints/4dvarnet-M3-s0-best.pt",
+      "flags": {
+        "use_sst": true,
+        "use_sqg": true,
+        "use_adv": true,
+        "use_uncert": false
+      },
+      "sst_factor": 4,
+      "mask_keep_every": 1
+    },
+    {
+      "model": {
+        "rmse_ssh": 0.05290153622627258,
+        "rmse_u": 0.17535018920898438,
+        "rmse_v": 0.16125093400478363,
+        "rmse_uv": 0.16844815015792847,
+        "tau_uv": 0.8757268712016307,
+        "tau_div": -8.400457934013232,
+        "tau_vort": 0.10598091348053673,
+        "tau_curl": 0.10598091348053673,
+        "tau_strain": -0.7680904527175008,
+        "lambda_x_ssh_km": 93.49614583333332,
+        "lambda_x_ssh_min_ratio": 0.0005801837827464234,
+        "lambda_x_ssh_resolved": 1.0,
+        "lambda_x_uv_km": 76.49684659090907,
+        "lambda_x_uv_min_ratio": 0.002566939184246116,
+        "lambda_x_uv_resolved": 1.0
+      },
+      "ckpt": "checkpoints/4dvarnet-M3-s0-best.pt",
+      "flags": {
+        "use_sst": true,
+        "use_sqg": true,
+        "use_adv": true,
+        "use_uncert": false
+      },
+      "sst_factor": 8,
+      "mask_keep_every": 1
+    }
+  ],
+  "altimetry_sparsity": [
+    {
+      "model": {
+        "rmse_ssh": 0.06354472786188126,
+        "rmse_u": 0.17656175792217255,
+        "rmse_v": 0.1666480451822281,
+        "rmse_uv": 0.17167648673057556,
+        "tau_uv": 0.8709177951997213,
+        "tau_div": -4.91716961529902,
+        "tau_vort": 0.2937710116068918,
+        "tau_curl": 0.2937710116068918,
+        "tau_strain": -0.4600379540634616,
+        "lambda_x_ssh_km": 93.49614583333332,
+        "lambda_x_ssh_min_ratio": 0.0003179854442810859,
+        "lambda_x_ssh_resolved": 1.0,
+        "lambda_x_uv_km": 76.49684659090907,
+        "lambda_x_uv_min_ratio": 0.002502557321583209,
+        "lambda_x_uv_resolved": 1.0
+      },
+      "ckpt": "checkpoints/4dvarnet-B2-s0-best.pt",
+      "flags": {
+        "use_sst": true,
+        "use_sqg": false,
+        "use_adv": false,
+        "use_uncert": false
+      },
+      "sst_factor": 1,
+      "mask_keep_every": 3
+    },
+    {
+      "model": {
+        "rmse_ssh": 0.05000676214694977,
+        "rmse_u": 0.14488033950328827,
+        "rmse_v": 0.144085094332695,
+        "rmse_uv": 0.14448325335979462,
+        "tau_uv": 0.9085718705862037,
+        "tau_div": -8.6845899327461,
+        "tau_vort": 0.2734712924934347,
+        "tau_curl": 0.2734712924934347,
+        "tau_strain": -0.7035730407353844,
+        "lambda_x_ssh_km": 93.49614583333332,
+        "lambda_x_ssh_min_ratio": 0.0005763330237338765,
+        "lambda_x_ssh_resolved": 1.0,
+        "lambda_x_uv_km": 64.72810096153846,
+        "lambda_x_uv_min_ratio": 0.0027755440515685238,
+        "lambda_x_uv_resolved": 1.0
+      },
+      "ckpt": "checkpoints/4dvarnet-M3-s0-best.pt",
+      "flags": {
+        "use_sst": true,
+        "use_sqg": true,
+        "use_adv": true,
+        "use_uncert": false
+      },
+      "sst_factor": 1,
+      "mask_keep_every": 3
+    }
+  ],
+  "strain_binning": [
+    {
+      "model": "B2",
+      "ckpt": "checkpoints/4dvarnet-B2-s0-best.pt",
+      "flags": {
+        "use_sst": true,
+        "use_sqg": false,
+        "use_adv": false,
+        "use_uncert": false
+      },
+      "tau_uv": 0.870998933020525,
+      "median_strain": 1.3868883797840681e-05,
+      "rmse_uv_high_strain": 0.201031893491745,
+      "rmse_uv_low_strain": 0.1359950751066208
+    },
+    {
+      "model": "M3",
+      "ckpt": "checkpoints/4dvarnet-M3-s0-best.pt",
+      "flags": {
+        "use_sst": true,
+        "use_sqg": true,
+        "use_adv": true,
+        "use_uncert": false
+      },
+      "tau_uv": 0.9087413169642362,
+      "median_strain": 1.3868883797840681e-05,
+      "rmse_uv_high_strain": 0.16789935529232025,
+      "rmse_uv_low_strain": 0.11611713469028473
+    }
+  ],
+  "notes": {
+    "sst_factor": "factor=1 native (~0.05\u00b0); factor=4 \u2248 0.2\u00b0; factor=8 \u2248 0.4\u00b0 (average-pool then upsample; approximates 1/4\u00b0 and ~1/2\u00b0 bands on this grid).",
+    "mask_keep_every": "keep every N-th valid altimetry pixel (deterministic thin mask)."
+  }
+}
