@@ -1,0 +1,161 @@
+>> C:\Users\Administrator\MiniConda3\envs\faceswap\python.exe E:\Projects\20260522-4DVarNets-sea-current\scripts\train.py --config config/default.yaml --source natl60 --exp-name B1-s0 --epochs 15 --crop-size 96 --batch-size 1 --device cuda --seed 0 --use-sst 0 --use-sqg 0 --use-adv 0 --use-uncert 0
+device=cuda  epochs=15  source=natl60  crop_size=96  max_samples=None  batch_size=1  seed=0  commit=89f61b6
+physics scales: dx=4382.6 m  dy=5559.7 m  f0=7.000e-05
+epoch 1: train=6.7311 val=5.0123
+epoch 2: train=6.1391 val=4.8915
+epoch 3: train=6.1223 val=4.7130
+epoch 4: train=5.9753 val=4.5764
+epoch 5: train=5.8897 val=4.9482
+epoch 6: train=5.8915 val=4.5014
+epoch 7: train=5.7158 val=4.4265
+epoch 8: train=5.7587 val=4.4200
+epoch 9: train=5.8460 val=4.4730
+epoch 10: train=5.5902 val=4.4316
+epoch 11: train=5.5700 val=4.3054
+epoch 12: train=5.5811 val=4.2782
+epoch 13: train=5.6310 val=4.1422
+epoch 14: train=5.6784 val=4.2130
+epoch 15: train=5.6903 val=4.2801
+Best val loss: 4.1422  ckpt=4dvarnet-B1-s0-best.pt  seed=0
+>> C:\Users\Administrator\MiniConda3\envs\faceswap\python.exe E:\Projects\20260522-4DVarNets-sea-current\scripts\evaluate.py --config config/default.yaml --source natl60 --ckpt E:\Projects\20260522-4DVarNets-sea-current\checkpoints\4dvarnet-B1-s0-best.pt --crop-size 96 --batch-size 1 --device cuda --out E:\Projects\20260522-4DVarNets-sea-current\results\post_p0\metrics_B1-s0.json
+=== 4DVarNet test metrics ===
+  physics scales: dx=4382.6 m  dy=5559.7 m
+  aggregation: full-test pooled (concat windows, score once)
+  geostrophic baseline: OI/DUACS-only (not hybrid OI+sparse)
+  rmse_ssh: 0.0586   (geostrophic 0.0596)
+  rmse_u: 0.1788   (geostrophic 0.1936)
+  rmse_v: 0.1728   (geostrophic 0.1815)
+  rmse_uv: 0.1758   (geostrophic 0.1877)
+  tau_uv: 0.8646   (geostrophic 0.8458)
+  tau_div: -11.3619   (geostrophic -0.0006)
+  tau_vort: 0.2184   (geostrophic 0.1572)
+  tau_curl: 0.2184   (geostrophic 0.1572)
+  tau_strain: -0.6144   (geostrophic -0.1841)
+  lambda_x_ssh_km: 93.4961   (geostrophic 93.4961)
+  lambda_x_ssh_min_ratio: 0.0004   (geostrophic 0.0004)
+  lambda_x_ssh_resolved: 1.0000   (geostrophic 1.0000)
+  lambda_x_uv_km: 76.4968   (geostrophic 76.4968)
+  lambda_x_uv_min_ratio: 0.0032   (geostrophic 0.0035)
+  lambda_x_uv_resolved: 1.0000   (geostrophic 1.0000)
+  lambda_t_uv_s: 283885.7143   (geostrophic nan)
+  lambda_t_uv_days: 3.2857   (geostrophic nan)
+  tau_uv (geostrophic baseline): 0.8458
+  tau_uv (4DVarNet): 0.8646
+  provisional batch-mean tau_uv: 0.8643 (geo 0.8456)
+  lambda_t_uv_days (model): 3.2857  [resolved_timescale on domain-mean UV series]
+OK: model beats geostrophic baseline on this test split
+Wrote E:\Projects\20260522-4DVarNets-sea-current\results\post_p0\metrics_B1-s0.json
+>> C:\Users\Administrator\MiniConda3\envs\faceswap\python.exe E:\Projects\20260522-4DVarNets-sea-current\scripts\train.py --config config/default.yaml --source natl60 --exp-name B1-s1 --epochs 15 --crop-size 96 --batch-size 1 --device cuda --seed 1 --use-sst 0 --use-sqg 0 --use-adv 0 --use-uncert 0
+device=cuda  epochs=15  source=natl60  crop_size=96  max_samples=None  batch_size=1  seed=1  commit=89f61b6
+physics scales: dx=4382.6 m  dy=5559.7 m  f0=7.000e-05
+epoch 1: train=7.1774 val=4.8494
+epoch 2: train=6.5206 val=4.7232
+epoch 3: train=6.0882 val=4.6708
+epoch 4: train=5.9715 val=4.5440
+epoch 5: train=6.0620 val=4.5974
+epoch 6: train=6.0183 val=5.0537
+epoch 7: train=6.1322 val=4.4560
+epoch 8: train=5.7035 val=4.2712
+epoch 9: train=5.8910 val=4.3688
+epoch 10: train=5.7533 val=4.6622
+epoch 11: train=6.1687 val=4.5617
+epoch 12: train=5.8868 val=4.3250
+epoch 13: train=5.7698 val=4.9400
+epoch 14: train=5.9056 val=4.8701
+epoch 15: train=5.7850 val=4.3448
+Best val loss: 4.2712  ckpt=4dvarnet-B1-s1-best.pt  seed=1
+>> C:\Users\Administrator\MiniConda3\envs\faceswap\python.exe E:\Projects\20260522-4DVarNets-sea-current\scripts\evaluate.py --config config/default.yaml --source natl60 --ckpt E:\Projects\20260522-4DVarNets-sea-current\checkpoints\4dvarnet-B1-s1-best.pt --crop-size 96 --batch-size 1 --device cuda --out E:\Projects\20260522-4DVarNets-sea-current\results\post_p0\metrics_B1-s1.json
+=== 4DVarNet test metrics ===
+  physics scales: dx=4382.6 m  dy=5559.7 m
+  aggregation: full-test pooled (concat windows, score once)
+  geostrophic baseline: OI/DUACS-only (not hybrid OI+sparse)
+  rmse_ssh: 0.0600   (geostrophic 0.0596)
+  rmse_u: 0.1849   (geostrophic 0.1936)
+  rmse_v: 0.1780   (geostrophic 0.1815)
+  rmse_uv: 0.1815   (geostrophic 0.1877)
+  tau_uv: 0.8558   (geostrophic 0.8458)
+  tau_div: -10.7943   (geostrophic -0.0006)
+  tau_vort: 0.1774   (geostrophic 0.1572)
+  tau_curl: 0.1774   (geostrophic 0.1572)
+  tau_strain: -0.7338   (geostrophic -0.1841)
+  lambda_x_ssh_km: 93.4961   (geostrophic 93.4961)
+  lambda_x_ssh_min_ratio: 0.0005   (geostrophic 0.0004)
+  lambda_x_ssh_resolved: 1.0000   (geostrophic 1.0000)
+  lambda_x_uv_km: 76.4968   (geostrophic 76.4968)
+  lambda_x_uv_min_ratio: 0.0040   (geostrophic 0.0035)
+  lambda_x_uv_resolved: 1.0000   (geostrophic 1.0000)
+  lambda_t_uv_s: 189257.1429   (geostrophic nan)
+  lambda_t_uv_days: 2.1905   (geostrophic nan)
+  tau_uv (geostrophic baseline): 0.8458
+  tau_uv (4DVarNet): 0.8558
+  provisional batch-mean tau_uv: 0.8556 (geo 0.8456)
+  lambda_t_uv_days (model): 2.1905  [resolved_timescale on domain-mean UV series]
+OK: model beats geostrophic baseline on this test split
+Wrote E:\Projects\20260522-4DVarNets-sea-current\results\post_p0\metrics_B1-s1.json
+>> C:\Users\Administrator\MiniConda3\envs\faceswap\python.exe E:\Projects\20260522-4DVarNets-sea-current\scripts\train.py --config config/default.yaml --source natl60 --exp-name B1-s2 --epochs 15 --crop-size 96 --batch-size 1 --device cuda --seed 2 --use-sst 0 --use-sqg 0 --use-adv 0 --use-uncert 0
+device=cuda  epochs=15  source=natl60  crop_size=96  max_samples=None  batch_size=1  seed=2  commit=89f61b6
+physics scales: dx=4382.6 m  dy=5559.7 m  f0=8.963e-05
+epoch 1: train=6.6999 val=4.7427
+epoch 2: train=6.1502 val=4.7760
+epoch 3: train=5.9630 val=4.4315
+epoch 4: train=5.7955 val=4.5808
+epoch 5: train=5.7470 val=4.3580
+epoch 6: train=5.7993 val=4.3752
+epoch 7: train=5.6405 val=4.5111
+epoch 8: train=6.2566 val=4.6393
+epoch 9: train=5.7528 val=4.3290
+epoch 10: train=5.8041 val=4.3839
+epoch 11: train=5.8737 val=4.2748
+epoch 12: train=5.5966 val=4.2347
+epoch 13: train=6.5256 val=7.1962
+epoch 14: train=6.5471 val=4.6686
+epoch 15: train=11.7595 val=8.4868
+Best val loss: 4.2347  ckpt=4dvarnet-B1-s2-best.pt  seed=2
+>> C:\Users\Administrator\MiniConda3\envs\faceswap\python.exe E:\Projects\20260522-4DVarNets-sea-current\scripts\evaluate.py --config config/default.yaml --source natl60 --ckpt E:\Projects\20260522-4DVarNets-sea-current\checkpoints\4dvarnet-B1-s2-best.pt --crop-size 96 --batch-size 1 --device cuda --out E:\Projects\20260522-4DVarNets-sea-current\results\post_p0\metrics_B1-s2.json
+=== 4DVarNet test metrics ===
+  physics scales: dx=4382.6 m  dy=5559.7 m
+  aggregation: full-test pooled (concat windows, score once)
+  geostrophic baseline: OI/DUACS-only (not hybrid OI+sparse)
+  rmse_ssh: 0.0579   (geostrophic 0.0596)
+  rmse_u: 0.1825   (geostrophic 0.1936)
+  rmse_v: 0.1730   (geostrophic 0.1815)
+  rmse_uv: 0.1778   (geostrophic 0.1877)
+  tau_uv: 0.8615   (geostrophic 0.8458)
+  tau_div: -9.3588   (geostrophic -0.0006)
+  tau_vort: 0.2873   (geostrophic 0.1572)
+  tau_curl: 0.2873   (geostrophic 0.1572)
+  tau_strain: -0.3704   (geostrophic -0.1841)
+  lambda_x_ssh_km: 93.4961   (geostrophic 93.4961)
+  lambda_x_ssh_min_ratio: 0.0003   (geostrophic 0.0004)
+  lambda_x_ssh_resolved: 1.0000   (geostrophic 1.0000)
+  lambda_x_uv_km: 76.4968   (geostrophic 76.4968)
+  lambda_x_uv_min_ratio: 0.0032   (geostrophic 0.0035)
+  lambda_x_uv_resolved: 1.0000   (geostrophic 1.0000)
+  lambda_t_uv_s: 1987200.0000   (geostrophic nan)
+  lambda_t_uv_days: 23.0000   (geostrophic nan)
+  tau_uv (geostrophic baseline): 0.8458
+  tau_uv (4DVarNet): 0.8615
+  provisional batch-mean tau_uv: 0.8614 (geo 0.8456)
+  lambda_t_uv_days (model): 23.0000  [resolved_timescale on domain-mean UV series]
+OK: model beats geostrophic baseline on this test split
+Wrote E:\Projects\20260522-4DVarNets-sea-current\results\post_p0\metrics_B1-s2.json
+>> C:\Users\Administrator\MiniConda3\envs\faceswap\python.exe E:\Projects\20260522-4DVarNets-sea-current\scripts\train.py --config config/default.yaml --source natl60 --exp-name B2-s0 --epochs 15 --crop-size 96 --batch-size 1 --device cuda --seed 0 --use-sst 1 --use-sqg 0 --use-adv 0 --use-uncert 0
+device=cuda  epochs=15  source=natl60  crop_size=96  max_samples=None  batch_size=1  seed=0  commit=89f61b6
+physics scales: dx=4382.6 m  dy=5559.7 m  f0=8.963e-05
+epoch 1: train=6.6450 val=4.8980
+epoch 2: train=5.9768 val=4.5208
+epoch 3: train=5.7981 val=4.3826
+epoch 4: train=5.6770 val=4.1105
+epoch 5: train=5.5001 val=4.1976
+epoch 6: train=5.5399 val=4.2047
+epoch 7: train=5.4625 val=4.1418
+epoch 8: train=5.4154 val=4.2837
+epoch 9: train=5.3565 val=4.1185
+epoch 10: train=5.3115 val=4.0567
+epoch 11: train=5.1971 val=3.8760
+epoch 12: train=5.1763 val=4.0071
+epoch 13: train=5.1783 val=4.0289
+epoch 14: train=5.1308 val=3.9630
+epoch 15: train=5.1323 val=3.9859
+Best val loss: 3.8760  ckpt=4dvarnet-B2-s0-best.pt  seed=0
+>> C:\Users\Administrator\MiniConda3\envs\faceswap\python.exe E:\Projects\20260522-4DVarNets-sea-current\scripts\evaluate.py --config config/default.yaml --source natl60 --ckpt E:\Projects\20260522-4DVarNets-sea-current\checkpoints\4dvarnet-B2-s0-best.pt --crop-size 96 --batch-size 1 --device cuda --out E:\Projects\20260522-4DVarNets-sea-current\results\post_p0\metrics_B2-s0.json

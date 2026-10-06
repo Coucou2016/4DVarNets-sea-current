@@ -2,6 +2,40 @@
 
 **Public repo:** [github.com/Coucou2016/4DVarNets-sea-current](https://github.com/Coucou2016/4DVarNets-sea-current)
 
+## Flat repository layout (intentional)
+
+> **This published tree is deliberately flat: every file sits directly at the
+> repository root, with no sub-directories.** Path separators are encoded as
+> `__` (e.g. `fourdvarnet/solver.py` → `fourdvarnet__solver.py`,
+> `docs/paper/PAPER.md` → `docs__paper__PAPER.md`). This is intentional, not a
+> broken export. The rationale is to let ChatGPT / other LLM agents and tools
+> fetch and read the complete code, docs, paper, report and core result data in
+> **a single directory listing (no recursion)**, enabling easy cross-review and
+> cross-audit by multiple agents.
+
+- Full explanation: [`FLAT_LAYOUT_NOTICE.md`](FLAT_LAYOUT_NOTICE.md)
+- Complete flat-name → original-path map (+ byte sizes): [`FLAT_FILE_INDEX.md`](FLAT_FILE_INDEX.md)
+- **To run the code**, either rebuild the structured tree with
+  `python flat_unflatten.py --out .` (then `python -m pytest tests/ -q`), or
+  check out the preserved runnable branch/tag: `git checkout structured` /
+  `git checkout v0.3.1-paper-report-pack`.
+- Re-flatten reproducibly with `python flat_flatten.py --dry-run`.
+
+Consequently, **all runnable commands and relative links in the sections below
+are written for the structured tree**; in the flat tree, prepend `__`-joined
+names or simply use `flat_unflatten.py` first. Common flat equivalents:
+
+| Structured (runnable) path | Flat name in this tree |
+|---|---|
+| `fourdvarnet/model.py` | `fourdvarnet__model.py` |
+| `data/natl60.py` | `data__natl60.py` |
+| `scripts/train.py` | `scripts__train.py` |
+| `tests/test_p0_correctness.py` | `tests__test_p0_correctness.py` |
+| `config/default.yaml` | `config__default.yaml` |
+| `docs/paper/PAPER.md` | `docs__paper__PAPER.md` |
+| `docs/report/report.html` / `report.pdf` | `docs__report__report.html` / `docs__report__report.pdf` |
+| `results/post_p0/metrics_B2-s0.json` | `results__post_p0__metrics_B2-s0.json` |
+
 **Compact 4DVarNet-inspired** implementation motivated by **Fablet et al. (2024)**, *Inversion of Sea Surface Currents From Satellite-Derived SST-SSH Synergies With 4DVarNets*, JAMES ([doi:10.1029/2023MS003609](https://doi.org/10.1029/2023MS003609)), plus physics-augmented variational cost terms for follow-on ablations.
 
 Reference code (full IMT stack): [CIA-Oceanix/4dvarnet-james-uv-ssc](https://github.com/CIA-Oceanix/4dvarnet-james-uv-ssc). This repo is **not** a byte-faithful Fablet reproduction (R0); a faithful R0 port is a later phase.

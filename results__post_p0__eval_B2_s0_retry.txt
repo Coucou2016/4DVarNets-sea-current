@@ -1,0 +1,27 @@
+=== 4DVarNet test metrics ===
+  physics scales: dx=4382.6 m  dy=5559.7 m
+  aggregation: full-test pooled (concat windows, score once)
+  geostrophic baseline: OI/DUACS-only (not hybrid OI+sparse)
+  rmse_ssh: 0.0635   (geostrophic 0.0596)
+  rmse_u: 0.1765   (geostrophic 0.1936)
+  rmse_v: 0.1666   (geostrophic 0.1815)
+  rmse_uv: 0.1716   (geostrophic 0.1877)
+  tau_uv: 0.8710   (geostrophic 0.8458)
+  tau_div: -4.8808   (geostrophic -0.0006)
+  tau_vort: 0.2987   (geostrophic 0.1572)
+  tau_curl: 0.2987   (geostrophic 0.1572)
+  tau_strain: -0.4550   (geostrophic -0.1841)
+  lambda_x_ssh_km: 93.4961   (geostrophic 93.4961)
+  lambda_x_ssh_min_ratio: 0.0003   (geostrophic 0.0004)
+  lambda_x_ssh_resolved: 1.0000   (geostrophic 1.0000)
+  lambda_x_uv_km: 76.4968   (geostrophic 76.4968)
+  lambda_x_uv_min_ratio: 0.0025   (geostrophic 0.0035)
+  lambda_x_uv_resolved: 1.0000   (geostrophic 1.0000)
+  lambda_t_uv_s: 220800.0000   (geostrophic nan)
+  lambda_t_uv_days: 2.5556   (geostrophic nan)
+  tau_uv (geostrophic baseline): 0.8458
+  tau_uv (4DVarNet): 0.8710
+  provisional batch-mean tau_uv: 0.8697 (geo 0.8456)
+  lambda_t_uv_days (model): 2.5556  [resolved_timescale on domain-mean UV series]
+OK: model beats geostrophic baseline on this test split
+Wrote E:\Projects\20260522-4DVarNets-sea-current\results\post_p0\metrics_B2-s0.json

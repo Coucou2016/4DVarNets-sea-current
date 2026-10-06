@@ -1,0 +1,6 @@
+Loading NATL60 paper-mode (obs+oi required)...
+Wrote E:\Projects\20260522-4DVarNets-sea-current\results\physics_ops\physics_ops_validation.json
+SQG tau_uv_mean=-0.0110  rmse_uv=0.4783
+Adv RMS truth=6.0587e-06  scrambled=2.2213e-05  zero=4.9740e-06
+CAUTION: SQG operator has near-zero / negative skill vs truth UV on this sample. Treat lam_sqg as a soft prior with caution; do not claim SQG recovers currents alone.
+Figures under E:\Projects\20260522-4DVarNets-sea-current\results\physics_ops

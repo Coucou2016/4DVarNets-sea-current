@@ -1,0 +1,11 @@
+SST coarsen factor=1 model=B2
+SST coarsen factor=4 model=B2
+SST coarsen factor=8 model=B2
+Altimetry thin keep_every=3 model=B2
+Strain binning model=B2
+SST coarsen factor=1 model=M3
+SST coarsen factor=4 model=M3
+SST coarsen factor=8 model=M3
+Altimetry thin keep_every=3 model=M3
+Strain binning model=M3
+Wrote E:\Projects\20260522-4DVarNets-sea-current\results\post_p0\sensitivity\sensitivity_summary.json
